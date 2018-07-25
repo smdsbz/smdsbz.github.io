@@ -666,4 +666,32 @@ For code, see [GitHub Repo](https://github.com/smdsbz/CS294-assignment/blob/mast
 
 ## Assignment 2
 
+### Section 4: Implement Policy Gradient
+
+**Networks**  
+
+1. Use `build_mlp` (Section 3) to create policy net, which takes in `observations` and gives logits of `actions`
+2. Choose / Sample one from `actions` based on calculated logits
+3. Calculate log probability of `actions` aginst their labels, i.e. error
+
+- `tf.nn.softmax_cross_entropy_with_logits_v2`
+    - Measures the probability error in **distance** classification tasks in which the classes are mutually exclusive.
+    - `logits` and `labels` must have the same shape, e.g. `[batch_size, num_classes]` and the same dtype (either `float16`, `float32` or `float64`)
+    - Backpropagation will happen into both `logits` and `labels`. To disallow backpropagation into `labels`, pass label tensors through `@{tf.stop_gradient}` before feeding it to this function
+- `tf.nn.sparse_softmax_cross_entropy_with_logits`
+    - Measures the probability error in **discrete** classification tasks in which the classes are mutually exclusive.
+    - A common use case is to have logits of shape `[batch_size, num_classes]` and labels of shape `[batch_size]`.
+
+> **Note**  
+> View **error** from a stocastic perspective: the higher an error is, the more the mean is deviated from the **most probable location** in the space (if you set label as **MPL** or **mean** roughly), i.e. less probability (or larger negative number in log space) at the spot where the error is calculated.  
+> In short, $$- \log{(\text{probability})} \Rightarrow \text{error}$$.  
+
+**Computing Q-Values**  
+
+- Policy gradient: $$\hat{g} = \mathbb{E}_\tau [ \sum_{t=0}^{T} \nabla \log{\pi(a_t | s_t)} \cdot (Q_t - b_t) ]$$
+- Q-value: $$Q_t$$
+    - trajectory-based (all along trajectory): $$\sum_{t'=0}^{T} \gamma^{t'} r_{t'}$$
+    - reward-to-go (from current timestep to future): $$\sum_{t'=t}^{T} \gamma^{t'-t} r_{t'}$$
+
 For code, see [GitHub Repo](https://github.com/smdsbz/CS294-assignment/blob/master/hw2/train_pg.py)
+
