@@ -666,5 +666,4 @@ For code, see [GitHub Repo](https://github.com/smdsbz/CS294-assignment/blob/mast
 
 ## Assignment 2
 
-**Simple MDP: Frozen Lake**  
-
+For code, see [GitHub Repo](https://github.com/smdsbz/CS294-assignment/blob/master/hw2/train_pg.py)
