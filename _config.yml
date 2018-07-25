@@ -109,6 +109,8 @@ pageview:
 #   google:
 #     tracking_id: UA-71907556-1
 
+toc:
+  selectors: "h1,h2,h3"
 
 ## => Build
 ##############################
