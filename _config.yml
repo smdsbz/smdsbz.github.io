@@ -16,41 +16,42 @@
 
 ## => Site Settings
 ##############################
-url: https://tianqi.name
+url: https://smdsbz.github.io
 baseurl: /
-title: Qi's Site
+title: "Xiaoguang Zhu's Blog"
 description: >
-    Tian Qi's Site | 田琦的小站
+    CS Undergrad @ HUST
 
 
 ## => Language and Timezone
 ##############################
-lang: zh
+lang: en
 timezone: Asia/Shanghai
 
 
 ## => Author and Social
 ##############################
 author:
-  name: Tian Qi
-  email: kitian616@outlook.com
-  twitter: kitian616
-  github:  kitian616
-  googleplus: 101827554735084402671
-  weibo: 234695683
-  douban: kitian616
+  name: Xiaoguang Zhu
+  avatar: ./assets/images/swag-dog.jpg
+  email: steamstuffedbun@gmail.com
+  # twitter: kitian616
+  github: smdsbz
+  # googleplus: 101827554735084402671
+  # weibo: 234695683
+  # douban: kitian616
 
 
 ## => GitHub Repository (if the site is hosted by GitHub)
 ##############################
-repository: kitian616/kitian616.github.io
+repository: smdsbz/smdsbz.github.io
 repository_tree: master
 
 
 ## => Paths
 ##############################
 paths:
-  root: /
+  root: /blog
   home: /blog
   archive: /blog/archive.html
   rss:  /feed.xml
@@ -63,7 +64,13 @@ excerpt_separator: <!--more-->
 excerpt_type: html # text (default), html
 
 ## license
-license: CC-BY-4.0
+license: CC-BY-NC-4.0
+
+
+## => Themes
+##############################
+text_skin: forest
+highlight_theme: tomorrow
 
 
 ## => Paginate
@@ -75,27 +82,36 @@ paginate_path: /blog/page:num
 ## => Comments
 ##############################
 comments:
-  provider: disqus
-  disqus:
-    shortname: kitian616-github-io
+  provider: gitalk
+  gitalk:
+    clientID    : 3793f3613e5597e98621
+    clientSecret: 627cc23140d8aff1474645feddbd46a68dc41007
+    repository  : smdsbz/smdsbz.github.io
+    owner       : smdsbz
+    admin:
+      - smdsbz
 
+
+mathjax: true
+mermaid: true
+chart: true
 
 ## => Pageview
 ##############################
 pageview:
   provider: leancloud
   leancloud:
-    app_id: uAG3OhdcH8H4fxSqXLyBljA7-gzGzoHsz
-    app_key: Mzf5m9skSwYVWVXhGiYMNyXs
-    app_class: ThomasBlog
+    app_id: 1AW2cAb1zQmW1iCS5EXu26Pf-gzGzoHsz
+    app_key: aQ0HJDT7L5nQlFmqGXKjJVHw
+    app_class: github-page
 
 
 ## => Analytics
 ##############################
-analytics:
-  provider: google
-  google:
-    tracking_id: UA-71907556-1
+# analytics:
+#   provider: google
+#   google:
+#     tracking_id: UA-71907556-1
 
 
 ## => Build
@@ -143,6 +159,8 @@ plugins:
   - jekyll-paginate
   - jemoji
 
+
+sources: bootcdn
 
 ## => Server
 ##############################
