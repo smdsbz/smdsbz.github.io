@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: article
 title: WeChat Mini-App Dev Notes
 ---
 

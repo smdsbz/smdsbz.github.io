@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: article
 title: Living in Arch, i3wm, Vim etc
 ---
 

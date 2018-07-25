@@ -1,6 +1,5 @@
 ---
-layout: post
-author: smdsbz
+layout: article
 title: Digital Logic Notes
 ---
 

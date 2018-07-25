@@ -1,7 +1,5 @@
-# tianqi.name
+# GitHub Page of smdsbz
 
-My Personal Website:
+Theme forked from here => [tianqi.name](https://tianqi.name).  
 
-Visit => [tianqi.name](https://tianqi.name).
-
-Powered by [Jekyll](http://jekyllrb.com/) & [TeXt Theme](https://github.com/kitian616/jekyll-TeXt-theme).
+Powered by [Jekyll](http://jekyllrb.com/) & this amazing [TeXt Theme](https://github.com/kitian616/jekyll-TeXt-theme) all about simplicity.  

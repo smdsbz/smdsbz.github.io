@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: article
 title: Tree Boosting and XGBoost
 ---
 

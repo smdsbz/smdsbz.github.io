@@ -92,10 +92,6 @@ comments:
       - smdsbz
 
 
-mathjax: true
-mermaid: true
-chart: true
-
 ## => Pageview
 ##############################
 pageview:
@@ -149,6 +145,9 @@ defaults:
         toc: true
       show_edit_on_github: true
       pageview: true
+      mathjax: true
+      mermaid: true
+      chart: true
 
 
 ## => Plugins

@@ -1,6 +1,5 @@
 ---
-layout: post
-author: smdsbz
+layout: article
 title: Introduction to Computer Systems Notes
 ---
 

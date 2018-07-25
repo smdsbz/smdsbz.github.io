@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: article
 title: Analog Circuits Quick-Ref
 ---
 

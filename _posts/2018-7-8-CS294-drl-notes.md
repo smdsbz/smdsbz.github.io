@@ -1,6 +1,5 @@
 ---
-layout: post
-author: smdsbz
+layout: article
 title: CS294 Deep Reinforcement Learning Notes
 ---
 
