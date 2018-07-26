@@ -5,7 +5,7 @@ key: assembly-language-notes
 tags: AssemblyLanguage CourseNotes
 ---
 
-<-!-- more -->
+<!-- more -->
 
 {:toc}
 
