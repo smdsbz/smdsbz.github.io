@@ -416,8 +416,8 @@ _Dealing with infinite, or large, timestep._
 -   Discounted problem can be obtained by adding transitions to *sink state*, where agent gets stuck and recieves zero reward
 
     $$
-    \tilde{P}(s' | s, a) = \begin{cases}
-    P(s' | s, a) \text{ with probability } \gamma \\
+    \tilde{P}(s' \vert s, a) = \begin{cases}
+    P(s' \vert s, a) \text{ with probability } \gamma \\
     \text{sink state with probability } 1 - \gamma
     \end{cases}
     $$
@@ -435,7 +435,7 @@ _Dealing with infinite, or large, timestep._
 -   V.I. update is a function $$\mathcal{T}: \mathbb{R}^{\#\mathcal{S}} \rightarrow \mathbb{R}^{\#\mathcal{S}}$$, called *backup operator*
 
     $$
-    V_{n+1} = [\mathcal{T} V_n](s) = \max_a \mathbb{E}_{s' | s, a} [ r + \gamma V_n(s') ]
+    V_{n+1} = [\mathcal{T} V_n](s) = \max_a \mathbb{E}_{s' \vert s, a} [ r + \gamma V_n(s') ]
     $$
 
 -   $$\mathcal{T}$$ is a contraction, that is
@@ -449,13 +449,13 @@ _Dealing with infinite, or large, timestep._
 **Problem:** evaluate fixed policy $$\pi$$
 
 $$
-V^{\pi, \gamma}(s) = \mathbb{E} [ r_0 + \gamma r_1 + \gamma^2 r_2 + \cdots | s_0 = s ]
+V^{\pi, \gamma}(s) = \mathbb{E} [ r_0 + \gamma r_1 + \gamma^2 r_2 + \cdots \vert s_0 = s ]
 $$
 
 Backwards recursion involves a backup operator $$V_t = \mathcal{T}^\pi V_{t+1}$$ where
 
 $$
-[\mathcal{T}^\pi V] = \mathbb{E}_{s' | s, a=\pi(s)} [ r + \gamma V(s') ]
+[\mathcal{T}^\pi V] = \mathbb{E}_{s' \vert s, a=\pi(s)} [ r + \gamma V(s') ]
 $$
 
 Alternate between  
@@ -463,7 +463,7 @@ Alternate between
 2.  Set new policy to be *greedy* policy for $$V^\pi$$
 
     $$
-    \pi(s) = \arg \max_a \mathbb{E}_{s' | s, a} [ r + \gamma V^\pi(s') ]
+    \pi(s) = \arg \max_a \mathbb{E}_{s' \vert s, a} [ r + \gamma V^\pi(s') ]
     $$
 
 #### Modified Policy Iteration
@@ -498,7 +498,7 @@ Analogous to classification or regression with input $$s$$, output $$a$$.
 **Goal**  
 
 $$
-\text{maximize} \, \mathbb{E} [ R | \pi_\theta ]
+\text{maximize} \, \mathbb{E} [ R \vert \pi_\theta ]
 $$
 
 **Intuitions**  
@@ -510,16 +510,16 @@ Collect a bunch of trajectories, and...
 
 #### Score Function Gradient Estimator
 
-Have expectation $$\mathbb{E}_{x \sim p(x | \theta)} [ f(x) ]$$, want gradient w.r.t. $$\theta$$.  
+Have expectation $$\mathbb{E}_{x \sim p(x \vert \theta)} [ f(x) ]$$, want gradient w.r.t. $$\theta$$.  
 
 $$
 \begin{align}
 \nabla_\theta \mathbb{E}_x [ f(x) ]
-&= \nabla_\theta \int dx \, p(x | \theta) f(x) \\
-&= \int dx \, \nabla_\theta p(x | \theta) f(x) \\
-&= \int dx \, p(x | \theta) \frac{\nabla_\theta p(x | \theta)}{p(x | \theta)} f(x) \\
-&= \int dx \, p(x | \theta) \nabla_\theta \log{p(x | \theta)} f(x) \\
-&= \mathbb{E}_x [ f(x) \nabla_\theta \log{p(x | \theta)} ] \,.
+&= \nabla_\theta \int dx \, p(x \vert \theta) f(x) \\
+&= \int dx \, \nabla_\theta p(x \vert \theta) f(x) \\
+&= \int dx \, p(x \vert \theta) \frac{\nabla_\theta p(x \vert \theta)}{p(x \vert \theta)} f(x) \\
+&= \int dx \, p(x \vert \theta) \nabla_\theta \log{p(x \vert \theta)} f(x) \\
+&= \mathbb{E}_x [ f(x) \nabla_\theta \log{p(x \vert \theta)} ] \,.
 \end{align}
 $$
 
@@ -529,23 +529,23 @@ $$
 Now we have the gradient  
 
 $$
-\hat{g}_i = f(x_i) \nabla_\theta \log{p(x | \theta)}
+\hat{g}_i = f(x_i) \nabla_\theta \log{p(x \vert \theta)}
 $$
 
 Then substitute $$f(x)$$ with whatever you want, say $$R(\tau)$$, where $$x$$ is substituted with the whole trajectory $$\tau = (s_0, a_0, r_0, s_1, a_1, r_1, \dots, s_{T-1}, a_{T-1}, r_{T-1}, s_T)$$, we get  
 
 $$
-\nabla_\theta \mathbb{E}_\tau [ R(\tau) ] = \mathbb{E}_\tau [ \nabla_\theta \log{p(\tau | \theta)} R(\tau) ]
+\nabla_\theta \mathbb{E}_\tau [ R(\tau) ] = \mathbb{E}_\tau [ \nabla_\theta \log{p(\tau \vert \theta)} R(\tau) ]
 $$
 
-Then we look at $$p(\tau | \theta)$$.  
+Then we look at $$p(\tau \vert \theta)$$.  
 
 $$
 \begin{align}
-p(\tau | \theta) &= \mu(s_0) \prod_{t=0}^{T-1} [ \pi(a_t | s_t, \theta) P(s_{t+1, r_t | s_t, a_t}) ] \\
-\log{p(\tau | \theta)} &= \log{\mu(s_0)} + \sum_{t=0}^{T-1} [ \log{\pi(a_t | s_t, \theta)} + \log{P(s_{t+1}, r_t | s_t, a_t)} ] \\
-\nabla_\theta \log{p(\tau | \theta)} &= \nabla_\theta \sum_{t=0}^{T-1} \log{\pi(a_t | s_t, \theta)} \\
-\nabla_\theta \mathbb{E}_\tau[R] &= \mathbb{E}_\tau \bigg[ R \, \nabla_\theta \sum_{t=0}^{T-1} \log{\pi(a_t | s_t, \theta)} \bigg]
+p(\tau \vert \theta) &= \mu(s_0) \prod_{t=0}^{T-1} [ \pi(a_t \vert s_t, \theta) P(s_{t+1, r_t \vert s_t, a_t}) ] \\
+\log{p(\tau \vert \theta)} &= \log{\mu(s_0)} + \sum_{t=0}^{T-1} [ \log{\pi(a_t \vert s_t, \theta)} + \log{P(s_{t+1}, r_t \vert s_t, a_t)} ] \\
+\nabla_\theta \log{p(\tau \vert \theta)} &= \nabla_\theta \sum_{t=0}^{T-1} \log{\pi(a_t \vert s_t, \theta)} \\
+\nabla_\theta \mathbb{E}_\tau[R] &= \mathbb{E}_\tau \bigg[ R \, \nabla_\theta \sum_{t=0}^{T-1} \log{\pi(a_t \vert s_t, \theta)} \bigg]
 \end{align}
 $$
 
@@ -554,7 +554,7 @@ $$
 Further reduce variance by introducing baseline $$b(S)$$.  
 
 $$
-\nabla_\theta \mathbb{E}_\tau[R] = \mathbb{E}_\tau \bigg[ \sum_{t=0}^{T-1} \nabla_\theta \log{\pi(a_t | s_t, \theta)} \bigg( \sum_{t' = t}^{T-1} r_{t'} - b(s_t) \bigg) \bigg]
+\nabla_\theta \mathbb{E}_\tau[R] = \mathbb{E}_\tau \bigg[ \sum_{t=0}^{T-1} \nabla_\theta \log{\pi(a_t \vert s_t, \theta)} \bigg( \sum_{t' = t}^{T-1} r_{t'} - b(s_t) \bigg) \bigg]
 $$
 
 -   Near optimal choice is expected return,
@@ -568,7 +568,7 @@ $$
 Introduce discount factor $$\gamma$$, which ignores delayed effects between actions and rewards.  
 
 $$
-\nabla_\theta \mathbb{E}_\tau[R] \approx \mathbb{E}_\tau \bigg[ \sum_{t=0}^{T-1} \nabla_\theta \log{\pi(a_t | s_t, \theta)} \bigg( \sum_{t' = t}^{T-1} \gamma^{t' - t} r_{t'} - b(s_t) \bigg) \bigg]
+\nabla_\theta \mathbb{E}_\tau[R] \approx \mathbb{E}_\tau \bigg[ \sum_{t=0}^{T-1} \nabla_\theta \log{\pi(a_t \vert s_t, \theta)} \bigg( \sum_{t' = t}^{T-1} \gamma^{t' - t} r_{t'} - b(s_t) \bigg) \bigg]
 $$
 
 -   want
@@ -590,7 +590,7 @@ $$
 &\hspace{1em} \text{Re-fit the baseline, by minimizing } \| b(s_t) - R_t \| ^2 \\
 &\hspace{2em} \text{summed over all trajectories and timesteps.} \\
 &\hspace{1em} \text{Update the policy, using a policy gradient estimate } \hat{g} \text{,} \\
-&\hspace{2em} \text{which is a sum of terms } \nabla_\theta \log{\pi(a_t | s_t, \theta)} \hat{A}_t \text{.} \\
+&\hspace{2em} \text{which is a sum of terms } \nabla_\theta \log{\pi(a_t \vert s_t, \theta)} \hat{A}_t \text{.} \\
 &\textbf{end for}
 \end{align}
 $$
@@ -600,7 +600,7 @@ $$
 -   Q-Function / state-action-value function
 
     $$
-    Q^{\pi, \gamma}(s, a) = \mathbb{E}_\pi [ r_0 + \gamma r_1 + \gamma^2 r_2 + \cdots | s_0 = s, a_0 = a ]
+    Q^{\pi, \gamma}(s, a) = \mathbb{E}_\pi [ r_0 + \gamma r_1 + \gamma^2 r_2 + \cdots \vert s_0 = s, a_0 = a ]
     $$
 
 -   state-value function
@@ -608,7 +608,7 @@ $$
     $$
     \begin{align}
     V^{\pi, \gamma}(s)
-    &= \mathbb{E}_\pi [ r_0 + \gamma r_1 + \gamma^2 r_2 + \cdots | s_0 = s ] \\
+    &= \mathbb{E}_\pi [ r_0 + \gamma r_1 + \gamma^2 r_2 + \cdots \vert s_0 = s ] \\
     &= \mathbb{E}_{a \sim \pi} [ Q^{\pi, \gamma}(s, a) ]
     \end{align}
     $$
@@ -624,9 +624,9 @@ $$
 $$
 \begin{align}
 \nabla_\theta \mathbb{E}_\tau [ R ]
-&= \mathbb{E}_\tau \bigg[ \sum_{t=0}^{T-1} \nabla_\theta \log{\pi(a_t | s_t, \theta)} Q^{\pi}(s_t, a_t) \bigg] \\
-&= \mathbb{E}_\tau \bigg[ \sum_{t=0}^{T-1} \nabla_\theta \log{\pi(a_t | s_t, \theta)} A^\pi(s_t, a_t) \bigg] \\
-&\approx \mathbb{E}_\tau \bigg[ \sum_{t=0}^{T-1} \nabla_\theta \log{\pi(a_t | s_t, \theta)|} A^{\pi, \gamma}(s_t, a_t) \bigg]
+&= \mathbb{E}_\tau \bigg[ \sum_{t=0}^{T-1} \nabla_\theta \log{\pi(a_t \vert s_t, \theta)} Q^{\pi}(s_t, a_t) \bigg] \\
+&= \mathbb{E}_\tau \bigg[ \sum_{t=0}^{T-1} \nabla_\theta \log{\pi(a_t \vert s_t, \theta)} A^\pi(s_t, a_t) \bigg] \\
+&\approx \mathbb{E}_\tau \bigg[ \sum_{t=0}^{T-1} \nabla_\theta \log{\pi(a_t \vert s_t, \theta)|} A^{\pi, \gamma}(s_t, a_t) \bigg]
 \end{align}
 $$
 
@@ -689,7 +689,7 @@ For code, see [GitHub Repo](https://github.com/smdsbz/CS294-assignment/blob/mast
 
 **Computing Q-Values**  
 
-- Policy gradient: $$\hat{g} = \mathbb{E}_\tau [ \sum_{t=0}^{T} \nabla \log{\pi(a_t | s_t)} \cdot (Q_t - b_t) ]$$
+- Policy gradient: $$\hat{g} = \mathbb{E}_\tau [ \sum_{t=0}^{T} \nabla \log{\pi(a_t \vert s_t)} \cdot (Q_t - b_t) ]$$
 - Q-value: $$Q_t$$
     - trajectory-based (all along trajectory): $$\sum_{t'=0}^{T} \gamma^{t'} r_{t'}$$
     - reward-to-go (from current timestep to future): $$\sum_{t'=t}^{T} \gamma^{t'-t} r_{t'}$$
