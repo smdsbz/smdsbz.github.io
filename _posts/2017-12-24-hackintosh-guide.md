@@ -1,6 +1,7 @@
 ---
 layout: article
 title: The Possibly General Hackintosh Guide
+key: the-possibly-general-hackintosh-guide
 tags: Hackintosh
 ---
 

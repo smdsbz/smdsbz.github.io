@@ -1,6 +1,7 @@
 ---
 layout: article
 title: WeChat Mini-App Dev Notes
+key: wechat-miniapp-dev-notes
 tags: Web WeChatMiniapp
 ---
 

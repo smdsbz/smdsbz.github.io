@@ -1,6 +1,8 @@
 ---
 layout: article
 title: Digital Logic Notes
+key: digital-logic-notes
+tags: CourseNotes
 ---
 
 <!-- more -->

@@ -1,6 +1,7 @@
 ---
 layout: article
 title: Tree Boosting and XGBoost
+key: tree-boosting-and-xgboost
 tags: MachineLearning
 ---
 

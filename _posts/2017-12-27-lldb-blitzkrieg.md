@@ -1,6 +1,7 @@
 ---
 layout: article
 title: LLDB Blitzkrieg
+key: lldb-blitzkrieg
 tags: UnixTools
 ---
 

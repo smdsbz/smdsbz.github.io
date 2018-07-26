@@ -1,6 +1,7 @@
 ---
 layout: article
 title: Introduction to Computer Systems Notes
+key: intro-to-cs-notes
 tags: CourseNotes
 ---
 

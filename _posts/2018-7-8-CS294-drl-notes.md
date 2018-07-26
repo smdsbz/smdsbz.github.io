@@ -1,6 +1,7 @@
 ---
 layout: article
 title: CS294 Deep Reinforcement Learning Notes
+key: cs294-drl-learning-notes
 tags: MachineLearning DeepLearning ReinforcementLearning
 ---
 

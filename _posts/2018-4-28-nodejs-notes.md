@@ -1,6 +1,7 @@
 ---
 layout: article
 title: Node.js Notes
+key: nodejs-notes
 tags: Web Javascript
 ---
 

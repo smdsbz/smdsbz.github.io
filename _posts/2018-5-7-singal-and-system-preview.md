@@ -1,6 +1,7 @@
 ---
 layout: article
 title: Signal and System Notes
+key: signal-and-system-notes
 tags: CourseNotes
 ---
 

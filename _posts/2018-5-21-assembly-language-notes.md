@@ -1,10 +1,11 @@
 ---
 layout: article
 title: Assembly Language Notes
+key: assembly-language-notes
 tags: AssemblyLanguage CourseNotes
 ---
 
-<!-- more -->
+<-!-- more -->
 
 {:toc}
 

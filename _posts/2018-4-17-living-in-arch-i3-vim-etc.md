@@ -1,6 +1,7 @@
 ---
 layout: article
 title: Living in Arch, i3wm, Vim etc
+key: living-in-arch-i3wm-vim
 tags: Linux Vim
 ---
 
