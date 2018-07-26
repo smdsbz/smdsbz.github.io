@@ -6,6 +6,8 @@ tags: Web WeChatMiniapp
 
 Random notes on WeChapp mini-app.
 
+<!-- more -->
+
 ### HowTo
 
 #### Line Input Field

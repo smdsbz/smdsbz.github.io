@@ -4,6 +4,8 @@ title: Assembly Language Notes
 tags: AssemblyLanguage CourseNotes
 ---
 
+<!-- more -->
+
 {:toc}
 
 ### MASM Code

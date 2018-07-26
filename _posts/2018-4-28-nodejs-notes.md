@@ -6,6 +6,8 @@ tags: Web Javascript
 
 Random notes on Nodejs.
 
+<!-- more -->
+
 ### HowTo
 
 #### Start a Waterfall

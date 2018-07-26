@@ -4,6 +4,8 @@ title: CS294 Deep Reinforcement Learning Notes
 tags: MachineLearning DeepLearning ReinforcementLearning
 ---
 
+<!-- more -->
+
 {:toc}
 
 ---

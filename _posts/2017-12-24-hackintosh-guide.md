@@ -7,6 +7,8 @@ tags: Hackintosh
 General purpose tutorial on hackintosh, that comes with **absolutely no
 warranty** :smirk:
 
+<!--more-->
+
 ### Current Specs.
 
 - Model: Asus U3000ua

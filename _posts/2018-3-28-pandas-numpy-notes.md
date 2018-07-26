@@ -6,6 +6,8 @@ tags: python
 
 `pandas` and `numpy` quick-ref list index
 
+<!-- more -->
+
 ### HowTo
 
 #### Reading the **Notorious** Excel files

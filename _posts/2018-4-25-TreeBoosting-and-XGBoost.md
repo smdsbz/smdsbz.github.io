@@ -6,6 +6,8 @@ tags: MachineLearning
 
 Learning notes of Boosted Tree and XGBoost.  
 
+<!-- more -->
+
 {:toc}
 
 -----------------------------------------

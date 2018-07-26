@@ -6,6 +6,8 @@ tags: Linux Vim
 
 Starting as a basic reminder of the special hacks.  
 
+<!-- more -->
+
 [TOC]
 
 #### Chinese input method

@@ -6,6 +6,8 @@ tags: UnixTools
 
 Simple demonstration of `lldb` capabilities.
 
+<!--more-->
+
 ```
 $ clang++ -Wall -std=c++1z -g ...
 $ lldb a.out
