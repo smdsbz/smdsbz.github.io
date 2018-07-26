@@ -82,14 +82,9 @@ paginate_path: /blog/page:num
 ## => Comments
 ##############################
 comments:
-  provider: gitalk
-  gitalk:
-    clientID    : 3793f3613e5597e98621
-    clientSecret: 627cc23140d8aff1474645feddbd46a68dc41007
-    repository  : smdsbz/smdsbz.github.io
-    owner       : smdsbz
-    admin:
-      - smdsbz
+  provider: disqus
+  disqus:
+    shortname: smdsbz-github-io
 
 
 ## => Pageview
@@ -104,10 +99,11 @@ pageview:
 
 ## => Analytics
 ##############################
-# analytics:
-#   provider: google
-#   google:
-#     tracking_id: UA-71907556-1
+analytics:
+  provider: google
+  google:
+    tracking_id: UA-122953339-1
+    anonymize_op: true
 
 toc:
   selectors: "h1,h2"
