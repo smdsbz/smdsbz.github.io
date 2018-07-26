@@ -1,6 +1,7 @@
 ---
 layout: article
 title: Node.js Notes
+tags: Web Javascript
 ---
 
 Random notes on Nodejs.

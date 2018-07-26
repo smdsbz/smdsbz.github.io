@@ -1,6 +1,7 @@
 ---
 layout: article
 title: Signal and System Notes
+tags: CourseNotes
 ---
 
 Preparation notes for upcomming Signal and System test.  

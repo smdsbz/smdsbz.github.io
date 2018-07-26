@@ -1,6 +1,7 @@
 ---
 layout: article
 title: WeChat Mini-App Dev Notes
+tags: Web WeChatMiniapp
 ---
 
 Random notes on WeChapp mini-app.

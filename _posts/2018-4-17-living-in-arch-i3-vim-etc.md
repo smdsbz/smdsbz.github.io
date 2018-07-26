@@ -1,6 +1,7 @@
 ---
 layout: article
 title: Living in Arch, i3wm, Vim etc
+tags: Linux Vim
 ---
 
 Starting as a basic reminder of the special hacks.  

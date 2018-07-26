@@ -1,6 +1,7 @@
 ---
 layout: article
 title: LLDB Blitzkrieg
+tags: UnixTools
 ---
 
 Simple demonstration of `lldb` capabilities.

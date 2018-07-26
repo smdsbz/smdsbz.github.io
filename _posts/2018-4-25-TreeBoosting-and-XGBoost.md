@@ -1,6 +1,7 @@
 ---
 layout: article
 title: Tree Boosting and XGBoost
+tags: MachineLearning
 ---
 
 Learning notes of Boosted Tree and XGBoost.  

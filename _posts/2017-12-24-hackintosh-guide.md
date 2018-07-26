@@ -1,6 +1,7 @@
 ---
 layout: article
 title: The Possibly General Hackintosh Guide
+tags: Hackintosh
 ---
 
 General purpose tutorial on hackintosh, that comes with **absolutely no

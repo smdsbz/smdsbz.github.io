@@ -1,6 +1,7 @@
 ---
 layout: article
 title: Pandas and Numpy Notes
+tags: python
 ---
 
 `pandas` and `numpy` quick-ref list index

@@ -1,6 +1,7 @@
 ---
 layout: article
 title: Analog Circuits Quick-Ref
+tags: CourseNotes
 ---
 
 Quick reference for Analog Circuits.  

@@ -1,6 +1,7 @@
 ---
 layout: article
 title: Introduction to Computer Systems Notes
+tags: CourseNotes
 ---
 
 {:toc}

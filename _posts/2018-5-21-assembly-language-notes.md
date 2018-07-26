@@ -1,6 +1,7 @@
 ---
 layout: article
 title: Assembly Language Notes
+tags: AssemblyLanguage CourseNotes
 ---
 
 {:toc}
