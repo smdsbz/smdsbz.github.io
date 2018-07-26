@@ -6,7 +6,7 @@ tags: UnixTools
 
 Simple demonstration of `lldb` capabilities.
 
-<!--more-->
+<!-- more -->
 
 ```
 $ clang++ -Wall -std=c++1z -g ...
