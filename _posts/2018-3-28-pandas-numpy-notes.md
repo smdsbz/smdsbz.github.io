@@ -2,7 +2,7 @@
 layout: article
 title: Pandas and Numpy Notes
 key: pandas-and-numpy-notes
-tags: python
+tags: Python
 ---
 
 `pandas` and `numpy` quick-ref list index

@@ -69,7 +69,7 @@ license: CC-BY-NC-4.0
 
 ## => Themes
 ##############################
-text_skin: forest
+text_skin: default
 highlight_theme: tomorrow
 
 
