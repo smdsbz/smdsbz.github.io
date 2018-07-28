@@ -650,7 +650,7 @@ Q^\pi(s_0, a_0)
 \end{align}
 $$
 
-Define the Bellman backup operator (operating on Q-functions) as follows  
+Define the Bellman backup operator (operating on Q functions) as follows  
 
 $$
 [\mathcal{T}^\pi Q](s_0, a_0) = \mathbb{E}_{s_1 \sim P(s_1 \vert s_0, a_0)} [ r_0 + \gamma \mathbb{E}_{a_1 \sim \pi}[Q(s_1, a_1)] ]
@@ -715,7 +715,7 @@ $$
 
 ### Function Approximation / Neural-Fitted Algorithms
 
-- Parameterize Q-function with a neural network $$Q_\theta$$
+- Parameterize Q function with a neural network $$Q_\theta$$
 - To approximate $$Q \leftarrow \widehat{\mathcal{T}Q}$$, do
 
     $$
@@ -743,7 +743,7 @@ $$
 ### Key Terms
 
 - Replay memory $$\mathcal{D}$$: history of last $$N$$ transitions
-- Target network: old Q-function $$Q^{(n)}$$ that is fixed over many (~ 10,000) timesteps, while $$Q \Rightarrow \mathcal{T}Q^{(n)}$$
+- Target network: old Q function $$Q^{(n)}$$ that is fixed over many (~ 10,000) timesteps, while $$Q \Rightarrow \mathcal{T}Q^{(n)}$$
 
 ### Deep Q-learning with Experience Replay
 
@@ -772,6 +772,65 @@ $$
 - $$\phi$$: preprocessed input, e.g. image, $$\approx s$$
 - $$\gamma$$: our good ol' discount factor
     - Assuming actions far in the past contribute less to the present, for their influences are *indirect*
+
+### Double Q-learning
+
+- $$\mathbb{E}_{x_1, x_2}[\max(x_1, x_2)] \geq \max (\mathbb{E}_{x_1, x_2}[x_1], \mathbb{E}[x_2])$$
+- Q values are noisy, thus $$r + \gamma \max_{a'} Q(s', a')$$ is an overestimate
+
+**Solution**  
+
+Use two networks $$Q_A, Q_B$$, and compute $$\arg\max$$ with the other network
+
+$$
+\begin{align}
+Q_A(s, a) &\leftarrow r + \gamma Q(s', \arg\max_{a'} Q_B(s', a')) \\
+Q_B(s, a) &\leftarrow r + \gamma Q(s', \arg\max_{a'} Q_A(s', a'))
+\end{align}
+$$
+
+- Two Q functions of different noise, avoid overestimation and converges faster
+
+### Dueling Net
+
+$$
+Q(s, a) = V(s) + A(s, a)
+$$
+
+$$\vert V \vert$$ has larger scale than $$\vert A \vert$$ by $$\approx 1 / (1 - \gamma)$$, for good states contributes more to the final goal than those good actions at given states do. But small differences $$A(s, a) - A(s, a')$$ determine policy, therefore they could be easily *submerged* by the swing in $$\vert V \vert$$!
+
+**Solution**  
+
+Parameterize Q function as follows  
+
+$$
+Q_\theta(s, a) = V_\theta(s) + \underbrace{F_\theta(s, a) - \text{mean}_{a'}F_\theta(s, a')}_{``\text{Advantage''} \text{ part}}
+$$
+
+### Prioritized Replay
+
+- Bellman error loss: $$\sum_{i \in \mathcal{D}} \lVert Q_\theta(s_i, a_i) - \hat{Q}_t \rVert ^2 / 2$$
+- Can use importance sampling to favor timestep $$i$$ with large gradient, allowing faster backwards propagation of reward info
+- Use last Bellman error $$\vert \delta_i \vert$$, where $$\delta_i = Q_\theta(s_i, a_i) - \hat{Q}_t$$ as proxy for size of gradient
+
+### Practical Tips
+
+- User *Huber loss* on Bellman error
+
+    $$
+    \begin{align*}
+    L(x) = \begin{cases}
+           x^2 / 2 &\text{if } \vert x \vert \leq \delta \\
+           \delta \vert x \vert - \delta^2 / 2 &\text{otherwise}
+           \end{cases}
+    \end{align*}
+    $$
+
+- Use Double DQN
+- Try your own skills at navigating the environment based on processed frames, in order to test out your data preprocessing (e.g. image down-sampling)
+- Always run at least two different seeds when experimenting
+- Learning rate schedueling, try high ones in initial exploring period
+- Try non-standard exploring schedules
 
 ---
 
