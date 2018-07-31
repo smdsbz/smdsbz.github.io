@@ -317,6 +317,7 @@ Simulate expert policies at states that are slightly off, by generating a correc
 
 
 
+
 ### Movement with Model Uncertianty
 
 - Generate noisy models varying:
@@ -359,6 +360,7 @@ Defined by the following components:
   $$
   \tilde{s}_0 = \{ y_0 \} ,\, \tilde{s}_1 = \{ y_0, y_1 \} ,\, \tilde{s}_2 = \{ y_0, y_1, y_2 \} ,\, \dots
   $$
+
 
 ### Problems Involving MDPs
 
@@ -409,6 +411,7 @@ _General idea of LQR algorithm._
   V_{T-1} = \max_{\pi_{T-1}} \mathbb{E} [ r_{T-1} + V_T(s_T) ]
   $$
 
+
 ##### Discounted Setting
 
 _Dealing with infinite, or large, timestep._  
@@ -424,6 +427,7 @@ _Dealing with infinite, or large, timestep._
     \text{sink state with probability } 1 - \gamma
     \end{cases}
     $$
+
 
 ##### Infinite-Horizon V.I. Via Finite-Horizon V.I.
 
@@ -447,6 +451,7 @@ _Dealing with infinite, or large, timestep._
     V, \mathcal{T} V, \mathcal{T}^2 V, \cdots \rightarrow V^{*, \gamma}
     $$
 
+
 #### Policy Iteration
 
 **Problem:** evaluate fixed policy $$\pi$$
@@ -468,6 +473,7 @@ Alternate between
     $$
     \pi(s) = \arg \max_a \mathbb{E}_{s' \vert s, a} [ r + \gamma V^\pi(s') ]
     $$
+
 
 #### Modified Policy Iteration
 
@@ -566,6 +572,7 @@ $$
     b(s_t) \approx \mathbb{E} [ r_t + r_{t+1} + \cdots + r_{T-1} ]
     $$
 
+
 **Discounts for Variance Reduction**  
 
 Introduce discount factor $$\gamma$$, which ignores delayed effects between actions and rewards.  
@@ -579,6 +586,7 @@ $$
     $$
     b(s_t) \approx \mathbb{E} [ r_t + \gamma r_{t+1} + \gamma^2 r_{t+2} + \cdots + \gamma^{T-1-t} r_{T-1} ]
     $$
+
 
 ### "Vanilla" Policy Gradient Algorithm
 
@@ -622,6 +630,7 @@ $$
     A^{\pi, \gamma}(s, a) = Q^{\pi, \gamma}(s, a) - V^{\pi, \gamma}(s)
     $$
 
+
 ### Policy Gradient Formulas with Value Functions
 
 $$
@@ -633,14 +642,13 @@ $$
 \end{align}
 $$
 
-
 ---
 
 ## Q-Function Learning Methods
 
 _(model-free reinforcement learning method)_
 
-### Bellman Equations for $$Q^\pi$$
+### Bellman Equations for $Q^\pi$
 
 $$
 \begin{align}
@@ -656,7 +664,7 @@ $$
 [\mathcal{T}^\pi Q](s_0, a_0) = \mathbb{E}_{s_1 \sim P(s_1 \vert s_0, a_0)} [ r_0 + \gamma \mathbb{E}_{a_1 \sim \pi}[Q(s_1, a_1)] ]
 $$
 
-### Introducing $$Q^\star$$
+### Introducing $Q^\star$
 
 - Let $$\pi^\star$$ denote an optimal policy
 - Define $$Q^\star = Q^{\pi^\star}$$, which satisfies $$Q^\star(s, a) = \max_\pi Q^{\pi}(s, a)$$
@@ -674,7 +682,7 @@ $$
 \lim_{t \rightarrow +\infty} \mathcal{T}^t Q \rightarrow Q^\star
 $$
 
-### Why $$Q$$ Rather than $$V$$
+### Why $Q$ Rather than $V$
 
 - Can compute greedy aciton $$\max_a Q(s, a)$$ without knowing $$P$$
 - Can compute unbiased estimator of backup value $$[\mathcal{T}Q](s, a)$$ without knowing $$P$$ using single transition $$(s, a, r, s')$$
@@ -698,14 +706,15 @@ $$
     \end{align}
     $$
 
+
 ### Sampling-Based Q-Value Iteration
 
 $$
 \begin{align}
-&\text{Initialize } Q^(0) \\
+&\text{Initialize } Q^{(0)} \\
 &\textbf{for } n = 0, 1, 2, \dots \text{ until termination conditon } \textbf{do} \\
 &\hspace{1em} \text{Interact with the environment for } K \text{ timesteps (including multiple episodes)} \\
-&\hspace{1em} Q^(n+1) = Q^(n) + \epsilon \nabla_Q \sum_{t=1}^{K} \lVert \widehat{\mathcal{T} Q_t} - Q(s_t, a_t) \rVert ^2 / 2 \\
+&\hspace{1em} Q^{(n+1)} = Q^{(n)} + \epsilon \nabla_Q \sum_{t=1}^{K} \lVert \widehat{\mathcal{T} Q_t} - Q(s_t, a_t) \rVert ^2 / 2 \\
 &\textbf{end for}
 \end{align}
 $$
@@ -734,7 +743,7 @@ $$
 &\text{Initialize } \theta^{(0)} \\
 &\textbf{for } n = 0, 1, 2, \dots \textbf{do} \\
 &\hspace{1em} \text{Run policy for } K \text{ timesteps using some policy } \pi^{(n)} \\
-&\hspace{1em} g^(n) = \nabla_\theta \sum_{t} \bigg( \widehat{\mathcal{T} Q_t} - Q_\theta(s_t, a_t) \bigg) ^2 \\
+&\hspace{1em} g^{(n)} = \nabla_\theta \sum_{t} \bigg( \widehat{\mathcal{T} Q_t} - Q_\theta(s_t, a_t) \bigg) ^2 \\
 &\hspace{1em} \theta^{(n+1)} = \theta^{(n)} - \alpha g^{(n)} \\
 &\textbf{end for}
 \end{align}
@@ -840,6 +849,8 @@ Code could be found on [GitHub](https://github.com/smdsbz/CS294-assignment).
 
 ## Assignment 1
 
+For code, see [GitHub Repo](https://github.com/smdsbz/CS294-assignment/blob/master/hw1/WarmUp.ipynb).  
+
 **Section 1: Getting Set Up**  
 
 - Out-Dated Pre-Trained `.pkl`
@@ -861,13 +872,13 @@ Code could be found on [GitHub](https://github.com/smdsbz/CS294-assignment).
     - Optimizer: SGD
 3. Train
 
-For code, see [GitHub Repo](https://github.com/smdsbz/CS294-assignment/blob/master/hw1/WarmUp.ipynb).  
-
 ---
 
 ## Assignment 2
 
 ### Section 4: Implement Policy Gradient
+
+For code, see [GitHub Repo](https://github.com/smdsbz/CS294-assignment/blob/master/hw2/train_pg.py)
 
 **Networks**  
 
@@ -894,5 +905,19 @@ For code, see [GitHub Repo](https://github.com/smdsbz/CS294-assignment/blob/mast
     - trajectory-based (all along trajectory): $$\sum_{t'=0}^{T} \gamma^{t'} r_{t'}$$
     - reward-to-go (from current timestep to future): $$\sum_{t'=t}^{T} \gamma^{t'-t} r_{t'}$$
 
-For code, see [GitHub Repo](https://github.com/smdsbz/CS294-assignment/blob/master/hw2/train_pg.py)
+---
 
+## Assignment 3
+
+For code, see [GitHub Repo](https://github.com/smdsbz/CS294-assignment/blob/master/hw3/dqn.py)
+
+### Section 3: Implementation
+
+**Bellman Error**  
+
+1. Build two Q networks, current running policy and target policy respectively
+2. Calculate state-value by multiplying the series of actions you take and their weights, i.e. Q
+3. Calculate state-action-value by $$r + \gamma \max_{a'} Q$$
+4. The Bellman error is the advantage of the Q value where target Q thinks best against Q value of average action
+
+The rest will be basic RTFM :smile:.  
