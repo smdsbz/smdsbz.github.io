@@ -841,6 +841,238 @@ $$
 - Learning rate schedueling, try high ones in initial exploring period
 - Try non-standard exploring schedules
 
+
+---
+
+## Artistic Stylization and Rendering
+
+### Methods
+
+- Procedural Methods
+    - Pure mathematics formulas, trying to immitate what real artists are thinking.  
+        - Pros
+            - lovely results
+            - very controllable
+        - Cons
+            - hard to design styles
+            - complex to implement
+
+- Patch-Based Methods
+    - Find in source for similar patches / patterns.  
+
+- Neural Methods
+    - Pros: good results
+    - Cons: no degree of control
+
+### Color Channel
+
+- Luminance channel
+    - texture and line info
+- Color channel
+    - color info
+
+> **Note**  
+> Luminance channel is much more important! Consider image compressing with `jpeg`.  
+
+### Adding Control to Neural Methods
+
+- Color control with Luminance style transfer
+- Space control: masking out areas to apply algorithm
+
+## Geometry Understanding
+
+### Data Labeling Approches "without Human-Hour"
+
+- Flickr image tags
+    - noisy
+    - try to model cofidence for tags
+- Online 3D models
+    - built with hierarchy in mind
+    - possible to use name of parts that come with the downloaded model
+        1. embedding geometries
+        2. clustering feature vectors
+        3. labeling each cluster with name and position in hierarchy
+
+
+---
+
+## Advanced Topics in Imitation Learning & Safety
+
+### Approaches to Provide Demonstrations for an Robotic Arm and Humanoid
+
+- kinesthetic teaching
+- teleoperation
+
+### Uncertainty-Aware Collision Cost
+
+$$
+c_\text{collision}(\tau) \propto \text{speed} \cdot \big( \mathbb{E}[p(c_{t+H} \vert \tau)] + \sqrt{\mathrm{Var}[p(c_{t+H} \vert \tau)]} \big)
+$$
+
+
+---
+
+## Inverse Reinforcement Learning
+
+### Motivation & Definition
+
+In the real world, human **dont't** get a score! The reward function is unclear.  
+
+Previously, solved by introducing *behavioral cloning*, but...  
+- no reasoning about outcomes or dynamics
+- the expert might have different degrees of freedom
+
+#### Inverse Optimal Control / Inverse Reinforcement Learning
+
+Infer cost / reward function from expert demonstrations.  
+
+Given...  
+- state & action space
+- roll-outs from $$\pi^*$$
+- [optional] dynamics model
+
+Goal...  
+- recover reward function
+- then use reward to get policy
+
+**Problem**  
+
+- Underdefined problem
+- Difficult to evaluate a learned cost
+- Demonstrations may not be precisely optimal
+
+### Maximum Entropy Inverse RL
+
+Want to have  
+- high scores for good trajectories
+- low scores for bad trajectories
+
+Construct  
+
+$$
+p(\tau) \propto e^{-c(\tau)}
+$$  
+
+Goal becomes  
+
+$$
+\min_\pi \mathbb{E}_\pi[c(\tau)] - \mathrm{H}(\pi)
+$$
+
+Now consider how to minimize the cost  
+- cross entropy
+
+$$
+\begin{align}
+\theta
+&= \arg \max_\theta \log{\prod_{\tau_d \in \mathcal{D}} p(\tau_d)} \\
+&= \arg \min_\theta - \frac{1}{M} \sum_{\tau_d \in \mathcal{D}} \log{\frac{1}{z} e^{-c(\tau_d)}} \\
+&= \arg \min_\theta \frac{1}{M} \sum_{\tau_d} c(\tau_d) + \log{\sum_\tau e^{-c(\tau)}} \\
+\end{align}
+$$
+
+where  
+- $$z := \sum_\tau e^{-c(\tau)}$$
+- $$M$$ is amount of data in demonstration dataset $$\mathcal{D}$$
+
+Consider using gradient descent method, define $$\mathcal{L}$$ by
+
+$$
+\mathcal{L} := \frac{1}{M} \sum_{\tau_d} c(\tau_d) + \log{\sum_\tau e^{-c(\tau)}}
+$$
+
+Therefore  
+
+$$
+\nabla_\theta \mathcal{L} = \frac{1}{M} \sum_{\tau_d} \frac{d c(\tau_d)}{d \theta} + \frac{1}{\sum_\tau e^{-c(\tau)}} \sum_\tau \big( e^{-c(\tau)} \cdot (-1) \cdot \frac{d c(\tau)}{d \theta} \big)
+$$
+
+Note that  
+
+$$
+p(\tau) = \frac{e^{-c(\tau)}}{\sum_\tau e^{-c(\tau)}}
+$$
+
+Have  
+
+$$
+\nabla_\theta \mathcal{L} = \frac{1}{M} \sum_{\tau_d} \frac{d c(\tau_d)}{d \theta} - \sum_\tau p(\tau \vert \theta, T) \frac{d c(\tau)}{d \theta}
+$$
+
+where  
+- $$T$$ is transition dynamics
+
+Substitute trajectories with their states  
+
+$$
+\nabla_\theta \mathcal{L} = \frac{1}{M} \sum_{\tau_d} \frac{d c(\tau_d)}{d \theta} - \sum_s p(s \vert \theta, T) \frac{d c(s)}{d \theta}
+$$
+
+Note  
+
+$$
+\begin{align}
+p(\tau)
+&= p(s_1) \prod_t \pi_\theta(a_t \vert s_t) T(s_{t+1} \vert s_t, a_t) \\
+&= p(s_1) \prod_t p(a_t \vert s_t, \theta) p(s_{t+1} \vert s_t, a_t)
+\end{align}
+$$
+
+To compute $$p(s \vert \theta, T)$$  
+1. $$\pi(a \vert s)$$ w.r.t. $$c_\theta$$
+2. do
+
+    $$
+    \begin{align}
+    &\mu_1(s) = p(s_1 = s) \\
+    &\textbf{for } t = 1 : T - 1 \textbf{ do} \\
+    &\hspace{1em} \mu_{t+1}(s) = \sum_{a', s'} \mu_t(s') \pi(a' \vert s') p(s \vert s', a') \\
+    &\textbf{end for}
+    \end{align}
+    $$
+
+    where
+    - $$\mu_t(s)$$ is probability visiting $$s$$ at $$t$$
+    - $$a', s'$$ are action / state of previous timestep respectively
+
+3. $$p(s \vert \theta, T) = \sum_t \mu_t(s)$$
+
+### Scaling Inverse RL to Deep Cost Functions
+
+Backpropagation :smile:  
+
+### Inverse RL with Unkown Dynamics
+
+Consider using importance sampling.  
+
+$$
+\begin{align}
+z
+&= \sum_\tau e^{-c(\tau)} \\
+&\approx \sum_{\tau_s \sim q} \frac{e^{-c(\tau_s)}}{q(\tau_s)}
+\end{align}
+$$
+
+For importance sampling, want large probability of sampling for dramatic costs.  
+
+$$
+\text{minimize} \ \mathrm{Var} \, [ q(\tau) \propto \vert e^{-c(\tau)} \vert ]
+$$
+
+Problem is the target $$q$$ is hard to guess. Instead, try to construct $$q$$ dynamically.  
+
+$$
+q = \arg \min_q \mathbb{E}_q[c(\tau)] - \mathrm{H}(q)
+$$
+
+Also, construct multiple $$q$$s to avoid introducing high variance to sample data.  
+
+$$
+v(\tau) = \frac{1}{K} \sum_k q_k(\tau)
+$$
+
+
+
 ---
 
 # Assignments
