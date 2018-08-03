@@ -1072,6 +1072,62 @@ v(\tau) = \frac{1}{K} \sum_k q_k(\tau)
 $$
 
 
+---
+
+## Advanced Policy Gradient Methods: Natural Gradient, TRPO, and More
+
+$$
+\text{maximize}_\theta \, \sum_{n=1}^N \frac{\pi_\theta(a_n \vert s_n)}{\pi_{\theta_\text{old}}(a_n \vert s_n)} \hat{A}_n - C \cdot \overline{\mathrm{KL}}_{\pi_{\theta_\text{old}}}(\pi_\theta)
+$$
+
+### Truncated Natural Policy Gradient Algorithm
+
+- Unconstrained problem: $$\text{maximize} \, L_{\pi_{\theta_\text{old}}}(\pi_\theta) - C \cdot \overline{\mathrm{KL}}_{\pi_{\theta_\text{old}}}(\pi_\theta)$$
+
+$$
+\begin{align}
+&\textbf{for} \text{ iteration} = 1, 2, \dots \textbf{ do} \\
+&\hspace{1em} \text{Run policy for } T \text{ timesteps or } N \text{ trajectories} \\
+&\hspace{1em} \text{Estimate advantage function at all timesteps} \\
+&\hspace{1em} \text{Compute policy gradient } g \\
+&\hspace{1em} \text{Use } \textit{Conjugated Gradient Method} \text{ (with Hessian-vector products) to compute } H^{-1}g \\
+&\hspace{1em} \text{Update policy parameter } \theta = \theta_\text{old} + \alpha H^{-1}g \\
+&\textbf{end for}
+\end{align}
+$$
+
+### TRPO
+
+- Constrained problem: $$\text{maximize} \, L_{\pi_{\theta_\text{old}}}(\pi_\theta)$$ subject to $$\overline{\mathrm{KL}}_{\pi_{\theta_\text{old}}}(\pi_\theta) \leq \delta$$
+    - Set hyperparameter $$\delta$$ rather than $$C$$
+
+$$
+\begin{align}
+&\textbf{for} \text{ iteration} = 1, 2, \dots \textbf{ do} \\
+&\hspace{1em} \text{Run policy for } T \text{ timesteps or } N \text{ trajectories} \\
+&\hspace{1em} \text{Estimate advantage function at all timesteps} \\
+&\hspace{1em} \text{Compute policy gradient } g \\
+&\hspace{1em} \text{Use } \textit{Conjugated Gradient Method} \text{ (with Hessian-vector products) to compute } H^{-1}g \\
+&\hspace{1em} \text{Compute rescaled step } s = \alpha H^-1 g \text{ with rescaling and line search} \\
+&\hspace{1em} \text{Apply update: } \theta = \theta_\text{old} + \alpha H^{-1}g \\
+&\textbf{end for}
+\end{align}
+$$
+
+### Alternative Method for Calculating Natural Gradients
+
+- Fisher information matrix
+
+    $$
+    \frac{\partial}{\partial^2 \theta} \mathrm{KL}[p_{\theta_\text{old}}, p_\theta] = \mathbb{E}_{x \sim p_{\theta_\text{old}}} \bigg[ \bigg( \frac{\partial}{\partial \theta} \log{p_\theta(x)} \bigg)^T \bigg( \frac{\partial}{\partial \theta} \log{p_\theta(x)} \bigg) \bigg] \vert_{\theta = \theta_\text{old}}
+    $$
+
+- In policy optimization setting, instead of forming FIM by differentiating $$\mathrm{KL}$$, can explicitly form $$\sum_n \big( \frac{\partial}{\partial \theta} \log{\pi_\theta(a_n \vert s_n)} \big) ^T \big( \frac{\partial}{\partial \theta} \log{\pi_\theta(a_n \vert s_n)} \big)$$
+
+
+---
+
+## Variance Reduction for Policy Gradient Methods
 
 ---
 
@@ -1147,9 +1203,9 @@ For code, see [GitHub Repo](https://github.com/smdsbz/CS294-assignment/blob/mast
 
 **Bellman Error**  
 
-1. Build two Q networks, current running policy and target policy respectively
+1. Build two Q networks, the exploring policy and the update target respectively
 2. Calculate state-value by multiplying the series of actions you take and their weights, i.e. Q
 3. Calculate state-action-value by $$r + \gamma \max_{a'} Q$$
-4. The Bellman error is the advantage of the Q value where target Q thinks best against Q value of average action
+4. The Bellman error is the differenct in Q values between the exploring policy and target policy
 
 The rest will be basic RTFM :smile:.  
