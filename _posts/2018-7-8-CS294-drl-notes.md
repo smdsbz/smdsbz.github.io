@@ -313,11 +313,6 @@ Simulate expert policies at states that are slightly off, by generating a correc
   \min_\theta \sum_{i, t} \lVert \pi_\theta(\mathbf{x}_{i, t}) - \mathbf{u}_{i, t} \rVert ^2
   $$
 
-
-
-
-
-
 ### Movement with Model Uncertianty
 
 - Generate noisy models varying:
@@ -1128,6 +1123,31 @@ $$
 ---
 
 ## Variance Reduction for Policy Gradient Methods
+
+### Reward Shaping
+
+Giving a hint to the model, via a shaping term in the reward / cost function.  
+
+$$\tilde{r}(s, a, s') = r(s, a, s') + \gamma \phi(s') - \phi(s)$$ for arbitrary *potential function* $$\phi$$.  
+
+- Reward shaping transformation leaves policy gradient and optimal policy invariant
+- Shaping with $$\phi \approx V^\pi$$ makes consequences of actions more immediate
+- Shaping, and then ignoring all but the first term, gives policy gradient
+
+### Variance Reduction
+
+Previously showed that taking  
+
+$$
+\hat{A}_t = r_t, + r_{t+1} + \cdots - b(s_t)
+$$
+
+for any function $$b(s_t)$$, gives an unbiased policy gradient estimator.  
+
+$$b(s_t) \approx V^\pi(s_t)$$ gives variance reduction.  
+
+### The Delayed Reward Problem
+
 
 ---
 
