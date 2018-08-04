@@ -1146,7 +1146,23 @@ for any function $$b(s_t)$$, gives an unbiased policy gradient estimator.
 
 $$b(s_t) \approx V^\pi(s_t)$$ gives variance reduction.  
 
-### The Delayed Reward Problem
+### Value Functions in the Future
+
+_(reward-to-go)_  
+
+Subtracting out baselines, get advantage estimators  
+
+$$
+\begin{align}
+&\hat{A}_t^{(1)} = r_t + \gamma V(s_{t+1}) - V(s_t) \\
+&\hat{A}_t^{(2)} = r_t + r_{t+1} + \gamma^2 V(s_{t+2}) - V(s_t) \\
+&\dots \\
+&\hat{A}_t^{(\infty)} = r_t + \gamma r_{t+1} + \gamma^2 r_{t+2} + \cdots  - V(s_t) \\
+\end{align}
+$$
+
+$$\hat{A}_t^{(1)}$$ has low variance but high bias, $$\hat{A}_t^{(\infty)}$$ has high variance but low bias.  
+Using intermediate $$k$$ gives an intermediate amount of bias and variance.  
 
 
 ---
