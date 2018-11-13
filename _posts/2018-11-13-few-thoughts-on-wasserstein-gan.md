@@ -22,13 +22,13 @@ _Originally published at [Dian Organization Blog](https://bbs.dian.org.cn/topic/
 
 Wasserstein GAN（以下简称 WGAN）主要是解决了一个问题——损失函数不连续。实际上在 CS294 Deep-RL 的 Q-Learn 相关章节中也有提到过类似的问题：试想我们在训练一个 agent 玩 PONG，一开始这个 agent 由于没有被训练，只能做出随机（naive）的动作，很大概率它八辈子摸不到球。偶尔有一次我们的 agent 终于打到球了，这个时候我们的原始的 summed reward 是长这样的👇  
 
-![discrete-reward-showcase](../assets/images/2018-11-13-WGAN/discrete-reward-showcase.png)  
+![discrete-reward-showcase](https://raw.githubusercontent.com/smdsbz/smdsbz.github.io/master/assets/images/2018-11-13-WGAN/discrete-reward-showcase.png)  
 
 agent 在第 6 次实验中打到了球，我们给了他一个 reward 值。但你能说之前所有的动作、所有实验都对这次击球没有贡献吗？可能第 6 次与第 5 次的差别仅仅在最后一毫秒，我们的 agent 把弹板向正确的方向移动了，打了一个擦边球。擦边与不擦边，在我们的世界（analog）看来，是差不多的；但在计算机（discrete）看来，这可是完全零与非零的区别，是一个无限大倍数的提升。计算机就会认为只有第 6 次的实验是成功的，其他的都是完全失败的。这也就导致了目前 DQN（reward 不连续）、GAN（loss 不连续） 模型训练极为困难的情况，因为所有“差一点成功”的实验结果都被扔掉了，而这些实验结果在人看来，虽然不够好，但是仍然有足够的参考意义，完全有资格作为训练样本。  
 
 这也正是为什么 WGAN 使用了 Wasserstein 距离（EM 距离）作为其衡量 loss / difference 的算子。传统 GAN 在衡量两个 agent 之间相似度（本质为两个概率分布的相似度）的时候使用的是一些经典老牌的公式：KL散度，JS散度，甚至还有人用单位阶跃 $$\delta$$。。。这些公式的解空间总是存在那么些个微分性质"不好"的地方，导致算法实际跑起来的时候梯度不是爆炸就是消失。但 Wasserstein 距离是连续的，给平滑的 SGD 过程提供了非常好的微分性质基础。下图展示了 Wasserstein 优越的连续性与微分性 [from the "Wasserstein GAN" paper]。  
 
-![em-distance-continuity](../assets/images/2018-11-13-WGAN/em-distance-continuity.png)  
+![em-distance-continuity](https://raw.githubusercontent.com/smdsbz/smdsbz.github.io/master/assets/images/2018-11-13-WGAN/em-distance-continuity.png)  
 
 在上图中，Wasserstein（左图）自始自终都提供了很好的微分性质，我们的 SGD 可以得到方向正确、大小合理的梯度作为输入；但 JS（右图）梯度甚至在消失之前就已经是 0 了，SGD 根本就走不动。可见，当需要将两个概率分布的相似度作为梯度来训练神经网络时，Wasserstein 距离显然是非常合适的。  
 
