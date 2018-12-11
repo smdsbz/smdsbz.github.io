@@ -11,9 +11,9 @@ Cheatsheet for Numerical Analysis, may contain errors, open for comments / issue
 
 [TOC]
 
-## Interpolation
+# Interpolation
 
-### Interpolation Polynomial
+## Interpolation Polynomial
 
 $$
 p_{n}(x) = a_0 + a_1 x + a_2 x^2 + \cdots + a_n x^n
@@ -32,7 +32,7 @@ $$
 
 s.t. $$y_i = f(x_i)$$.  
 
-### Lagrange Interpolation
+## Lagrange Interpolation
 
 $$
 L_n(x) = y_0 l_0(x) + y_1 l_1(x) + \cdots + y_n l_n(x)
@@ -67,7 +67,7 @@ $$
 - $$n = 1$$, linear interpolation
 - $$n = 2$$, parabola interpolation
 
-### Newton Interpolation
+## Newton Interpolation
 
 $$
 \begin{align}
@@ -87,7 +87,7 @@ $$
 N_n(x) = \sum_{i=0}^{n} \Big[ f[x_0, x_1, \cdots, x_i] \prod_{j=0}^{i} (x - x_j) \Big]
 $$
 
-#### Difference Quotient
+### Difference Quotient
 
 Having  
 
@@ -116,7 +116,7 @@ $$
 
 *==TODO==*  
 
-### Hermite Interpolation
+## Hermite Interpolation
 
 For $$n+1$$ different points $$\{ x_i \vert x_i \in [a, b], i = 0 \dots n \}$$, we have  
 
@@ -204,7 +204,7 @@ H_3(x) &= y_0 \alpha_0 \Big( \frac{x - x_0}{h} \Big) + y_1 \alpha_1 \Big( \frac{
 \end{cases}
 $$
 
-## Integration
+# Integration
 
 **Naive Approach**  
 
@@ -217,7 +217,7 @@ $$
 \end{cases}
 $$
 
-### Interpolation Approach
+## Interpolation Approach
 
 $$
 \begin{align}
@@ -227,7 +227,7 @@ I &= \int_{a}^{b} f(x) dx \approx \int_{a}^{b} L_n(x) dx \\
 \end{align}
 $$
 
-#### Newton-Cotes
+### Newton-Cotes
 
 $$
 \begin{align}
