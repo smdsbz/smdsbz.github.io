@@ -217,6 +217,10 @@ $$
 \end{cases}
 $$
 
+## Algebraic Precision
+
+For $$f(x) = 1, x, x^2, \dots$$, if $$I(f)$$ holds when $$f(x) = x^k$$ and fails when $$f(x) = x^{k + 1}$$, $$I(f)$$ has algebraic precision of $$k$$.  
+
 ## Interpolation Approach
 
 $$
