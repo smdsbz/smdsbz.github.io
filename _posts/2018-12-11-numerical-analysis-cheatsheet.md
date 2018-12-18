@@ -291,6 +291,7 @@ $$
   R_C = - \frac{8 h^7}{945} \cdot f^{(6)}(\eta) \hspace{1em} h = \frac{b - a}{4}
   $$
 
+
 **Multiply**  
 
 - Multiple Trapezoid  
@@ -321,6 +322,7 @@ $$
   R_{C_n} &= - \frac{m \cdot 8 h^7}{945} f^{(6)}(\eta) \hspace{1em} h = \frac{b - a}{4}
   \end{align}
   $$
+
 
 > **Algebraic Precision**  
 > 1 higher than non multiply version.  
@@ -439,5 +441,21 @@ $$
   k_3 = h f(x_n + h, y_n - k_1 + 2 k_2)
   \end{cases}
   $$
+
+### Variable Step Size
+
+For $$p$$-th order Runge-Kutta,  
+
+$$
+\Delta \approx \vert \frac{1}{2^p - 1} \big[ y_{n+1}^{(h/2)} y_{n+1}^{(h)} \big] \vert
+$$
+
+- while $$\Delta > \sigma$$, half the step size
+    - ensure truncational error bellow threshold
+- while $$\Delta < \sigma$$, double the step size
+    - lesser computational cost & accumulated round-off error
+
+
+
 
 
