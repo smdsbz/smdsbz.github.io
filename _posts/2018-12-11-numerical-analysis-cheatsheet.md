@@ -343,11 +343,101 @@ $$
 \end{align}
 $$
 
+# Ordinary Differential Equation
 
+$$
+\begin{cases}
+y' = f(x, y) \\
+y(x_0) = y_0
+\end{cases}
+$$
 
+## Euler Method
 
+**Method 1: to Difference Quotient**  
 
+$$
+y'(x) = \lim_{h \rightarrow 0} \frac{y(x_n + h) - y(x_n)}{h} \approx \frac{y(x_{n+1}) - y(x_n)}{h}
+$$
 
+**Method 2: Integral**  
 
+$$
+\int_{x_n}^{x_{n+1}} y' \mathrm{d}x = \int_{x_n}^{x_{n+1}} f[x, y(x)] \mathrm{d}x
+$$
+
+Get  
+
+$$
+\begin{cases}
+y_{n+1} = y_n + h f(x_n, y_n) \\
+y_0 = y(x_0)
+\end{cases}
+$$
+
+### Hidden Euler
+
+$$
+\begin{cases}
+y_{n+1} = y_n + h f(x_{n+1}, y_{n+1}) \\
+y_0 = y(x_0)
+\end{cases}
+$$
+
+> **Note**  
+> $$y_{n+1}$$ is unkown.  
+
+### Two Step Euler
+
+$$
+\begin{cases}
+y_{n+1} =  y_{n-1} + 2h f(x_n, y_n) \\
+y_0 = y(x_0)
+\end{cases}
+$$
+
+### Trapezoid Euler
+
+$$
+\begin{cases}
+y_{n+1} = y_n + \frac{h}{2} \big[ f(x_n, y_n) + f(x_{n+1}, y_{n+1}) \big] \\
+y_0 = y(x_0)
+\end{cases}
+$$
+
+> **Note**  
+> **Trapezoid Euler** = average of **Euler** and **Hidden Euler**  
+
+## Regional Truncation Error
+
+$$
+T_{n+1} = y(x_{n+1}) - y_{n+1} \propto O(h^{p+1}) \hspace{1em} \text{s.t.} \ \text{algebraic precision of} \ p
+$$
+
+## Improved Euler Method
+
+- propose: $$\overline{y}_{n+1} = y_n + h f(x_n, y_n)$$
+- calibration: $$y_{n+1} = y_n + \frac{h}{2} \big[ f(x_n, y_n) + f(x_{n+1}, \overline{y}_{n+1}) \big]$$
+
+## Runge-Kutta Method
+
+$$
+\begin{cases}
+y_{n+1} = y_n + c_1 k_1 + c_2 k_2 \\
+k_1 = h f(x_n, y_n) \\
+k_2 = h f(x_n + a_2 h, y_n + b_{21} k_1)
+\end{cases}
+$$
+
+- Second-Order Runge-Kutta: Improved Euler Method
+- Third-Order Runge-Kutta: Kutta Euqations  
+  $$
+  \begin{cases}
+  y_{n+1} = y_n + \frac{1}{6} k_1 + \frac{4}{6} k_2 + \frac{1}{6} k_3 \\
+  k_1 = h f(x_n, y_n) \\
+  k_2 = h f(x_n + \frac{1}{2} h, y_n + \frac{1}{2} k_1) \\
+  k_3 = h f(x_n + h, y_n - k_1 + 2 k_2)
+  \end{cases}
+  $$
 
 
