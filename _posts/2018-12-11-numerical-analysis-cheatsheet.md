@@ -171,24 +171,9 @@ $$
 It therefore can be concluded that  
 
 $$
-H_{2n+1}(x) = \sum_{i = 0}^{n} \bigg\{ y_i \underbrace{ \Big[ 1 - 2(x - x_i) \sum_{j = 0, j \neq i}^{n} \frac{1}{x_i - x_j} \Big] l_i^2(x) }_{\alpha_i(x)} + y'_i \underbrace{(x - x_i)l_i^2(x)}_{\beta_i(x)} \bigg\}
-$$
-
-**Remainder**  
-$$
 \begin{align}
-R_{2n+1}(x) &= \frac{f^{(2n+2)}(\xi)}{(2n + 2)!} \Big[ \prod_{i = 0}^{n} (x - x_i) \Big]^2 \hspace{1em} \xi \in (a, b) \\
-&= \frac{f^{(2n+2)}(\xi)}{(2n + 2)!} \, \omega_{n+1}^2(x)
-\end{align}
-$$
-
-**Example**  
-
-*==TODO==*  
-
-**Segmental Hermite Interpolation**  
-$$
-\begin{align}
+H_{2n+1}(x) &= \sum_{i = 0}^{n} \bigg\{ y_i \underbrace{ \Big[ 1 - 2(x - x_i) \sum_{j = 0, j \neq i}^{n} \frac{1}{x_i - x_j} \Big] l_i^2(x) }_{\alpha_i(x)} + y'_i \underbrace{(x - x_i)l_i^2(x)}_{\beta_i(x)} \bigg\} \\
+\\
 H_3(x) &= y_0 \alpha_0 \Big( \frac{x - x_0}{h} \Big) + y_1 \alpha_1 \Big( \frac{x - x_0}{h} \Big) \\
 &+ h y'_0 \beta_0 \Big( \frac{x - x_0}{h} \Big) + h y'_1 \beta_1 \Big( \frac{x - x_0}{h} \Big) \hspace{2em} h = x_1 - x_0
 \end{align}
@@ -203,6 +188,25 @@ H_3(x) &= y_0 \alpha_0 \Big( \frac{x - x_0}{h} \Big) + y_1 \alpha_1 \Big( \frac{
 \beta_1(x) = x^2 (x - 1)
 \end{cases}
 $$
+
+**Remainder**  
+$$
+\begin{align}
+R_{2n+1}(x) &= \frac{f^{(2n+2)}(\xi)}{(2n + 2)!} \Big[ \prod_{i = 0}^{n} (x - x_i) \Big]^2 \hspace{2em} \xi \in (a, b) \\
+&= \frac{f^{(2n+2)}(\xi)}{(2n + 2)!} \, \omega_{n+1}^2(x) \\
+\\
+\vert R_3(x) \vert &\leq \frac{h^4}{384} \max_{x_0 \leq x \leq x_1} \vert f^{(4)} (x) \vert \hspace{2em} h = x_1 - x_0
+\end{align}
+$$
+
+**Example**  
+
+*==TODO==*  
+
+**Segmental Hermite Interpolation**  
+
+Apply Hermite Interpolation for each segment s.t. $$S_3(x_i) = y_i, S_3'(x_i) = y_i'$$.  
+
 
 # Integration
 
@@ -291,7 +295,6 @@ $$
   R_C = - \frac{8 h^7}{945} \cdot f^{(6)}(\eta) \hspace{1em} h = \frac{b - a}{4}
   $$
 
-
 **Multiply**  
 
 - Multiple Trapezoid  
@@ -322,7 +325,6 @@ $$
   R_{C_n} &= - \frac{m \cdot 8 h^7}{945} f^{(6)}(\eta) \hspace{1em} h = \frac{b - a}{4}
   \end{align}
   $$
-
 
 > **Algebraic Precision**  
 > 1 higher than non multiply version.  
@@ -442,6 +444,12 @@ $$
   \end{cases}
   $$
 
+
+
+
+
+
+
 ### Variable Step Size
 
 For $$p$$-th order Runge-Kutta,  
@@ -454,6 +462,75 @@ $$
     - ensure truncational error bellow threshold
 - while $$\Delta < \sigma$$, double the step size
     - lesser computational cost & accumulated round-off error
+
+## Convergability
+
+==TODO:==  
+
+## Stability
+
+==TODO:==  
+
+# Solving Equations
+
+## Bisection Method
+
+### Prior Estimate
+
+For series of ranges contianing root $$[a_0, b_0] \supset [a_1, b_1] \supset \cdots \supset [a_n, b_n] \supset \cdots$$, have  
+
+$$
+b_n - a_n = \frac{1}{2} (b_{n - 1} - a_{n - 1})
+$$
+
+Thus, the following inequality holds  
+
+$$
+\vert x_n - x^* \vert \leq \frac{b_n - a_n}{2}
+$$
+
+Want  
+
+$$
+\vert x_n - x^* \vert \leq \epsilon
+$$
+
+## Iteration Method
+
+Construct equation, such that  
+
+$$
+x^* = \phi(x^*)
+$$
+
+Have iteration  
+
+$$
+x_{n+1} = \phi(x_n) \hspace{2em} n = 0, 1, \cdots
+$$
+
+> **Note**  
+> A convergent iteration is required!  
+
+**Convergence**  
+
+- $$\phi(x)$$ is (1st order) differentiable in range $$[a, b]$$.
+- For $$x \in [a, b]$$, $$\phi(x) \in [a, b]$$.
+- Exists $$0 < L < 1$$, s.t. $$\forall x \in [a, b]$$,  
+
+  $$
+  \vert \phi'(x) \vert \leq L < 1 \ .
+  $$
+
+
+
+
+
+
+Have $$x = \phi(x)$$, for $$x \in [a, b]$$, exists one single root $$x^*$$. And for arbitrary initial start-off value $$x_0 \in [a, b]$$, $$\lim_{n \rightarrow \infty} x_n = x^*$$.  
+
+
+
 
 
 
