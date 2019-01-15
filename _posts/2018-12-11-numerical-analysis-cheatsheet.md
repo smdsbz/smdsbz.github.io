@@ -2,7 +2,7 @@
 layout: article
 title: Numerial Analysis CheatSheet
 key: numerial-analysis-cheatsheet
-tag: CourseNotes NumericalAnalysis
+tags: CourseNotes NumericalAnalysis
 ---
 
 Cheatsheet for Numerical Analysis, may contain errors, open for comments / issues.  
@@ -295,6 +295,7 @@ $$
   R_C = - \frac{8 h^7}{945} \cdot f^{(6)}(\eta) \hspace{1em} h = \frac{b - a}{4}
   $$
 
+
 **Multiply**  
 
 - Multiple Trapezoid  
@@ -325,6 +326,7 @@ $$
   R_{C_n} &= - \frac{m \cdot 8 h^7}{945} f^{(6)}(\eta) \hspace{1em} h = \frac{b - a}{4}
   \end{align}
   $$
+
 
 > **Algebraic Precision**  
 > 1 higher than non multiply version.  
@@ -450,6 +452,7 @@ $$
 
 
 
+
 ### Variable Step Size
 
 For $$p$$-th order Runge-Kutta,  
@@ -521,6 +524,7 @@ $$
   $$
   \vert \phi'(x) \vert \leq L < 1 \ .
   $$
+
 
 
 
