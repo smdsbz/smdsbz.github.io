@@ -525,18 +525,4 @@ $$
   \vert \phi'(x) \vert \leq L < 1 \ .
   $$
 
-
-
-
-
-
-
 Have $$x = \phi(x)$$, for $$x \in [a, b]$$, exists one single root $$x^*$$. And for arbitrary initial start-off value $$x_0 \in [a, b]$$, $$\lim_{n \rightarrow \infty} x_n = x^*$$.  
-
-
-
-
-
-
-
-
