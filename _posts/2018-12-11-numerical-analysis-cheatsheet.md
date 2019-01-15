@@ -435,15 +435,6 @@ $$
   \end{cases}
   $$
 
-
-
-
-
-
-
-
-
-
 ### Variable Step Size
 
 For $$p$$-th order Runge-Kutta,  
@@ -463,7 +454,7 @@ $$
 
 ## Stability
 
-==TODO:==  
+Model function: $$y' = \lambda y (\lambda < 0)$$.  
 
 # Solving Equations
 
