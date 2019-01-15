@@ -177,16 +177,6 @@ H_{2n+1}(x) &= \sum_{i = 0}^{n} \bigg\{ y_i \underbrace{ \Big[ 1 - 2(x - x_i) \s
 H_3(x) &= y_0 \alpha_0 \Big( \frac{x - x_0}{h} \Big) + y_1 \alpha_1 \Big( \frac{x - x_0}{h} \Big) \\
 &+ h y'_0 \beta_0 \Big( \frac{x - x_0}{h} \Big) + h y'_1 \beta_1 \Big( \frac{x - x_0}{h} \Big) \hspace{2em} h = x_1 - x_0
 \end{align}
-\\
-\begin{cases}
-\alpha_0(x) = (x - 1)^2 (2x + 1) \\
-\alpha_1(x) = x^2 (-2x + 3)
-\end{cases}
-\hspace{3em}
-\begin{cases}
-\beta_0(x) = x (x - 1)^2 (2x + 1) \\
-\beta_1(x) = x^2 (x - 1)
-\end{cases}
 $$
 
 **Remainder**  
@@ -295,7 +285,6 @@ $$
   R_C = - \frac{8 h^7}{945} \cdot f^{(6)}(\eta) \hspace{1em} h = \frac{b - a}{4}
   $$
 
-
 **Multiply**  
 
 - Multiple Trapezoid  
@@ -326,7 +315,6 @@ $$
   R_{C_n} &= - \frac{m \cdot 8 h^7}{945} f^{(6)}(\eta) \hspace{1em} h = \frac{b - a}{4}
   \end{align}
   $$
-
 
 > **Algebraic Precision**  
 > 1 higher than non multiply version.  
@@ -453,6 +441,7 @@ $$
 
 
 
+
 ### Variable Step Size
 
 For $$p$$-th order Runge-Kutta,  
@@ -524,5 +513,6 @@ $$
   $$
   \vert \phi'(x) \vert \leq L < 1 \ .
   $$
+
 
 Have $$x = \phi(x)$$, for $$x \in [a, b]$$, exists one single root $$x^*$$. And for arbitrary initial start-off value $$x_0 \in [a, b]$$, $$\lim_{n \rightarrow \infty} x_n = x^*$$.  
