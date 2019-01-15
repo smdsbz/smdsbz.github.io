@@ -276,14 +276,15 @@ $$
   $$
   \begin{align}
   R_S &= \int_{a}^{b} \frac{f^{(4)}(\xi)}{4!} (x - a) \big( x - \frac{a + b}{2} \big)^2 (x - b) \mathrm{d}x \\
-  &= - \frac{h^5}{90} f^{(4)}(\eta) \hspace{1em} h = \frac{b - a}{2}
+  &= - \frac{h^5}{90} f^{(4)}(\eta) \hspace{2em} h = \frac{b - a}{2}
   \end{align}
   $$
 
 - Cotes (algebraic precision: 5)  
   $$
-  R_C = - \frac{8 h^7}{945} \cdot f^{(6)}(\eta) \hspace{1em} h = \frac{b - a}{4}
+  R_C = - \frac{8 h^7}{945} \cdot f^{(6)}(\eta) \hspace{2em} h = \frac{b - a}{4}
   $$
+
 
 **Multiply**  
 
@@ -292,7 +293,7 @@ $$
   \begin{align}
   I &= \frac{h}{2} \big[ f(a) + 2 \sum_{i = 1}^{n - 1} f(x_i) + f(b) \big] \\
   \\
-  R_{T_n} &= \sum R_T = - \frac{n h^3}{12} f''(\eta) \hspace{1em} h = b - a
+  R_{T_n} &= \sum R_T = - \frac{n h^3}{12} f''(\eta) \hspace{2em} h = b - a
   \end{align}
   $$
 
@@ -302,7 +303,7 @@ $$
   I &= \sum_{i = 0}^{m - 1} \int_{x_{2i}}^{x_{2i + 2}} f(x) \mathrm{d}x \\
   &\approx \frac{2h}{6} \big[ f(a) + 4 \sum_{i = 0}^{m - 1} f(x_{2i + 1}) + 2 \sum_{i = 1}^{m - 1} f(x_{2i}) + f(b) \big] \hspace{1em} \text{s.t.} \ n = 2m \\
   \\
-  R_{S_n} &= \sum R_S = - \frac{m h^5}{90} f^{(4)}(\eta) \hspace{1em} h = \frac{b - a}{2}
+  R_{S_n} &= \sum R_S = - \frac{m h^5}{90} f^{(4)}(\eta) \hspace{2em} h = \frac{b - a}{n}, n = 2m
   \end{align} \\
   $$
 
@@ -312,7 +313,7 @@ $$
   I &= \sum_{i = 0}^{m - 1} \int_{x_{4i}}^{x_{4i + 4}} f(x) \mathrm{d}x \\
   &\approx \frac{4h}{90} \Big[ 7 f(a) + 14 \sum_{i = 0}^{m - 1} f(x_{4i}) + 32 \sum_{i = 0}^{m - 1} f(x_{4i + 1}) + 12 \sum_{i = 0}^{m - 1} f(x_{4i + 2}) + 32 \sum_{i = 0}^{m - 1} f(x_{4i + 3}) + 7 f(b) \Big] \\
   \\
-  R_{C_n} &= - \frac{m \cdot 8 h^7}{945} f^{(6)}(\eta) \hspace{1em} h = \frac{b - a}{4}
+  R_{C_n} &= - \frac{m \cdot 8 h^7}{945} f^{(6)}(\eta) \hspace{2em} h = \frac{b - a}{n}, n = 4m
   \end{align}
   $$
 
@@ -442,6 +443,7 @@ $$
 
 
 
+
 ### Variable Step Size
 
 For $$p$$-th order Runge-Kutta,  
@@ -513,6 +515,7 @@ $$
   $$
   \vert \phi'(x) \vert \leq L < 1 \ .
   $$
+
 
 
 Have $$x = \phi(x)$$, for $$x \in [a, b]$$, exists one single root $$x^*$$. And for arbitrary initial start-off value $$x_0 \in [a, b]$$, $$\lim_{n \rightarrow \infty} x_n = x^*$$.  
