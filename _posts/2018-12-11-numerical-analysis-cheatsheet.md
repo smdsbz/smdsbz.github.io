@@ -286,6 +286,7 @@ $$
   $$
 
 
+
 **Multiply**  
 
 - Multiple Trapezoid  
@@ -316,6 +317,7 @@ $$
   R_{C_n} &= - \frac{m \cdot 8 h^7}{945} f^{(6)}(\eta) \hspace{2em} h = \frac{b - a}{n}, n = 4m
   \end{align}
   $$
+
 
 > **Algebraic Precision**  
 > 1 higher than non multiply version.  
@@ -435,6 +437,7 @@ $$
   \end{cases}
   $$
 
+
 ### Variable Step Size
 
 For $$p$$-th order Runge-Kutta,  
@@ -506,7 +509,5 @@ $$
   $$
   \vert \phi'(x) \vert \leq L < 1 \ .
   $$
-
-
 
 Have $$x = \phi(x)$$, for $$x \in [a, b]$$, exists one single root $$x^*$$. And for arbitrary initial start-off value $$x_0 \in [a, b]$$, $$\lim_{n \rightarrow \infty} x_n = x^*$$.  
