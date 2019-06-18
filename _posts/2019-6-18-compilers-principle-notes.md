@@ -132,19 +132,19 @@ tags: Compilers CourseNotes
 
         - NFA 到 DFA 转换
             1. 置 $K'$ 为k空集；
-            2. 计算 $M'$ 的开始状态集 $S' = \epsilon\text{_closure}(S)$，$S'$ 作为 $K'$ 新增状态；
-            3. 对于 $K'$ 每一个新增状态 $q$，计算出每一个 $a \in \Sigma$ 的转换状态 $p$，即 $f'(q, a) = p = \epsilon\text{_closure}(M(q, a))$。如果 $p \notin K'$，则 $p$ 作为 $K'$ 的新增状态；
+            2. 计算 $M'$ 的开始状态集 $S' = \epsilon\_\text{closure}(S)$，$S'$ 作为 $K'$ 新增状态；
+            3. 对于 $K'$ 每一个新增状态 $q$，计算出每一个 $a \in \Sigma$ 的转换状态 $p$，即 $f'(q, a) = p = \epsilon\_\text{closure}(M(q, a))$。如果 $p \notin K'$，则 $p$ 作为 $K'$ 的新增状态；
             4. 重复步骤 3，直到 $K'$ 不再出现新增状态为止；
             5. 计算接收状态集 $Z' = \{ q \vert q \in K', q \cap Z \neq \Phi \}$。
 
 
-- $\epsilon\text{_closure}$
+- $\epsilon\_\text{closure}$
 
-    设 NFA $M = (K, \Sigma, f, S, Z)$，$I \subset K$，则 $\epsilon\text{_closure}(I)$ 计算过程如下：  
-    1. $I \subset \epsilon\text{_closure}(I)$
-    2. $M(\epsilon\text{_closure}(I), \epsilon) \subset \epsilon\text{_closure}(I)$  
+    设 NFA $M = (K, \Sigma, f, S, Z)$，$I \subset K$，则 $\epsilon\_\text{closure}(I)$ 计算过程如下：  
+    1. $I \subset \epsilon\_\text{closure}(I)$
+    2. $M(\epsilon\_\text{closure}(I), \epsilon) \subset \epsilon\_\text{closure}(I)$  
         其中 $M(I, a) = \cup_{q \in I} f(q, a)$。
-    3. 重复步骤 2，直至 $\epsilon\text{_closure}(I)$ 不再扩大为止。
+    3. 重复步骤 2，直至 $\epsilon\_\text{closure}(I)$ 不再扩大为止。
 
 
 
