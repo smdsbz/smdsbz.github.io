@@ -174,7 +174,7 @@ tags: Compilers CourseNotes
     （或者 $\text{FOLLOW}(A) = \\{ a \vert S \overset{\star}{\Rightarrow} \cdots A a \cdots, A \in V_N, a \in V_T \\}$）
 
     - 计算方法（$X \in V_N$）
-        1. 置 $\text{FOLLOW}(S) = \\{ \# \\}$；
+        1. 置 $\text{FOLLOW}(S) = \\{ \\# \\}$；
         2. 对所有规则：  
             若 $A \rightarrow \alpha B \beta$，且 $B \in V_N$，则 $\text{FOLLOW}(B) \cup = \text{FIRST}(B) - \\{ \epsilon \\}$；  
             若 $\beta \overset{\star}{\Rightarrow} \epsilon$，则 $\text{FOLLOW}(B) \cup = \text{FOLLOW}(A)$；
