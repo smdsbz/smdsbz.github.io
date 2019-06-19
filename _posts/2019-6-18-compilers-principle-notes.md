@@ -243,7 +243,134 @@ tags: Compilers CourseNotes
             - 消除间接左递归
                 - 代入原规则，消除直接左递归。
     - 出错处理
-        - 跳过输入栈中符号，直到遇到 $$\text{FOLLOW}(A)$$ / $$\text{FIRST}(B)$$ 中符号；
+        - 跳过输入栈中符号，直到遇到 $$\text{FOLLOW}(A)$$ / $$\text{FIRST}(A)$$ 中符号；
+
+# 自底向上优先分析
+
+- 简单优先文法
+
+    - 简单优先关系
+        - $$X \doteq Y \ \text{iff} \ A \rightarrow \cdots X Y \cdots \in P$$
+        - $$X \lessdot Y \ \text{iff} \ A \rightarrow \cdots X B \cdots \in P, B \overset{+}{\Rightarrow} Y \cdots$$
+        - $$X \gtrdot Y \ \text{iff} \ A \rightarrow \cdots B D \cdots \in P, B \overset{+}{\Rightarrow} \cdots X, D \overset{\star}{\Rightarrow} Y \cdots$$
+
+    设 $$G$$ 为简单优先文法，句型 $$\# a_1 a_2 \cdots a_{i-1} a_i a_{i+1} \cdots a_{j-1} a_j a_{j+1} \cdots a_n \#$$，且存在下列关系：
+
+    $$
+    a_{i-1} \lessdot a_i a_{i+1} \cdots a_{j-1} a_j \gtrdot a_{j+1} \ ,
+    $$
+
+    则字串 $$a_i \cdots a_j$$ 是句型的直接短语。特别地，如果这个字串是句型最左字串，则该字串是该句型的句柄。
+
+    不断用句柄对应规则的右部进行规约，直接规约出句型 $$\# S \# \leftarrow S'$$（增加规则）为止。
+
+- 算符优先文法
+
+    - 算符优先关系
+
+        与简单优先分析法不同，算符优先分析法仅利用相邻两个终结符之间优先关系寻找归约字串。这个归约字串不是句柄，是一种特殊的直接短语，“最左素短语”。
+
+        - $$a \doteq b \ \text{iff} \ A \rightarrow \cdots a b \cdots \in P \ \text{or} \ A \rightarrow \cdots a B b \cdots \in P$$
+        - $$a \lessdot b \ \text{iff} \ A \rightarrow \cdots a B \cdots \in P, B \overset{+}{\Rightarrow} b \cdots \ \text{or} \ B \overset{+}{\Rightarrow} C b \cdots$$
+        - $$a \gtrdot b \ \text{iff} \ A \rightarrow \cdots B b \cdots \in P, B \overset{+}{\Rightarrow} \cdots a \ \text{or} \ B \overset{+}{\Rightarrow} \cdots C a$$
+
+    若 $$G$$ 中没有形如 $$A \rightarrow \cdots B C \cdots$$ 的规则，则称文法 $$G$$ 为算符文法（Operator Grammar）。
+
+    若任意两终结符之间至多存在 $$\doteq$$、$$lessdot$$、$$gtrdot$$ 三种算符优先关系之一，则称文法 $$G$$ 为算符优先文法（Operator Precedence Grammar）。
+
+    句型的素短语是满足下列两个条件的短语：
+
+    1. 至少含有一个终结符；
+    2. 除自身之外不再包含其他素短语。
+
+    特别地，最左边的素短语为最左素短语。
+
+    - $$\text{FIRSTVT}(B) = \{ b \vert B \overset{+}{\Rightarrow} b \cdots \ \text{or} \ B \overset{+}{\Rightarrow} C b \cdots \}$$
+        - 计算方法
+            1. 对形如 $$A \rightarrow a \cdots$$、$$A \rightarrow B a \cdots$$ 的规则，$$\text{FIRSTVT}(A) \cup = \{ a \}$$；
+            2. 对形如 $$A \rightarrow B \cdots$$ 的规则，$$\text{FIRSTVT}(A) \cup = \text{FIRSTVT}(B)$$；
+            3. 重复步骤 2，直至 $$\text{FIRSTVT}$$ 集不再扩大为止。
+    - $$\text{LASTVT}(B) = \{ a \vert B \overset{+}{\Rightarrow} \cdots a \ \text{or} \ B \overset{+}{\Rightarrow} \cdots a C \}$$
+        - 计算方法
+            1. 对形如 $$A \rightarrow \cdots a$$、$$A \rightarrow \cdots a B$$ 的规则，$$\text{LASTVT}(A) \cup = \{ a \}$$；
+            2. 对形如 $$A \rightarrow \cdots B$$ 的规则，$$\text{LASTVT}(A) \cup = \text{LASTVT}(B)$$；
+            3. 重复步骤 2，直至 $$\text{LASTVT}$$ 集不再扩大为止。
+    - 算符优先关系计算方法
+        - 若 $$A \rightarrow \cdots a b \cdots$$ 或 $$A \rightarrow \cdots a B b \cdots$$，则 $$a \doteq b$$；
+        - 若 $$A \rightarrow \cdots a B \cdots$$，且 $$b \in \text{FIRSTVT}(B)$$，则 $$a \lessdot b$$；
+        - 若 $$A \rightarrow \cdots B a \cdots$$，且 $$b \in \text{LASTVT}(B)$$，则 $$a \gtrdot b$$；
+
+    - 算符优先函数
+        1. 对 $$a \in V_T$$，$$f(a) = g(a) = 1$$
+        2. 对每个关系对偶 $$\langle a, b \rangle$$：
+            - 若 $$a \doteq b,\ f(a) \neq g(b)$$，则 $$\min \{ f(a), g(b) \} = \max \{ f(a), g(b) \}$$；
+            - 若 $$a \lessdot b,\ f(a) \geq g(b)$$，则 $$g(b) = f(a) + 1$$；
+            - 若 $$a \gtrdot b,\ f(a) \leq g(b)$$，则 $$f(a) = g(b) + 1$$。
+        3. 重复步骤 2，直至过程收敛，或有函数值大于 $$2 \lvert V_T \rvert$$，则函数不存在。
+
+# $$\text{LR}$$ 分析
+
+$$\text{LR}(K)$$ 分析法。
+- $$\text{L}$$：从左至右扫描字符串；
+- $$\text{R}$$：最右推导逆过程，即规范规约；
+- $$K$$：向右查看输入串符号个数。
+
+<br />
+
+- 输入栈 $$I$$（栈顶元素为 $$a$$）
+- 分析栈：状态栈 $$S.Q$$（栈顶元素为 $$q$$）、符号栈 $$S.X$$
+- 分析表：$$M : \text{ACTION}, \text{GOTO}$$
+- 总控程序
+    1. 初始化：$$(0, \#)$$ 进栈 $$S$$；
+    2. 移进（__s__hift）：如果 $$M.\text{ACTION}[q, a] = s_j$$，则将 $$(j, a)$$ 进栈 $$S$$，输入栈 $$I$$ 出栈，转步骤 2；
+    3. 归约（__r__educe）：如果 $$M.\text{ACTION}[q, a] = r_i$$，则  
+        1. 令第 $$i$$ 条规则为 $$A \rightarrow \alpha$$，将 $$\lvert \alpha \rvert$$ 个状态和符号退出分析栈 $$S$$；
+        2. 令 $$q'$$ 为此刻状态栈 $$S.Q$$ 栈顶元素。若 $$M.\text{GOTO}[q', A] = j$$，将 $$(j, A)$$ 进栈 $$S$$，转步骤 2；否则 $$M.\text{GOTO}[q', A] = e_k$$，转出错处理 $$\text{ERROR}()$$。
+    4. 报错：如果 $$M.\text{ACTION}[q, a] = e_k$$，转出错处理 $$\text{ERROR}()$$；
+    5. 接收：如果 $$M.\text{ACTION}[q, a] = \text{acc}$$，则输出 $$\text{OK}$$，结束。
+
+<br />
+
+- $$\text{LR}(0)$$ 分析
+    - 可归前缀和活前缀
+        - 将符号串的任意含有头符号的子串称为前缀。特别地，空串 $$\epsilon$$ 为任意串的前缀。
+        - 若 $$S \underset{R}{\overset{\star}{\Rightarrow}} \alpha A \omega \underset{R}{\Rightarrow} \alpha \beta \omega$$ 是句型 $$\alpha \beta \omega$$ 的规范推导，则 $$\alpha \beta$$ 为可归前缀，$$\alpha \beta$$ 的前缀为活前缀。
+
+        > 尾符号恰好是句柄 $$\beta$$ 尾符号的文法规范句型的前缀，称为可归前缀，可归前缀的前缀称为活前缀。
+
+    - $$\text{LR}(0)$$ 项目
+        - 移进项目：$$A \rightarrow \alpha \cdot a \beta$$
+        - 待约项目：$$A \rightarrow \alpha \cdot X \beta$$
+        - 归约项目：$$A \rightarrow \alpha \cdot$$
+        - 接受项目：$$S' \rightarrow \alpha \cdot$$
+
+    - $$\text{Move}(I, X) = \{ A \rightarrow \alpha X \cdot \beta \vert A \rightarrow \alpha \cdot X \beta \in I \}$$
+    - $$\text{closure}(I)$$
+        1. $$I \subset \text{closure}(I)$$
+        2. $$\{ B \rightarrow \cdot \gamma \vert A \rightarrow \alpha \cdot B \beta \in \text{closure}(I) \} \subset \text{closure}(I)$$
+        3. 重复步骤 2，直至 $$\text{closure}(I)$$ 不再扩大为止。
+
+    - $$\text{LR}(0)$$ 识别活前缀的 DFA $$M = (K, \Sigma, f, S, Z)$$ 的构造方法
+        1. $$K \subseteq \rho$$（$$\text{LR}(0)$$ 项目集规范族）
+        2. $$\Sigma = V_N \cup V_T$$
+        3. $$f(I, X) = \text{closure}(\text{Move}(I, X)),\ I \in K, X \in \Sigma$$
+        4. $$S = \text{closure}(S' \rightarrow \cdot S)$$
+        5. $$Z = \{ q \vert q \in K, q \ \text{含归约项目} \}$$
+
+    - $$\text{LR}(0)$$ 分析表的构造
+        1. 对每一个 $$\text{LR}(0)$$ 项目
+            - 若为移进项目 $$A \rightarrow \alpha \cdot a \beta \in I_k,\ f(I_k, a) = I_j$$，则 $$M.\text{ACTION}[k, a] = s_j$$；
+            - 若为归约项目 $$A \rightarrow \alpha \cdot \in I_k$$，规则 $$A \rightarrow \alpha$$ 标号为 $$i$$，则对 $$\forall a \in V_T \cup \{ \# \}$$，$$M.\text{ACTION}[k, a] = r_i$$；
+            - 若为接受项目 $$S' \rightarrow S \cdot \in I_k$$，则 $$M.\text{ACTION}[k, \#] = \text{acc}$$；
+            - 另外，若 $$f(I_k, A) = I_j,\ A \in V_N$$，则 $$M.\text{GOTO}[k, A] = j$$。
+        2. 其余空位置 $$e_{\cdot}$$。
+
+
+
+
+
+
+
 
 
 
