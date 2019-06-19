@@ -365,6 +365,64 @@ $$\text{LR}(K)$$ 分析法。
             - 另外，若 $$f(I_k, A) = I_j,\ A \in V_N$$，则 $$M.\text{GOTO}[k, A] = j$$。
         2. 其余空位置 $$e_{\cdot}$$。
 
+    - 同时含有移进项目和归约项目的项目集称含有移进-归约冲突的项目集；同时含有一个以上的归约项目的项目集称含有归约-归约冲突的项目集。
+
+- $$\text{SLR}(1)$$ 分析
+
+    若 $$\text{LR}(0)$$ 文法项目规范族中移进符号集与归约项目的冲突项目集的 $$\text{FOLLOW}$$ 集两两交集均为空集，则文法为 $$\text{SLR}(1)$$。
+
+    - 若文法是 $$\text{LR}(0)$$ 文法，则一定是 $$\text{SLR}(1)$$。
+
+    - 分析表构造方法
+        1. 对每一个 $$\text{LR}(0)$$ 项目
+            - 若为移进项目 $$A \rightarrow \alpha \cdot a \beta \in I_k,\ f(I_k, a) = I_j$$，则 $$M.\text{ACTION}[k, a] = s_j$$；
+            - 若为归约项目 $$A \rightarrow \alpha \cdot \in I_k$$，规则 $$A \rightarrow \alpha$$ 标号为 $$i$$，__且 $$a \in \text{FOLLOW}(A)$$__，则 $$M.\text{ACTION}[k, a] = r_i$$；
+
+                > $$\text{LL}(0)$$ 中直接填充一整行为 $$r_i$$，此时若一个项目集中有多个项目，可能出现移进-归约冲突或归约-归约冲突。
+
+            - 若为接受项目 $$S' \rightarrow S \cdot \in I_k$$，则 $$M.\text{ACTION}[k, \#] = \text{acc}$$；
+            - 另外，若 $$f(I_k, A) = I_j,\ A \in V_N$$，则 $$M.\text{GOTO}[k, A] = j$$。
+        2. 其余空位置 $$e_{\cdot}$$。
+
+- $$\text{LR}(1)$$ 分析
+
+    若 $$\text{SLR}(1)$$ 文法项目规范组中移进符号集与归约项目的冲突项目集的搜索集两两交集均为空，则文法为 $$\text{LR}(1)$$ 文法。
+
+    - 若文法是 $$\text{SLR}(1)$$ 文法，则一定是 $$\text{LR}(1)$$。
+
+    - 文法的附加搜索符的 $$\text{LR}(0)$$ 项目称为 $$\text{LR}(1)$$ 项目。  
+        其中 $$\text{LR}(0)$$ 项目部分称为 $$\text{LR}(1)$$ 项目的心。  
+        记为 $$[ \text{LR}(0) \ \text{项目}, \text{搜索符}_1 \vert \cdots \vert \text{搜索符}_m ]$$（其中第二项称为搜索集）。
+
+    - $$\text{Move1}(I, X) = \{ [ A \rightarrow \alpha X \cdot \beta, a ] \vert [ A \rightarrow \alpha \cdot X \beta, a ] \in I \}$$
+    - $$\text{closure1}(I)$$
+        1. $$I \subset \text{closure1}(I)$$
+        2. $$\{ [ B \rightarrow \cdot \gamma, b ] \vert [ A \rightarrow \alpha \cdot B \beta, a ] \in \text{closure1}(I),\ b \in \text{FIRST}(\beta a) \} \subset \text{closure1}(I)$$
+        3. 重复步骤 2，直至不再扩大为止。
+
+    - 使用 $$\text{Move1}$$ 与 $$\text{closure1}$$ 构造识别活前缀 DFA。
+        - 起始项目为 $$[S' \rightarrow \cdot S, \#]$$。
+
+    - 分析表构造方法
+        - 类似 $$\text{SLR}(1)$$；
+        - 若为移进项目 $$[A \rightarrow \alpha \cdot a \beta, b] \in I_k,\ f(I_k, a) = I_j$$，则 $$M.\text{ACTION}[k, a] = s_j$$；
+        - 若为归约项目 $$[A \rightarrow \alpha \cdot, b] \in I_k$$，规则 $$A \rightarrow \alpha$$ 标号为 $$i$$，__则 $$M.\text{ACTION}[k, b] = r_i$$__；
+        - 若为接受项目 $$[S' \rightarrow S \cdot, \#] \in I_k$$，则 $$M.\text{ACTION}[k, \#] = \text{acc}$$；
+
+- $$\text{LALR}(1)$$ 分析
+
+    若采用同心项目合集合并法进行合并后的 $$\text{LR}(1)$$ 项目集规范族，没有 $$\text{LR}(1)$$ 项目冲突，则为 $$\text{LALR}(1)$$。
+
+    - 若文法是 $$\text{LALR}(1)$$ 文法，则一定是 $$\text{LR}(1)$$。
+
+- 二义性文法一定不是 $$\text{LR}$$ 文法。
+    - 应用优先级与结合性解决冲突。
+
+- 用 $$S$$ 表示文法集，则有
+
+    $$
+    S_{\text{LR}(0)} \subsetneq S_{\text{SLR}(1)} \subsetneq S_{\text{LALR}(1)} \subsetneq S_{\text{LR}(1)} \ .
+    $$
 
 
 
