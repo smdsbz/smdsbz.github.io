@@ -201,5 +201,55 @@ tags: Compilers CourseNotes
     $$
 
     - 确定的自顶向下语法分析不必穷举推导过程，避免了回溯现象，也称不带回溯的自顶向下语法分析。
+        - 递归子程序法
+
+            将每个非终结符编写为一个递归子程序，子程序中将输入串下一个符号逐个与选择集进行判定，当下一个符号不属于任何选择集时报错。
+
+        - 预测分析法
+            - 输入栈、分析栈、分析表
+            - 分析栈初始内容为：$$\# \ S$$
+            - 输入栈初始内容为：$$a \ b \ c \ \cdots \ \#$$
+            - 查看输入栈栈顶元素，将分析栈栈顶元素规约为分析表中对应规则右部。
+            - 若分析栈栈顶与输入栈栈顶的终结符匹配，则同时弹出。
+            - 直至分析栈与输入栈中仅含界符时终止。
+    - $$\text{LL}(1)$$ 文法的判定
+        1. 计算可推导出 $$\epsilon$$ 的非终结符号；
+        2. 计算非终结符号的 $$\text{FIRST}(X)$$ 集；
+        3. 计算规则右部的 $$\text{FIRST}(\alpha)$$ 集；
+        4. 计算非终结符号的 $$\text{FOLLOW}(A)$$ 集；
+        5. 计算规则的 $$\text{SELECT}$$ 集。
+    - 某些非 $$\text{LL}(1)$$ 文法到 $$\text{LL}(1)$$ 文法的等价变换
+        - 提取左公因子法
+
+            $$
+            \begin{align}
+            &A \rightarrow \alpha \beta_1 \vert \alpha \beta_2 \vert \cdots \vert \alpha \beta_n \vert \gamma_1 \vert \cdots \vert \gamma_m \\\\
+            \Rightarrow &A \rightarrow \alpha B \vert \gamma_1 \vert \cdots \vert \gamma_m \\
+            &B \rightarrow \beta_1 \vert \beta_2 \vert \cdots \vert \beta_n
+            \end{align}
+            $$
+
+        - 消除左递归法
+            - 消除直接左递归
+
+                $$
+                \begin{align}
+                &A \rightarrow A \alpha_1 \vert A \alpha_2 \vert \cdots \vert A \alpha_n \vert \beta_1 \vert \cdots \vert \beta_m \\\\
+                \Rightarrow &A \rightarrow \beta_1 A' \vert \cdots \vert \beta_m A' \\
+                &A' \rightarrow \alpha_1 A' \vert \cdots \vert \alpha_n A' \vert \epsilon
+                \end{align}
+                $$
+
+            - 消除间接左递归
+                - 代入原规则，消除直接左递归。
+    - 出错处理
+        - 跳过输入栈中符号，直到遇到 $$\text{FOLLOW}(A)$$ / $$\text{FIRST}(B)$$ 中符号；
+
+
+
+
+
+
+
 
 
