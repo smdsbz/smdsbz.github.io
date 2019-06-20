@@ -593,6 +593,18 @@ $$\text{LR}(K)$$ 分析法。
                 2. 如果 $$NEW\_D \neq D(n)$$，$$D(n) \leftarrow NEW\_D$$
             3. 重复步骤 2，直至所有 $$D(n)$$ 不再变化为止。
 
+        - 假设 $$n \rightarrow m$$ 是流图的一条边，若存在 $$m \ \text{DOM} \ n$$，则称 $$n \rightarrow m$$ 是流图的一条回边。
+
+        - 循环查找算法（$$n \rightarrow m$$ 是流图上回边，求 $$m$$ 为入口 $$n$$ 为出口的循环）
+            1. $$loop \leftarrow \{ m, n \},\ S \leftarrow \{ n \}$$；
+            2. $$S \leftarrow \cup_{q \in S} P(q) - loop$$；
+            3. $$loop \leftarrow loop \cup S$$；
+            4. 重复步骤 2、3，直至所有 $$loop$$ 不再变化为止。
+
+- 可归约流图
+
+    一个流图是可归约流图，当且仅当流图中除去回边后，其余边构成一个无环路流图。
+
 
 
 
