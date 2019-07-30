@@ -132,7 +132,6 @@ __After a `reshard` Is Issued...__
 Call stack (`src/redis-cli.c`)
 
 - `clusterManagerCommandReshard`
-  
     - `clusterManagerCheckCluster`
         - `clusterManagerIsConfigConsistent`
         - for each slot, check
@@ -142,8 +141,8 @@ Call stack (`src/redis-cli.c`)
             - `clusterManagerFixMultipleSlotOwners`
     - get target node to `MIGRATE` to by calling `clusterNodeForResharding`
     - get list of source slots (and the nodes they're on) by calling
-    `clusterManagerComputeReshardTable`
-    
+        `clusterManagerComputeReshardTable`
+
         > __Sidenotes on implementation__
         >
         > The migration is issued evenly accross slots, with only bit more focus
@@ -152,17 +151,18 @@ Call stack (`src/redis-cli.c`)
         > ```c
         > ...
         > qsort(sorted, src_count, sizeof(clusterManagerNode *),
-        >    clusterManagerSlotCountCompareDesc);
+        >     clusterManagerSlotCountCompareDesc);
         > for (i = 0; i < src_count; i++) {
-        >  ...
-        >  float n = ((float) numslots / tot_slots * node->slots_count);
-        >  if (i == 0) n = ceil(n);
-        >  else n = floor(n);
-        >  ...
+        >     ...
+        >     float n = ((float) numslots / tot_slots * node->slots_count);
+        >     if (i == 0) n = ceil(n);
+        >     else n = floor(n);
+        >     ...
         > }
         > ```
-    
-    - for each `clusterManagerResharTableItem` in the reshard table, run `clusterManagerMoveSlot`
+
+    - for each `clusterManagerResharTableItem` in the reshard table, run
+        `clusterManagerMoveSlot`
         - for target, issue `CLUSTER SETSLOT <slot> IMPORTING <source-id>`
         - for source, issue `CLUSTER SETSLOT <slot> MIGRATING <target-id>`
         - `clusterManagerMigrateKeysInSlot`
