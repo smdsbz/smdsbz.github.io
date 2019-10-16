@@ -51,15 +51,17 @@ further calculates which Ceph OSD Daemon should store the placement group.
 
 *Do this for all service nodes.*
 
-1. User with password-less `sudo` privilege named `ceph`
+1. User with password-less `sudo` privilege named `cephuser`
 
     ```console
-    # useradd -d /home/ceph -m ceph     # create user if not exists
-    # passwd ceph                       # enter password
-    # echo "ceph ALL = (root) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/ceph  # password-less sudo
+    # useradd -d /home/ceph -m cephuser     # create user if not exists
+    # passwd cephuser                       # enter password
+    # echo "cephuser ALL = (root) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/ceph  # password-less sudo
     # chmod 0440 /etc/sudoers.d/ceph
     # sed -i "s/Defaults requiretty/#Defaults requiretty"g /etc/sudoers     # tty-less sudo
     ```
+
+    > You may **NOT** name the user `ceph`, for Ceph software may use this name.
 
 2. [Required for CentOS] Enable source of wanted Ceph release
 
@@ -174,8 +176,45 @@ further calculates which Ceph OSD Daemon should store the placement group.
     >     # yum remove `yum list installed | grep ceph-{release} | awk '{print $1}'`
     >     ```
 
+> Deploying Ceph on a one-node cluster can cause deadlock!
+>
+> See [here](https://docs.ceph.com/docs/luminous/rados/troubleshooting/troubleshooting-pg/#one-node-cluster)
+> before you proceed.
+
 3. Create monitors
 
+    ```console
+    $ ceph-deploy mon create ceph-mon1
+    $ ceph-deploy gatherkeys ceph-mon1
+    ```
+
+4. Register admin node of the cluster
+
+    ```console
+    $ ceph-deploy admin ceph-admin
+    ```
+
+    Now you may use `ceph` CLI tool without having to specify the monitor address
+    and `ceph.client.admin.keyring` before you execute a command.
+
+5. Deploy a manager daemon
+
+    ```console
+    $ ceph-deploy mgr create ceph-mgr1
+    ```
+
+6. Add OSDs
+
+    ```console
+    $ ceph-deploy osd create ceph-osd1:vdb ceph-osd2:vdb ceph-osd3:vdb
+    ```
+
+7. Check cluster health
+
+    ```console
+    $ ssh ceph-node sudo ceph health
+    $ ssh ceph-node sudo ceph -s
+    ```
 
 
 
