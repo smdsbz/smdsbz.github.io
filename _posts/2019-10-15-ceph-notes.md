@@ -153,8 +153,14 @@ further calculates which Ceph OSD Daemon should store the placement group.
 
     > Packages in official CentOS repo is outdated, and may try to download from
     > `http://ceph.com/xxxx`, not the updated `https://download.ceph.com/xxxx`.
-    > To correct this, you may edit URLs in
-    > `/usr/lib/python2.7/site-packages/ceph_deploy/hosts/centos/install.py`.
+    > To correct this, you may
+    > 1. <span></span>
+    >     ```console
+    >     $ export CEPH_DEPLOY_REPO_URL=http://mirrors.163.com/ceph/{dist}-{release}
+    >     $ export CEPH_DEPLOY_GPG_URL=http://mirrors.163.com/ceph/keys/release.asc
+    >     ```
+    > 2. edit URLs in
+    >     `/usr/lib/python2.7/site-packages/ceph_deploy/hosts/centos/install.py`.
 
     > To **truely** uninstall Ceph,
     >
