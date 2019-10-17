@@ -63,15 +63,10 @@ further calculates which Ceph OSD Daemon should store the placement group.
 
     > You may **NOT** name the user `ceph`, for Ceph software may use this name.
 
-2. [Required for CentOS] Enable source of wanted Ceph release
+2. Check hostname
 
-    > Otherwise will complain package `ceph`, `ceph-radowsgw` cannot be found.
+    Server nodes' hostnames must be identical to their hostnames on admin node.
 
-    ```console
-    # yum install centos-release-ceph-{release}
-    ```
-
-    > `yum search ceph` for all available Ceph releases.
 
 ### Admin Node Setup
 
@@ -148,9 +143,6 @@ further calculates which Ceph OSD Daemon should store the placement group.
     $ ceph-deploy install [--release {release}] ceph-mon1 ceph-osd1 ...
     ```
 
-    > The default release is hard-coded into
-    > `/usr/lib/python2.7/site-packages/ceph_deploy/install.py`.
-
     > Packages in official CentOS repo is outdated, and may try to download from
     > `http://ceph.com/xxxx`, not the updated `https://download.ceph.com/xxxx`.
     > To correct this, you may
@@ -164,27 +156,42 @@ further calculates which Ceph OSD Daemon should store the placement group.
 
     > To **truely** uninstall Ceph,
     >
-    > 1. Uninstall Ceph software
-    >
-    >     ```console
-    >     $ ceph-deploy uninstall ceph-mon1 ceph-osd1 ...
-    >     ```
-    >
-    > 2. Remove repository
-    >
-    >     ```console
-    >     # yum remove centos-release-ceph-{release}
-    >     ```
-    >
-    > 3. Manuall uninstall all python dependencies
-    >
-    >     ```console
-    >     # yum remove `yum list installed | grep ceph-{release} | awk '{print $1}'`
-    >     ```
+    > ```console
+    > $ ceph-deploy purge node1 node2 ...
+    > $ ceph-deploy purgedata node1 node2 ...
+    > $ ceph-deploy forgetkeys node1 node2 ...
+    > # yum remove `yum list installed | grep ceph | awk '{print $1}'`
+    > # rm -rf /var/run/ceph
+    > # vgremove ceph-xxxxx
+    > ```
+
+> If you have more than one network interface, you must have the following option
+> configured and pushed to service nodes.
+>
+> ```toml
+> [global]
+> public_network=xxx.xxx.xxx.xxx/xx
+> ```
+>
+> Push config file and restart Ceph service to make new configs in effect.
+>
+> ```console
+> $ ceph-deploy --overwrite-conf config push node1 node2 ...
+> $ ssh node1 sudo systemctl restart ceph.target
+> ```
 
 > Deploying Ceph on a one-node cluster can cause deadlock!
 >
-> See [here](https://docs.ceph.com/docs/luminous/rados/troubleshooting/troubleshooting-pg/#one-node-cluster)
+> Before you continue to create monitors, you must have the following options
+> configured and pushed to service nodes.
+>
+> ```toml
+> [global]
+> osd_crush_chooseleaf_type = 0     # let CRUSH navigate to OSDs instead of hosts
+> osd_pool_default_min_size = 1     # allow PGs to provide service at 'undesired' state
+> ```
+>
+> See [here](https://docs.ceph.com/docs/master/rados/troubleshooting/troubleshooting-pg/#one-node-cluster)
 > before you proceed.
 
 3. Create monitors
@@ -193,6 +200,19 @@ further calculates which Ceph OSD Daemon should store the placement group.
     $ ceph-deploy mon create ceph-mon1
     $ ceph-deploy gatherkeys ceph-mon1
     ```
+
+    > On CentOS, if encountered error throwing this message
+    >
+    > ```text
+    > [ceph-deploy.mon][ERROR] Failed to execute command: /usr/sbin/service ceph -c /etc/ceph/ceph.conf start mon.{node}
+    > ```
+    >
+    > It may due to `ceph-deploy` being outdated (for it's invoking `service`
+    > instead of the more mordern, feature-rich `systemctl`), or lack of LSB
+    > (Linux Standard Base) support.
+    >
+    > Fix it by installing the latest `ceph-deploy` scripts and the `redhat-lsb`
+    > package.
 
 4. Register admin node of the cluster
 
@@ -221,6 +241,18 @@ further calculates which Ceph OSD Daemon should store the placement group.
     $ ssh ceph-node sudo ceph health
     $ ssh ceph-node sudo ceph -s
     ```
+
+8. \[Optional] Testrun: create / delete object
+
+    ```console
+    $ echo 'something' > testfile
+    # ceph osd pool create mytest 30    # 30 PGs, too few will cause RADOS to deadlock
+    # rados --pool=mytest put test-obj1 ./testfile
+    # rados -p mytest ls
+    # rados -p mytest rm test-obj1
+    ```
+
+
 
 
 
