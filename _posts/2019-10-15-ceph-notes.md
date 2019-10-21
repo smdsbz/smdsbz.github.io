@@ -188,6 +188,7 @@ further calculates which Ceph OSD Daemon should store the placement group.
 > ```toml
 > [global]
 > osd_crush_chooseleaf_type = 0     # let CRUSH navigate to OSDs instead of hosts
+> osd_pool_default_size = 1
 > osd_pool_default_min_size = 1     # allow PGs to provide service at 'undesired' state
 > ```
 >
@@ -253,6 +254,66 @@ further calculates which Ceph OSD Daemon should store the placement group.
     # rados -p mytest rm test-obj1
     ```
 
+## Cache Tiering
+
+* [Cache Tiering - Ceph Documentation](https://docs.ceph.com/docs/master/rados/operations/cache-tiering/)
+
+<center><img src="https://docs.ceph.com/docs/master/_images/ditaa-2982c5ed3031cac4f9e40545139e51fdb0b33897.png"/></center>
+
+The Ceph objecter handles where to place the objects and the tiering agent
+determines when to flush objects from the cache to the backing storage tier.
+
+The cache tier and the backing storage tier are completely transparent to Ceph
+clients.
+
+### `cache-mode`
+
+* `writeback`
+
+    Flushing is performed asynchronously.
+
+* `readproxy`
+
+    Use any objects that already exists in the cache tier, but does **not**
+    migrate data on cache miss.
+
+    Useful for transitioning from `writeback` mode to disable cache.
+
+* `readonly`
+
+    Promotes objects to cache on read operations only, write operations are
+    forwarded to base tier.
+
+    Updates on base tier are **not** synced to cache tier.
+
+* `none`
+
+### Creating a Cache Tier
+
+Settings up a cache pool follows the same procedure as the standard storage
+scenario, but with this difference: the drives for the cache tier are typically
+high performance drives that reside in their own servers and have their own
+CRUSH rule. When setting up such a rule, it should take account of the hosts
+that have the high performance drives while omitting the hosts that don't.
+See [Manually Editing a CRUSH Map](https://docs.ceph.com/docs/master/rados/operations/crush-map-edits/#placing-different-pools-on-different-osds)
+for details.
+
+> You may manually assign device class to devices.
+>
+> ```console
+> # ceph osd crush rm-device-class osd.2 osd.3
+> # ceph osd crush set-device-class ssd osd.2 osd.3
+> ```
+
+```console
+# ceph osd tier add base-tier-pool cache-tier-pool
+# ceph osd tier cache-mode cache-tier-pool writeback
+# ceph osd tier set-overlay base-tier-pool cache-tier-pool
+```
+
+Changes to base tier will now be handled by cache tier.
+
+<center><img src="https://raw.githubusercontent.com/smdsbz/smdsbz.github.io/master/assets/images/2019-10-15-ceph-notes/cache-tier-testrun.png"/></center>
 
 
 
