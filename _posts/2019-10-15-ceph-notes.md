@@ -192,6 +192,7 @@ further calculates which Ceph OSD Daemon should store the placement group.
 > ```
 >
 > See [here](https://docs.ceph.com/docs/master/rados/troubleshooting/troubleshooting-pg/#one-node-cluster)
+> and [here](https://tracker.ceph.com/projects/ceph/wiki/How_Can_I_Give_Ceph_a_Try)
 > before you proceed.
 
 3. Create monitors
