@@ -216,6 +216,14 @@ further calculates which Ceph OSD Daemon should store the placement group.
     > Fix it by installing the latest `ceph-deploy` scripts and the `redhat-lsb`
     > package.
 
+    > If your monitor starts but reported to be stuck at `probing` state, there
+    > is a good chance that IP addresses for monitors in `monmap` are broken.
+    > Please ensure that
+    >
+    > 1. The IPs are correct
+    > 2. No mixed use of IPv4 and IPv6 (e.g. using IPv4 for `public_network`
+    >     with `ms_bind_ipv6 = true`)
+
 4. Register admin node of the cluster
 
     ```console
@@ -328,4 +336,3 @@ Changes to base tier will now be handled by cache tier.
 
 * [Ceph Documentation](https://docs.ceph.com/docs/master/)
 * [How to Build a Ceph Distributed Storage Cluster on CentOS 7](https://www.howtoforge.com/tutorial/how-to-build-a-ceph-cluster-on-centos-7/)
-* [Using Ceph as Block Device on CentOS 7](https://www.howtoforge.com/tutorial/using-ceph-as-block-device-on-centos-7/)
