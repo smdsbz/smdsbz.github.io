@@ -67,6 +67,8 @@ further calculates which Ceph OSD Daemon should store the placement group.
 
     Server nodes' hostnames must be identical to their hostnames on admin node.
 
+3. Install NTP
+
 
 ### Admin Node Setup
 
@@ -159,7 +161,7 @@ further calculates which Ceph OSD Daemon should store the placement group.
     > ```console
     > $ ceph-deploy purge node1 node2 ...
     > $ ceph-deploy purgedata node1 node2 ...
-    > $ ceph-deploy forgetkeys node1 node2 ...
+    > $ ceph-deploy forgetkeys
     > # yum remove `yum list installed | grep ceph | awk '{print $1}'`
     > # rm -rf /var/run/ceph
     > # vgremove ceph-xxxxx
@@ -223,6 +225,16 @@ further calculates which Ceph OSD Daemon should store the placement group.
     > 1. The IPs are correct
     > 2. No mixed use of IPv4 and IPv6 (e.g. using IPv4 for `public_network`
     >     with `ms_bind_ipv6 = true`)
+
+    > If your monitor starts but reported to be stuck at `electing` state, you
+    > may have a *clock drift* situation. You may find the following configuration
+    > helpful.
+    >
+    > ```toml
+    > [global]
+    > mon_force_quorum_join = true      # prefered if debugging
+    > mon_clock_drift_allowed = 5.0     # in seconds
+    > ```
 
 4. Register admin node of the cluster
 
@@ -317,7 +329,14 @@ for details.
 # ceph osd tier add base-tier-pool cache-tier-pool
 # ceph osd tier cache-mode cache-tier-pool writeback
 # ceph osd tier set-overlay base-tier-pool cache-tier-pool
+# ceph osd pool set cache-tier-pool target_max_bytes {size}
 ```
+
+> Ceph cannot determin size of cache pool automatically, thus configuration on
+> absolute size is required, otherwise flush / evict will not work.
+
+> All client requests **will be blocked** when `target_max_bytes` or
+> `target_max_objects` reached, and flushing / evicting will start.
 
 Changes to base tier will now be handled by cache tier.
 
