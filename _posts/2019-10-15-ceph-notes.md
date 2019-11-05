@@ -254,7 +254,7 @@ further calculates which Ceph OSD Daemon should store the placement group.
 6. Add OSDs
 
     ```console
-    $ ceph-deploy osd create ceph-osd1:vdb ceph-osd2:vdb ceph-osd3:vdb
+    $ ceph-deploy osd create --data /dev/sdx ceph-osdx
     ```
 
 7. Check cluster health
