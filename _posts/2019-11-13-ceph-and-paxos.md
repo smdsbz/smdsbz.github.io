@@ -5,7 +5,7 @@ key: ceph-and-paxos
 tags: DistributedSystems Ceph Paxos Consensus
 ---
 
-Lines from ["Ceph Monitors and Paxos, a chat with Joao"](1).
+Lines from ["Ceph Monitors and Paxos, a chat with Joao"](https://ceph.io/geen-categorie/monitors-and-paxos-a-chat-with-joao/).
 
 <!-- more -->
 
@@ -46,7 +46,7 @@ Lines from ["Ceph Monitors and Paxos, a chat with Joao"](1).
 1. The *time to live* is configured among all Paxos learners. On expiration,
     the previous version of proposition is no longer valid.
 
-2. It seems Ceph relies on an authouritative clock for checking expiration, if
+2. It seems Ceph relies on an authouritative clock for expiration timeout. If
     clocks are un-synchronized, the `last_committed` version will not expire on
     all learners **simultaneously**.
 
@@ -63,7 +63,4 @@ Lines from ["Ceph Monitors and Paxos, a chat with Joao"](1).
 
 ## Reference
 
-* [Ceph Monitors and Paxos, a chat with Joao](1)
-
-
-[1]: https://ceph.io/geen-categorie/monitors-and-paxos-a-chat-with-joao/
+* [Ceph Monitors and Paxos, a chat with Joao](https://ceph.io/geen-categorie/monitors-and-paxos-a-chat-with-joao/)
