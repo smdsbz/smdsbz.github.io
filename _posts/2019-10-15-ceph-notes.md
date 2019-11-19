@@ -315,10 +315,25 @@ scenario, but with this difference: the drives for the cache tier are typically
 high performance drives that reside in their own servers and have their own
 CRUSH rule. When setting up such a rule, it should take account of the hosts
 that have the high performance drives while omitting the hosts that don't.
-See [Manually Editing a CRUSH Map](https://docs.ceph.com/docs/master/rados/operations/crush-map-edits/#placing-different-pools-on-different-osds)
+
+If you want PGs of cache pools only on SSDs and those of cold storage pools only
+on HDDs, you may trivially create dedicated CRUSH rules and assign them to pools.
+
+```console
+# # ceph osd crush rule create-replicated <name> <root> <leaf type> [<device class>]
+# ceph osd crush rule create-replicated hdd_rule default host hdd
+# ceph osd crush rule create-replicated ssd_rule default host ssd
+# ceph osd pool set cache-tier-pool crush_rule ssd_rule
+# ceph osd pool set base-tier-pool crush_rule hdd_rule
+```
+
+> A **complete** reshuffling is required for CRUSH rule changes.
+
+For more information, see [Manually Editing a CRUSH Map](https://docs.ceph.com/docs/master/rados/operations/crush-map-edits/#placing-different-pools-on-different-osds)
 for details.
 
-> You may manually assign device class to devices.
+> You may manually assign device class to devices if their device classes are
+> not inferred correctly.
 >
 > ```console
 > # ceph osd crush rm-device-class osd.2 osd.3
@@ -329,11 +344,11 @@ for details.
 # ceph osd tier add base-tier-pool cache-tier-pool
 # ceph osd tier cache-mode cache-tier-pool writeback
 # ceph osd tier set-overlay base-tier-pool cache-tier-pool
+# ceph osd pool set cache-tier-pool hit_set_type bloom  # all these are *required*
+# ceph osd pool set cache-tier-pool hit_set_count 12
+# ceph osd pool set cache-tier-pool hit_set_period 14400
 # ceph osd pool set cache-tier-pool target_max_bytes {size}
 ```
-
-> Ceph cannot determin size of cache pool automatically, thus configuration on
-> absolute size is required, otherwise flush / evict will not work.
 
 > All client requests **will be blocked** when `target_max_bytes` or
 > `target_max_objects` reached, and flushing / evicting will start.
