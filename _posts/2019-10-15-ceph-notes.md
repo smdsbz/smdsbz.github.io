@@ -362,6 +362,8 @@ Changes to base tier will now be handled by cache tier.
 
 *written at 2019.11.27*
 
+### Python2 Issues
+
 As the counsul dropping support for Python2, some packages' versions are no longer
 allowed to be left unspecified, for `more-itertools` (required by `tox`) and
 `pytest` will complain.
@@ -400,6 +402,13 @@ A temporary fix will be appending `more-itertools==4.1.0` to every occurance of
 3. Fixing `pytest<=4.6` on every failure the script complains, including
 
     * `src/pybind/mgr/ansible/requirements.txt`
+
+### `xxHash.c` Issue
+
+If you got error when running `./do_cmake.sh` complaing it cannot find some
+`xxHash/xxHash.c` file, just comment it out (can be found in `src/CMakeLists.txt`
+at the `set(libcommon_files ...)` section).
+
 
 
 
