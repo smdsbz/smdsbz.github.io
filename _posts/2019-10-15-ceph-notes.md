@@ -403,12 +403,6 @@ A temporary fix will be appending `more-itertools==4.1.0` to every occurance of
 
     * `src/pybind/mgr/ansible/requirements.txt`
 
-### `xxHash.c` Issue
-
-~~If you got error when running `./do_cmake.sh` complaing it cannot find some
-`xxHash/xxHash.c` file, just comment it out (can be found in `src/CMakeLists.txt`
-at the `set(libcommon_files ...)` section).~~
-
 
 
 
