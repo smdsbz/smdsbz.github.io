@@ -358,6 +358,51 @@ Changes to base tier will now be handled by cache tier.
 <center><img src="https://raw.githubusercontent.com/smdsbz/smdsbz.github.io/master/assets/images/2019-10-15-ceph-notes/cache-tier-testrun.png"/></center>
 
 
+## Development Build Environment Setup
+
+*written at 2019.11.27*
+
+As the counsul dropping support for Python2, some packages' versions are no longer
+allowed to be left unspecified, for `more-itertools` (required by `tox`) and
+`pytest` will complain.
+
+A temporary fix will be appending `more-itertools==4.1.0` to every occurance of
+`tox`, and fixing `pytest` version to `<=4.6`:
+
+1. Append `'more-itertools == 4.1.0'` to the `pip` call found in
+    `install-deps.sh/populate_wheelhouse()`.
+
+    ```bash
+    function populate_wheelhouse() {
+        local install=$1
+        shift
+
+        # although pip comes with virtualenv, having a recent version
+        # of pip matters when it comes to using wheel packages
+        PIP_OPTS="--timeout 300 --exists-action i"
+        pip $PIP_OPTS $install \
+          'setuptools >= 0.8' 'pip >= 7.0' 'wheel >= 0.24' 'more-itertools == 4.1.0' 'tox >= 2.9.1' || return 1
+        #                                                  ~~~~~~~~~~~~~~~~~~~~~~~~~ <- here!
+        # pip $PIP_OPTS $install \
+        #   'setuptools >= 0.8' 'pip >= 7.0' 'wheel >= 0.24' 'tox >= 2.9.1' || return 1
+        if test $# != 0 ; then
+            pip $PIP_OPTS $install $@ || return 1
+        fi
+    }
+    ```
+
+2. Append `more-itertools==4.1.0` on every failure the script complains, including
+
+    * `src/ceph-volume/plugin/zfs/requirements_dev.txt`
+    * `src/pybind/mgr/orchestrator_cli/requirements.txt`
+    * `src/pybind/mgr/ansible/requirements.txt`
+
+3. Fixing `pytest<=4.6` on every failure the script complains, including
+
+    * `src/pybind/mgr/ansible/requirements.txt`
+
+
+
 
 
 
