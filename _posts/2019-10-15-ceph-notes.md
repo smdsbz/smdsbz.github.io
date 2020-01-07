@@ -344,10 +344,15 @@ for details.
 # ceph osd tier add base-tier-pool cache-tier-pool
 # ceph osd tier cache-mode cache-tier-pool writeback
 # ceph osd tier set-overlay base-tier-pool cache-tier-pool
-# ceph osd pool set cache-tier-pool hit_set_type bloom  # all these are *required*
+# # all options below required
+# ceph osd pool set cache-tier-pool hit_set_type bloom
 # ceph osd pool set cache-tier-pool hit_set_count 12
 # ceph osd pool set cache-tier-pool hit_set_period 14400
 # ceph osd pool set cache-tier-pool target_max_bytes {size}
+# # set evict ratio, otherwise always evict everything in cache tier
+# ceph osd pool set cache-tier-pool cache_target_dirty_ratio 0.4
+# ceph osd pool set cache-tier-pool cache_target_dirty_high_ratio 0.6
+# ceph osd pool set cache-tier-pool cache_target_full_ratio 0.8
 ```
 
 > All client requests **will be blocked** when `target_max_bytes` or
