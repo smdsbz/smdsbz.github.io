@@ -1,6 +1,6 @@
 ---
 layout: article
-title: Ceph `ObjectStore` Interface Notes
+title: Ceph ObjectStore Interface Notes
 key: ceph-objectstore-interface-notes
 tags: DistributedSystems Ceph Storage SourceCode
 ---
