@@ -5,7 +5,7 @@ key: ceph-crush-pipeline
 tags: DistributedSystems Storage Ceph CRUSH
 ---
 
-# Ceph CRUSH Pipeline
+<!-- more -->
 
 _based on version nautilus (b0c68711039276c1e8d5bfa838207468a36a165c)_
 
@@ -28,6 +28,15 @@ _based on version nautilus (b0c68711039276c1e8d5bfa838207468a36a165c)_
         const string& key,
         const string& nspace,
         pg_t *pg) const;
+    ```
+
+    `src/osd/OSDMap.h/OSDMap/object_locator_to_pg()`
+
+    Helper function of `OSDMap::map_to_pg()`, used more often.
+
+    ```c++
+      int object_locator_to_pg(const object_t& oid, const object_locator_t& loc,
+    			   pg_t &pg) const;
     ```
 
 2. `src/osd/OSDMap.h/OSDMap/raw_pg_to_pg()`
