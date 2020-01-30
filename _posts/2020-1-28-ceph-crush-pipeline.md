@@ -98,3 +98,20 @@ _based on version nautilus (b0c68711039276c1e8d5bfa838207468a36a165c)_
                                  vector<int> *acting, int *acting_primary,
                                  bool raw_pg_to_pg = true) const;
     ```
+
+    `src/osd/OSDMap.h/OSDMap::_get_temp_osds()`
+
+    > `temp` here means _under calculation_ or _to be used for calculation_,
+    > this function spits out intermediate results for the calculated physical
+    > OSD placements.
+
+    ```c++
+      /**
+       * Get the pg and primary temp, if they are specified.
+       * @param temp_pg [out] Will be empty or contain the temp PG mapping on return
+       * @param temp_primary [out] Will be the value in primary_temp, or a value derived
+       * from the pg_temp (if specified), or -1 if you should use the calculated (up_)primary.
+       */
+      void _get_temp_osds(const pg_pool_t& pool, pg_t pg,
+                          vector<int> *temp_pg, int *temp_primary) const;
+    ```
