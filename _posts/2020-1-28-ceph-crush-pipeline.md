@@ -14,12 +14,12 @@ _based on version nautilus (b0c68711039276c1e8d5bfa838207468a36a165c)_
 
 ![](https://blog-10039692.file.myqcloud.com/1510039997413_2100_1510040043286.jpg)
 
-> Image explained pipeline for default RBD files, no pool related details are shown.
+> Image above explained pipeline for default RBD files, no pool related details are shown.
 
 
 ## Dive-In
 
-1.  `src/osd/OSDMap.h/OSDMap/map_to_pg()`
+1.  `src/osd/OSDMap.h/OSDMap::map_to_pg()`
 
     ```c++
       int map_to_pg(
@@ -30,16 +30,30 @@ _based on version nautilus (b0c68711039276c1e8d5bfa838207468a36a165c)_
         pg_t *pg) const;
     ```
 
-    `src/osd/OSDMap.h/OSDMap/object_locator_to_pg()`
+    `src/osd/OSDMap.h/OSDMap::object_locator_to_pg()`
 
     Helper function of `OSDMap::map_to_pg()`, used more often.
 
     ```c++
       int object_locator_to_pg(const object_t& oid, const object_locator_t& loc,
-    			   pg_t &pg) const;
+                               pg_t &pg) const;
+      pg_t object_locator_to_pg(const object_t& oid,
+                                const object_locator_t& loc) const {
+        pg_t pg;
+        int ret = object_locator_to_pg(oid, loc, pg);
+        ceph_assert(ret == 0);
+        return pg;
+      }
     ```
 
-2. `src/osd/OSDMap.h/OSDMap/raw_pg_to_pg()`
+    `src/osd/osd_types.h/pg_pool_t::hash_key()`
+
+    ```c++
+      /// hash a object name+namespace key to a hash position
+      uint32_t hash_key(const string& key, const string& ns) const;
+    ```
+
+2. `src/osd/OSDMap.h/OSDMap::raw_pg_to_pg()`
 
     ```c++
       pg_t raw_pg_to_pg(pg_t pg) const {
@@ -49,7 +63,7 @@ _based on version nautilus (b0c68711039276c1e8d5bfa838207468a36a165c)_
       }
     ```
 
-3. `src/osd/osd_types.h/pg_pool_t/raw_pg_to_pg()`
+   `src/osd/osd_types.h/pg_pool_t::raw_pg_to_pg()`
 
     ```c++
       /*
@@ -58,7 +72,7 @@ _based on version nautilus (b0c68711039276c1e8d5bfa838207468a36a165c)_
       pg_t raw_pg_to_pg(pg_t pg) const;
     ```
 
-4. `src/osd/OSDMap.h/OSDMap/pg_to_up_acting_osds()`
+3. `src/osd/OSDMap.h/OSDMap::pg_to_up_acting_osds()`
 
     ```c++
       /**
@@ -72,4 +86,15 @@ _based on version nautilus (b0c68711039276c1e8d5bfa838207468a36a165c)_
                                 vector<int> *acting, int *acting_primary) const {
         _pg_to_up_acting_osds(pg, up, up_primary, acting, acting_primary);
       }
+    ```
+
+    `src/osd/OSDMap.h/OSDMap::_pg_to_up_acting_osds()`
+
+    ```c++
+      /**
+       *  map to up and acting. Fills in whatever fields are non-NULL.
+       */
+      void _pg_to_up_acting_osds(const pg_t& pg, vector<int> *up, int *up_primary,
+                                 vector<int> *acting, int *acting_primary,
+                                 bool raw_pg_to_pg = true) const;
     ```
