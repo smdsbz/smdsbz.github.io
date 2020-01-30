@@ -101,6 +101,9 @@ _based on version nautilus (b0c68711039276c1e8d5bfa838207468a36a165c)_
 
     `src/osd/OSDMap.h/OSDMap::_get_temp_osds()`
 
+    Spits out empty active set when OSD mapping is stable (for `temp_*` members
+    will not be specified then), and `OSDMap:_pg_to_raw_osds()` gets executed.
+
     > `temp_osd` stands for OSDs that are temporarily responsible and currently
     > __available__ for incoming I/O.
     >
@@ -119,6 +122,8 @@ _based on version nautilus (b0c68711039276c1e8d5bfa838207468a36a165c)_
     ```
 
     `src/osd/OSDMap.h/OSDMap::_pg_to_raw_osds()`
+
+    Invokes `CrushWrapper::do_rule()`.
 
     ```c++
       /// pg -> (raw osd list)
