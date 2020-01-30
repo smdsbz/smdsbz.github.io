@@ -101,9 +101,8 @@ _based on version nautilus (b0c68711039276c1e8d5bfa838207468a36a165c)_
 
     `src/osd/OSDMap.h/OSDMap::_get_temp_osds()`
 
-    > `temp` here means _under calculation_ or _to be used for calculation_,
-    > this function spits out intermediate results for the calculated physical
-    > OSD placements.
+    > `temp` here means _ready to be used_, this function spits out intermediate
+    > results for the calculated physical OSD placements.
 
     ```c++
       /**
