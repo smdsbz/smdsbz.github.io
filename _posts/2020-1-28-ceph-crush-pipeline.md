@@ -101,8 +101,11 @@ _based on version nautilus (b0c68711039276c1e8d5bfa838207468a36a165c)_
 
     `src/osd/OSDMap.h/OSDMap::_get_temp_osds()`
 
-    > `temp` here means _ready to be used_, this function spits out intermediate
-    > results for the calculated physical OSD placements.
+    > `temp_osd` stands for OSDs that are temporarily responsible and currently
+    > __available__ for incoming I/O.
+    >
+    > See [here](https://blog.csdn.net/wojiaowugen/article/details/80204121) for
+    > why the `temp` mechanism is needed.
 
     ```c++
       /**
@@ -113,4 +116,14 @@ _based on version nautilus (b0c68711039276c1e8d5bfa838207468a36a165c)_
        */
       void _get_temp_osds(const pg_pool_t& pool, pg_t pg,
                           vector<int> *temp_pg, int *temp_primary) const;
+    ```
+
+    `src/osd/OSDMap.h/OSDMap::_pg_to_raw_osds()`
+
+    ```c++
+      /// pg -> (raw osd list)
+      void _pg_to_raw_osds(
+        const pg_pool_t& pool, pg_t pg,
+        vector<int> *osds,
+        ps_t *ppps) const;
     ```
