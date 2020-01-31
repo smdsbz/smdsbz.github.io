@@ -408,6 +408,10 @@ A temporary fix will be appending `more-itertools==4.1.0` to every occurance of
 
     * `src/pybind/mgr/ansible/requirements.txt`
 
+4. Switch to `python3` for `$python_command` in package build script.
+
+    * `make-dist`: in method `_python_autoselect()`
+
 
 
 
