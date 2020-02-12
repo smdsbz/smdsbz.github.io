@@ -67,6 +67,20 @@ $$
 \end{aligned}
 $$
 
+
+$$
+\begin{aligned}
+E(d_\text{cached})
+&= p_\text{hit} \big( E(d_\text{ssd}) + E(d_\text{network}) \big) \\
+&+ (1 - p_\text{hit}) \underbrace{\big( E(d_\text{hdd}) + E_{c,\text{ssd}}(d_\text{dist}) \big)}_\text{promote lat.} \\
+&+ (1 - p_\text{hit}) (1 - p_\text{read}) \underbrace{\big( E(d_\text{ssd}) + E_{b,\text{hdd}}(d_\text{dist}) \big)}_\text{flush lat.} \\
+&+ d_\text{software} \\
+\\
+E_{r,\text{type}} (d_\text{dist})
+&= E(\max_r d_\text{network}) + E(\max_r d_\text{type}) \hspace{1em} \text{s.t. type} \in \{\text{ssd}, \text{hdd}\} \\
+\end{aligned}
+$$
+
 ## Dive-In
 
 1.  `src/osd/OSDMap.h/OSDMap::map_to_pg()`
