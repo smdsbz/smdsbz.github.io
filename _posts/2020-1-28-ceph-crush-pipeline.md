@@ -71,17 +71,39 @@ $$
 $$
 \begin{aligned}
 E(d_\text{cached})
-&= p_\text{hit} \big( E(d_\text{ssd}) + E(d_\text{network}) \big) \\
+=\ &p_\text{hit} \big( E(d_\text{ssd}) + E(d_\text{network}) \big) \\
 &+ (1 - p_\text{hit}) \underbrace{\big( E(d_\text{hdd}) + E_{c,\text{ssd}}(d_\text{dist}) \big)}_\text{promote lat.} \\
-&+ (1 - p_\text{hit}) (1 - p_\text{read}) \underbrace{\big( E(d_\text{ssd}) + E_{b,\text{hdd}}(d_\text{dist}) \big)}_\text{flush lat.} \\
+&+ (1 - p_\text{hit}) p_\text{write} \underbrace{\big( E(d_\text{ssd}) + E_{b,\text{hdd}}(d_\text{dist}) \big)}_\text{flush lat.} \\
 &+ d_\text{software} \\
-\\
+\text{s.t.} \hspace{1em}
 E_{r,\text{type}} (d_\text{dist})
-&= E(\max_r d_\text{network}) + E(\max_r d_\text{type}) \hspace{1em} \text{s.t. type} \in \{\text{ssd}, \text{hdd}\} \\
+\approx\ &E(\max_r d_\text{network}) + E(\max_r d_\text{type}), \text{type} \in \{\text{ssd}, \text{hdd}\} \\
+\\
+E(t_\text{cached}|_r) =\ &r (1 - p_\text{hit}) (1 + p_\text{write}) E(t_\text{IO})
 \end{aligned}
 $$
 
+For a primary-aligned modification,
+
+$$
+\begin{aligned}
+E(d_\text{cached})
+=\ &p_\text{hit} \big( E(d_\text{ssd}) + E(d_\text{network}) \big) \\
+&+ (1 - p_\text{hit}) \underbrace{\big( E(d_\text{hdd}) + E_{c,\text{ssd}}(d_\text{dist}) \big)}_\text{promote lat.} \\
+&+ (1 - p_\text{hit}) p_\text{write} \underbrace{\big( E(d_\text{ssd}) + E_{b,\text{hdd}}(d_\text{dist}) \big)}_\text{flush lat.} \\
+&+ d_\text{software} \\
+\text{s.t.} \hspace{1em}
+E_{r,\text{type}} (d_\text{dist})
+\approx\ &E(\max_{r-1} d_\text{network}) + E(\max_r d_\text{type}), \text{type} \in \{\text{ssd}, \text{hdd}\} \\
+\\
+E(t_\text{cached}|_r) =\ &(r - 1) (1 - p_\text{hit}) (1 + p_\text{write}) E(t_\text{IO})
+\end{aligned}
+$$
+
+
 ## Dive-In
+
+### Logic
 
 1.  `src/osd/OSDMap.h/OSDMap::map_to_pg()`
 
@@ -198,4 +220,20 @@ $$
         const pg_pool_t& pool, pg_t pg,
         vector<int> *osds,
         ps_t *ppps) const;
+    ```
+
+### Command-Line
+
+* `src/mon/OSDMonitor.h/OSDMonitor::preprocess_command()`
+
+    ```c++
+      bool preprocess_command(MonOpRequestRef op);
+    ```
+
+    ```c++
+      } else if (prefix == "osd map") {
+        string poolstr, objstr, namespacestr;
+        cmd_getval(cct, cmdmap, "pool", poolstr);
+        cmd_getval(cct, cmdmap, "object", objstr);
+        cmd_getval(cct, cmdmap, "nspace", namespacestr);
     ```
