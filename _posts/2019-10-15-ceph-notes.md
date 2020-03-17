@@ -369,6 +369,8 @@ Changes to base tier will now be handled by cache tier.
 
 ### Python2 Issues
 
+***Forget it, just stick to what Ceph wants you to do!***
+
 As the counsul dropping support for Python2, some packages' versions are no longer
 allowed to be left unspecified, for `more-itertools` (required by `tox`) and
 `pytest` will complain.
@@ -413,6 +415,34 @@ A temporary fix will be appending `more-itertools==4.1.0` to every occurance of
     * `make-dist`: in method `_python_autoselect()`
 
 
+## Build & Install Customized Ceph (rpm)
+
+**On the dev machine**
+
+0. Run script `./install-deps.sh` to install required utilities.
+1. Make your modifications and **commit changes to Git**.
+2. Run script `./make-srpm.sh` found in project root.
+
+    > You may put your own copy of Boost under project root to skip this
+    > possibly length process.
+
+3. Compile the output source package.
+
+    ```console
+    $ rpmbuild --rebuild ./ceph-{version}.el7.src.rpm
+    ```
+
+    Output binary packages can be found at `~/rpmbuild/RPMS/`.
+
+4. Copy binary packages to the target machine.
+
+    > You may want to ignore the gigantic *debuginfo* package.
+
+**On the target machine**
+
+5. Install the `epel-release` package, otherwise some dependencies won't resolve.
+
+6. Install all the rpms.
 
 
 
