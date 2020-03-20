@@ -444,6 +444,32 @@ A temporary fix will be appending `more-itertools==4.1.0` to every occurance of
 
 6. Install all the rpms.
 
+## 构建并安装自定义 Ceph（rpm）
+
+**在开发机上**
+
+0. 运行脚本 `./install-deps.sh` 拉取依赖；
+1. 修改 Ceph，并**将修改提交至本地 Git**；
+2. 运行脚本 `./make-srpm.sh`；
+
+    > 若不希望从远端下载 Boost 库，可以将预先下载好的 Boost 源码压缩包复制到项目根目录。
+
+3. 编译生成二进制安装包，输出文件位于 `~/rpmbuild/RPMS/` 下；
+
+    ```console
+    $ rpmbuild --rebuild ./ceph-{version}.el7.src.rpm
+    ```
+
+4. 将所有安装包拷贝到目标机器上；
+
+    > 这里可以选择不安装调试信息包 debuginfo。
+
+**在目标节点上**
+
+5. 安装 `epel-release` 包，否则安装时部分依赖无法自动拉取；
+6. （使用 `yum` 或其他包管理软件）安装所有包。
+
+安装完成后，在部署时可以跳过 `ceph-deploy install` 步骤。
 
 
 
