@@ -64,7 +64,7 @@ excerpt_separator: "<!-- more -->"
 excerpt_type: html # text (default), html
 
 ## license
-license: CC-BY-NC-4.0
+# license: CC-BY-NC-4.0
 
 
 ## => Themes

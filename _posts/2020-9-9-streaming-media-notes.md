@@ -1,7 +1,7 @@
 ---
 layout: article
 title: Streaming Media Technology
-key: streaming-media
+key: streaming-media-notes
 tags: StreamingMedia MachineLearning DeepLearning CourseNotes
 ---
 
