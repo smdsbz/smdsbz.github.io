@@ -24,7 +24,7 @@ __Two learning manners__
 ------------------------------------------------
 
 Saliency
---------
+========
 
 * __Saliency Detection__
 
@@ -50,3 +50,26 @@ Evaluation
 <small>[F-Score Definition](https://deepai.org/machine-learning-glossary-and-terms/f-score#:~:text=The%20F-score%20is%20a%20set-based%20measure%2C%20meaning%20that,a%20good%20overview%20of%20the%20search%20engine%E2%80%99s%20performance.)</small>
 
 * PR curve: precision, recall, and F-measure
+
+------------------------------------------------
+
+SLIC Superpixels Segmentation
+============================
+
+__Application__
+* Manifold ranking 流形排序
+* Absorbing Markov-chain
+
+__Intuition__
+
+受位置约束的颜色空间 K-means 分类
+
+1. uniform seeding
+2. calculate distance, and label after argmin seed
+
+    $$
+    D(k,i) = d_{lab}(k,i) + \frac{m}{S} d_{xy}(k,i)
+    $$
+
+3. enforce connectivity
+    * remove small isolated regions
