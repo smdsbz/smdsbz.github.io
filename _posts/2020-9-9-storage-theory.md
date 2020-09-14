@@ -20,9 +20,6 @@ __多层次研究__
 * 存储 Storage
 * 存取 Access
 
-存储器类型
---------
-
 __存取方法__
 
 * 顺序
@@ -57,3 +54,13 @@ __存储级别__
 1. 在线存储 On-line storage
 2. 近线存储（联机后备存储） Near-line storage
 3. 离线存储（脱机后备存储） Off-line storage
+
+__存储系统发展__
+
+1. 直接附加存储 Direct Attached Storage, DAS 盘阵
+2. 附网存储 Network-attached Storage, NAS 文件系统
+3. 存储区域网 Storage Area Network, SAN 存储池
+
+__基于对象存储系统__
+
+三方：Metadata Server (MDS), client, OSD
