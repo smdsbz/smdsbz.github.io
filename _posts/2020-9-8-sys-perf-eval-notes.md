@@ -20,7 +20,7 @@ __Objects 目标__
 
 * Optimally designing systems / selection
 
-* Queuing theory, Petri nets & conbination of tests and simulations
+* Queueing theory, Petri nets & conbination of tests and simulations
 
 
 __方法选择__
@@ -37,7 +37,7 @@ __方法选择__
 
     揭示系统内在规律，指明工作理论性贡献，但须结合实际实验数据！
 
-    probability, stochastic process, queuing systems, queuing networks,
+    probability, stochastic process, queueing systems, queueing networks,
     Petri nets, Markov-chain, etc.
 
     因负载/任务随机性，多采用随机过程与概率方法。
@@ -56,7 +56,7 @@ __Measures 度量__
 * Response time _(definition varies)_
 * Waiting time, processing time
 
-    queuing vs. serving
+    queueing vs. serving
 
 * Utilization
 * Throughput
@@ -104,7 +104,7 @@ __Technique__
 
     1. Construct mathematical model
 
-        Queuing, Markov-chain, Petri, etc.
+        Queueing, Markov-chain, Petri, etc.
 
     2. Solve It!
 
@@ -242,6 +242,43 @@ Measurement
 __Technique__
 
 * Types of workloads
+    * Instruction Mixes
+        * average instruction time
+        * performance of processor __only a factor__ of entire system performance
+    * Processing Kernels
+        * generalization of Instruction Mixes
+    * Application Benchmark
 * Performance monitoring
+    * to measure resource utilizations & to find performance bottleneck
+    * Event, Trace, Overhead, Domain, Input rate, Input width, Resolution
+    * Event-driven, Timer-driven (Sampling)
 * Summarizing measured data
+    * Sample Mean / Median, Geometric Mean, Variability
 * Experimental design
+    * Full Factorial Design 全因子设计
+
+-----------------------------------------------------------------
+
+Queueing Theory
+===============
+
+__Properties of Queues__
+
+* Arrival Process (A) 输入到达过程
+* Service Time Distribution (S) 服务时间
+    * 即使处理能力确定，但服务时间可能在不同时刻不一样（考虑缓存情况），但认为其分布确定
+* Number of Servers (m)
+* System Capacity (B) 系统容量
+* Population Size (K)
+* Service Discipline (SD)
+
+Inter-arrival and service times are typically
+* M Exponential, memoryless (Markov's process)
+* D Deterministic, times are constant
+* G General, distribution not specified
+
+Simple queueing system
+---------------------
+
+Queueing networks
+----------------
