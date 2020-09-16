@@ -73,3 +73,29 @@ __Intuition__
 
 3. enforce connectivity
     * remove small isolated regions
+
+------------------------------------------------
+
+Semi-Supervised Learning
+=======================
+
+* exploit prior knowledge from unlabeled data
+
+__Local and Global Consistency (LGC)__
+
+Assumption
+
+* nearby samples are likely having same label
+* samples on same structure (refered to as cluster / manifold) are likely having
+    same label
+
+Take assumption to math...
+
+cost function / energy function (*proposed, may have other forms)
+
+$$
+\begin{aligned}
+&E(F) = \underbrace{\sum_i(F_i - Y_i)^2}_\text{label fitness} + \underbrace{\frac{1}{2} \lambda \sum_{ij} w_{ij} (\frac{F_i}{\sqrt{d_{ii}}} - \frac{F_j}{\sqrt{d_{jj}}})^2}_\text{manifold smoothness} \\
+\Rightarrow &F \sim (I - \frac{\lambda}{1+\lambda}D^{-\frac{1}{2}}WD^{-\frac{1}{2}})^{-1} Y
+\end{aligned}
+$$
