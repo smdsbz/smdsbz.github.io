@@ -265,8 +265,15 @@ Queueing Theory
 __Properties of Queues__
 
 * Arrival Process (A) 输入到达过程
+    * arrival rate $$\lambda$$
+    * waiting time $$T_w$$
 * Service Time Distribution (S) 服务时间
+    * service time $$T_s$$, service rate $$\mu=T_s$$
+    * utilization $$\rho$$
     * 即使处理能力确定，但服务时间可能在不同时刻不一样（考虑缓存情况），但认为其分布确定
+
+> time spent in system $$T_q = T_w + T_s$$
+
 * Number of Servers (m)
 * System Capacity (B) 系统容量
 * Population Size (K)
@@ -279,6 +286,58 @@ Inter-arrival and service times are typically
 
 Simple queueing system
 ---------------------
+
+### Queue
+
+__Single server__
+
+* $$\rho = \lambda T_s$$
+* $$q = w + \rho$$
+* maximum arrival rate $$\lambda_\text{max}=\frac{1}{T_s}$$
+* departure rate $$\min{\{\lambda, \lambda_\text{max}\}}$$
+
+__Multiple servers (single / multiple queues)__
+
+* $$\rho = \lambda / n \cdot T_s$$
+* $$q = w + n \rho$$
+* maximunm arrical rate $$\lambda_\text{max}=\frac{n}{T_s}$$
+* departure rate $$\min{\{\lambda, \lambda_\text{max}\}}$$
+
+__General formula (Little's formula)__
+
+* 系统中平均用户数 $$q = \lambda T_q$$
+    * 即从用户进入系统到出系统时间中，平均进入系统的新用户人数
+* 队列中平均等待用户数 $$w = \lambda T_w$$
+
+### M/M/n modeling
+
+_arrival Markov 泊松分布, serve Markov 负指数分布, n servers_
+
+__M/M/1 modeling__
+
+Assume $$N(t)$$ be number of customers in system at time $$t$$,
+$$\{N(t), t \geq 0\}$$ is continuous and homogeneous Markov's link (birth and
+death process)
+
+> 连续时间齐次马尔科夫链：状态转移仅与时段有关，与初始状态无关。
+>
+> $$p(X_s + T = j | X_s = i) = f(T)$$
+
+* server utilization $$\rho = \lambda / \mu$$
+* stable states distribution $$\{\eta_k, k \geq 0\}$$
+
+    $$
+    \begin{aligned}
+    &\underbrace{\eta_{k-1} \lambda + \eta_{k+1} \mu}_\text{State k's generation rate} = \underbrace{\eta_k (\lambda + \mu)}_\text{State k's departure rate}\\
+    \Rightarrow\ &\eta_k = \rho^k(1-\rho)
+    \end{aligned}
+    $$
+
+* $$q = E[N] = \rho / (1-\rho)$$
+* $$Var[N] = \rho / (1-\rho)^2$$
+
+* $$T_q = q / \lambda = 1 / [\mu(1-\rho)]$$
+* $$w = q - \rho = \rho^2/(1-\rho)$$
 
 Queueing networks
 ----------------
