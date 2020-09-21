@@ -99,3 +99,9 @@ $$
 \Rightarrow &F \sim (I - \frac{\lambda}{1+\lambda}D^{-\frac{1}{2}}WD^{-\frac{1}{2}})^{-1} Y
 \end{aligned}
 $$
+
+BP Network
+==========
+
+* 若希望输出和原始输入一样，则为常见的自编码网络
+    * 正交矩阵，输入特征正交性较好，互不相关
