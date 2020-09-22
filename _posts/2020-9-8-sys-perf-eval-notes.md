@@ -336,8 +336,39 @@ death process)
 * $$q = E[N] = \rho / (1-\rho)$$
 * $$Var[N] = \rho / (1-\rho)^2$$
 
+> 结合切比雪夫不等式，对系统前缓冲器大小设置中有指导意义。
+
+combined with Little's formula
+
 * $$T_q = q / \lambda = 1 / [\mu(1-\rho)]$$
 * $$w = q - \rho = \rho^2/(1-\rho)$$
+* $$T_w = \rho / [\mu(1-\rho)]$$
+
+__M/M/n queueing__
+
+此时系统出流量最多为 $$n\mu$$
+
+$$
+\eta_{k-1}\lambda + \eta_{k+1}\max(n,k+1)\mu = \eta_k (\lambda + \max(n,k-1)\mu)
+$$
+
+$$
+\begin{aligned}
+\eta_k &= \begin{cases}
+\eta_0 \rho^k \frac{1}{k!}, &k \lt n\\
+\eta_0 \rho^k \frac{1}{n! n^{k-n}}, &k \geq n
+\end{cases}\\
+\eta_0 &= [\sum_{k=0}^{n-1}\frac{(n\rho)^k}{k!} + \frac{(n\rho)^k}{n!} \frac{1}{1-\rho}]^{-1}\\
+q &= n\rho + \rho \frac{(n\rho)^n}{n!} \frac{\eta_0}{(1-\rho)^2}
+\end{aligned}
+$$
+
+* __shared queue__ or independent queue?
+    * eg. 2x M/M/1 vs M/M/2, M/M/2 win (by $$T_q$$)
+        * in 2x M/M/1, one process with empty queue cannot serve customer waiting in the other queue
+* shared queue + independent queue?
+    * selection, followed by independent queue (supermarket model)
+    * choosing shortest queue in $$d$$ samples vs random choose (2001, Dr. M. Mitzenmacher, Harvard University)
 
 Queueing networks
 ----------------
