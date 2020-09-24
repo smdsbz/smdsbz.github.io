@@ -369,6 +369,47 @@ $$
 * shared queue + independent queue?
     * selection, followed by independent queue (supermarket model)
     * choosing shortest queue in $$d$$ samples vs random choose (2001, Dr. M. Mitzenmacher, Harvard University)
+* single proessor multiple processes queueing system
+    * M/M/m model
 
 Queueing networks
 ----------------
+
+### Jackson's network
+
+* open queueing network
+* M nodes (queueing system), independent, apply to exponential distribution of rate $$\mu_i(n)$$
+* arrival from outside to node $$\gamma_i$$
+* customer choose to enter other node or leave system with prob $$q_{ij}\ (i=\{1,\dots,M\},j=\{0,1,\dots,M\})$$
+
+__Jackson's traffic equation__
+* average arrival rate of note i $$\lambda_i = \gamma_i + \sum \lambda_j q_{ji}$$
+* total traffic $$\gamma = \sum \lambda_i q_{i0}$$
+    * $$q_{i0}$$ is prob of customer departure after getting serviced at node i
+
+__Single data transfering channel__
+* communication task stream $$\gamma$$
+* transfer fail prob $$q$$
+
+__Jackson's theorem (stable states distribution)__
+* number of customers at node i is independent with that at other nodes
+* total arrival at node i is a Poisson stream of rate $$\lambda_i$$, and
+
+    $$
+    \begin{aligned}
+    &\eta(n_1, \dots, n_M) = \prod \eta_i(n_i) \\
+    &\eta_i(n_1) = \eta_i(0) \frac{\lambda_i^{n_i}}{\prod_{j=1}^{n_i} \mu_i(j)}
+    \end{aligned}
+    $$
+
+__Jackson's network measurements__
+* mean number of customers at node i $$q_i = \rho_i / (1-\rho_i)$$
+* mean response time (using Little's formula on equivalent single queueing system) $$T_q = \sum \rho_i / (1-\rho_i) / \gamma$$
+* mean waiting time $$T_{wi} = (q_i - \rho_i) / \lambda_i$$
+* interval from arrival at node i to departure $$T_{i0} = T_{qi} + \sum q_{ij}T_{j0}$$
+
+> another viewing angle: mean visiting times at node i $$v_i$$
+>
+> * $$v_i = \lambda_i / \gamma = \gamma_i / \gamma + \sum_{j=1}^M v_j q_{ji}$$
+> * $$q_{0i} = \gamma_i / \gamma$$
+> * $$T_{qi} = \frac{D_i}{v_i(1-\gamma D_i)}, \quad D_i = \rho_i / \gamma$$
