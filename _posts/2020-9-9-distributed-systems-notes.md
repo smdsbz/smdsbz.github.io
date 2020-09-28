@@ -9,6 +9,9 @@ tags: DistributedSystems CourseNotes
 
 <!-- more -->
 
+分布式系统简介
+===========
+
 分布式系统表现形式
 --------------
 
@@ -102,3 +105,26 @@ tags: DistributedSystems CourseNotes
     * 分区不是绝对的，是有时效性的
 
 > __CAP 定理：__ 三选二
+
+
+分布式通讯
+========
+
+__形式__
+
+* 远程过程调用
+* 基于消息的通讯
+* 流式通讯
+* 多播通讯
+
+__通讯的类型__
+
+* 非易失 persistent / 暂存 transient
+* 同步 synchronous / 异步 asynchronous
+* 离散 discrete / 连续 stream
+
+e.g.
+
+* E-mail 非易失+同步
+* RPC 暂存+同步
+    * 异步 RPC、两阶段异步 RPC
