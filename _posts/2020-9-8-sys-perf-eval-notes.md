@@ -333,16 +333,16 @@ death process)
     \end{aligned}
     $$
 
-* $$q = E[N] = \rho / (1-\rho)$$
+* average number of customers in system $$q = E[N] = \rho / (1-\rho)$$
 * $$Var[N] = \rho / (1-\rho)^2$$
 
 > 结合切比雪夫不等式，对系统前缓冲器大小设置中有指导意义。
 
 combined with Little's formula
 
-* $$T_q = q / \lambda = 1 / [\mu(1-\rho)]$$
-* $$w = q - \rho = \rho^2/(1-\rho)$$
-* $$T_w = \rho / [\mu(1-\rho)]$$
+* average response time $$T_q = q / \lambda = 1 / [\mu(1-\rho)]$$
+* average number of customers waiting $$w = q - \rho = \rho^2/(1-\rho)$$
+* average waiting time $$T_w = \rho / [\mu(1-\rho)]$$
 
 __M/M/n queueing__
 
@@ -413,3 +413,36 @@ __Jackson's network measurements__
 > * $$v_i = \lambda_i / \gamma = \gamma_i / \gamma + \sum_{j=1}^M v_j q_{ji}$$
 > * $$q_{0i} = \gamma_i / \gamma$$
 > * $$T_{qi} = \frac{D_i}{v_i(1-\gamma D_i)}, \quad D_i = \rho_i / \gamma$$
+
+### __M/G/1__
+
+泊拉前克-欣钦公式 Pollaczek-Khintchine
+
+$$
+T_w = \frac{\lambda}{2 (1-\lambda \underbrace{T_S}_\text{平均单次处理时间})} E[{\underbrace{T_s}_\text{一次正确服务时间}}^2]
+$$
+
+### Sequential network
+
+_可看作 Jackson 网络特例_
+
+每个节点独立，i.e. 系统状态为联合分布，具有乘积解
+
+### Gordon-Newell network
+
+* like Jackson's network, but with $$q_{0j} = q_{i0} = 0$$
+* closed system, constant customers $$K$$
+* state space: $$S = \{ (n_1, \dots, n_M) | n_i \geq 0, \sum n_i = K \},\ |S| \lt \infty$$
+
+<br/>
+
+* traffic equation $$\lambda_i = \sum \lambda_j q_{ji}$$
+* for one non-zero solution $$(e_i,\dots,e_M)$$, $$\lambda_i = c \cdot e_i$$
+* stable state distribution
+
+    $$
+    \begin{aligned}
+    \eta(n_1,\dots,n_M) &= \frac{1}{G} \prod_{i=1}^M x_i(n_i) \\
+    x_i(n_i) &= \frac{e_i^{n_i}}{\prod_{j=1}^{n_i} \mu_i(j)},\ G(M,K): \text{unitary constant}
+    \end{aligned}
+    $$
