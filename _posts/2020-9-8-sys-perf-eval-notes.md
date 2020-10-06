@@ -446,3 +446,39 @@ _可看作 Jackson 网络特例_
     x_i(n_i) &= \frac{e_i^{n_i}}{\prod_{j=1}^{n_i} \mu_i(j)},\ G(M,K): \text{unitary constant}
     \end{aligned}
     $$
+
+* closed network equivalent open network
+    * insert node $$o$$, where $$\lambda_{0o}=\mu_{o0}$$
+
+### Approximative solution of queueing networks
+
+* limited queue length
+* priority scheduling
+* non-exponential service distribution
+
+lead to local unbalance, 解不具有乘积解形式
+
+__Closed / open network with limited resources__
+
+* upper bound modification $$R_U$$ 悲观修改 吞吐量最小
+    * 阻塞加挡/吞吐率加墙：when output is 0, let input be 0 too
+    * when node 2 is full, let node 1's input be blocked too
+    * when node 1 is full, let node 2's departure be blocked simultaneously
+* lower bound modification $$R_L$$ 乐观修改 吞吐量最大
+    * to avoid output being 0, don't let arrival be blocked 
+    * only when the whole system is full, refuse new customers
+
+$$
+\begin{cases}
+&R_U: n_1 \leq N_1, n_2 \leq N_2, n_1 + n_2 \neq N_1 + N_2 \\
+&R_O: n_1 \leq N_1, n_2 \leq N_2 \\
+&R_L: n_1 + n_2 \leq N_1 + N_2
+\end{cases}
+$$
+
+__Shared resource system__
+
+* upper bound modification
+    * while server 1's input is blocked, let output be blocked too
+* lower bound modification
+    * cacel server 2's priority, shares D equally
