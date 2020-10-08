@@ -110,3 +110,18 @@ __尾延迟 Tail latency__
     * 用于应对系统或负载长期性的变化
 * 优化请求调度：动态调度、冗余请求等
     * 用于应对系统或负载短期性的变化
+
+存储服务质量
+==========
+
+虚拟化环境
+--------
+
+Virtualization deals with extending or replacing an existing interface so as to
+mimic the behavior of another system.
+
+* isolation
+* packaging
+* compatibility
+
+SLO 精确保障
