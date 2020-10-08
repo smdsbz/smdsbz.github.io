@@ -414,7 +414,7 @@ __Jackson's network measurements__
 > * $$q_{0i} = \gamma_i / \gamma$$
 > * $$T_{qi} = \frac{D_i}{v_i(1-\gamma D_i)}, \quad D_i = \rho_i / \gamma$$
 
-### __M/G/1__
+### M/G/1
 
 泊拉前克-欣钦公式 Pollaczek-Khintchine
 
@@ -482,3 +482,21 @@ __Shared resource system__
     * while server 1's input is blocked, let output be blocked too
 * lower bound modification
     * cacel server 2's priority, shares D equally
+
+__Decomposing method__
+
+Markov's chain (MC) is NCD (Nearly Complete Decomposable, 接近完全分解)
+
+* iff MC's state transferring rate matrix is approx. to diagonal __blocks__ matrix
+* (unitizing block) 置零位置的概率补充到子系统中，满足概率之和为 1
+* (states compressing) condition: sub-sums of each row are same
+    * get Concentrating matrix 集总矩阵
+
+> May rearrange states' order, making NCD essentially __states groups'__ decomposing.
+
+----------------------------------------------
+
+Petri Nets
+==========
+
+* graphical description of information system
