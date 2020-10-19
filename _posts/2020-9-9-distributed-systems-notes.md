@@ -265,3 +265,60 @@ $$a \lt_{hb} b \Leftrightarrow Vec(a) \lt Vec(b)$$
         * 写操作总是能够被所有后续读看到
     * 读后写一致性
         * 读出的值不能比后续写操作所基于的值更新
+
+
+分布式共识
+========
+
+__共识算法的属性__
+
+* Agreement 协定性
+
+    Every correct process must agree to the same value
+
+* Validity 合法性
+
+    If all correct process proposed the same value v, then any correct process
+    must desice v
+
+* Integrity 完备性
+
+    No node decide twice （即不可逆）
+
+* Termination 可终止性
+
+    Eventually every correct process must decide some value
+
+拜占庭容错
+--------
+
+__错误分类__
+
+* Omission failure 不会显示出来的错误
+
+* Execution failure or Lying 发送错误或不一致数据
+
+__拜占庭将军问题__
+
+_TODO 或见百度/知乎_
+
+> 该问题中假定通信链路可靠，通过 RSA 或其他签名算法保证。
+
+Lamport 研究表明，当恶意节点个数小于节点总数 1/3 时，通过口头同步通信可以构造同时满足一致性和正确性的解决方法。
+
+Paxos 算法
+---------
+
+_TODO 或见百度/知乎_
+
+一个正常进行的表决过程可以表述为：当大部分牧师在议会大厅呆了足够长时间，且期间没有牧师进入或者退出，那么提出的法案应该被通过并被记录在每个牧师的账目上。
+
+> 该问题中执法者（处理器）和服务员（通信链路）都不可靠。
+
+__角色__
+
+* Proposer 提议者
+* Acceptor 接收者：是否接收的决策者，仅当 epoch 更大时存储新的提案
+* Learner 学习者：后来者，无表决权，不参与决策
+
+> 单个节点或处理器可能同时具有多个角色。
