@@ -500,3 +500,24 @@ Petri Nets
 ==========
 
 * graphical description of information system
+
+Model description
+-----------------
+
+* Place (circle)
+* Transition (vertical line)
+* Directed arc
+* Token (dot in circle)
+
+__Firing rule 实施规则__
+
+* Enable condition: each input place has at least w token
+* Fired results: input place decreases w token, output place increases w token
+* Atomic operation: tokens moving out from input place and moving into output
+    place cannot be separated
+
+> __NOTE:__ 同一变迁下的弧权可能不同
+>
+> ```text
+> O <-- w1 -- | <-- w2 -- O ,  w1 != w2
+> ```
