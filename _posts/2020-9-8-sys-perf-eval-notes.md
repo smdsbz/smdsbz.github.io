@@ -521,3 +521,15 @@ __Firing rule 实施规则__
 > ```text
 > O <-- w1 -- | <-- w2 -- O ,  w1 != w2
 > ```
+
+__Smallest token set 最小标识集 $$[M_0\gt$$__
+
+系统可能达到的所有状态的集合，可达标识集 reachable token set
+
+__Reachable tree__
+
+TODO
+
+__Associated matrix, invariant__
+
+TODO
