@@ -70,6 +70,7 @@ Defining Edge Storage
 在项目的上下文中，_边缘存储_ 更多是指 _边缘数据中心_ 上的分布式存储。
 
 * [边缘数据中心规划发展研究](https://zhuanlan.zhihu.com/p/172160917)
+* [多站融合边缘数据中心方案 - 新华三集团](https://www.h3c.com/cn/d_202012/1362371_473305_0.htm#)
 
 边缘数据中心在靠近用户的网络边缘提供基础设施资源，支持边缘计算对本地化、实时性的数据进行分析、处理、执行以及反馈，从而对云计算能力进行补充。借助边缘计算，数据可以在边缘数据中心进行处理，从而节省到传统集中式数据中心的通信等待时间。
 
@@ -94,6 +95,12 @@ __发展方向__
     * 游牧数据中心（Nomadic Data Center）  
         Nawab F, Agrawal D, El Abbadi A. Nomadic datacenter sat the network edge: Data management challenges for the cloud with mobile infrastructure[C]. EDBT, 2018:497-500.
 * 标准化
+
+> 新华三边缘数据中心机房采用微模块标准化建设模式，提供标准接口、部件、子系统、整体架构全方位标准化、模块化定义数据中心，实现客户按需定制，非常适合多站融合边缘计算场景的云基础设施快速部署。
+
+| ![](https://www.h3c.com/cn/res/202012/09/20201209_5411526_image002_1362371_473305_0.jpg) |
+|:-:|
+| 新华三云边协同处理流程 |
 
 TODO:
 
