@@ -21,6 +21,9 @@ Defining Edge Storage
 * [边缘存储](https://blog.csdn.net/Owen_Liangcheng/article/details/103274598)
 * [星际云通](https://www.szxjyt.cn/xjyt/storage/)
 * [边缘计算：分布式存储的另一种可能](https://zhuanlan.zhihu.com/p/166374976)
+* __[边缘计算：跨越传统数据中心](https://amotoki.github.io/edge-computing-whitepaper/zh_CN/)__
+    * original whitepaper on [OpenStack](https://www.openstack.org/use-cases/edge-computing/)
+* [Open Glossary of Edge Computing](https://github.com/State-of-the-Edge/glossary/blob/master/edge-glossary.md)
 
 #### 一般定义与应用场景
 
@@ -49,6 +52,49 @@ Defining Edge Storage
 * 安全与隐私兼顾
 * 与边缘计算结合
     * 数据实时性、时效性
+
+#### 边缘计算环境的特点
+
+* 多个站点之间的潜在高延迟
+* 网络不可达、慢速带宽
+* 伴随一般数据中心中心化资源池所不能应对的其他交付服务和应用功能
+
+#### 边缘计算的能力
+
+* 提供一个跨多种基础设施的一致性操作范式
+* 能够支持大规模分布式环境
+* 能够为全球分布的客户交付网络服务
+* 能够满足应用集成、编排和服务交付的需求
+* 能够满足硬件资源的限制和成本的限制
+* 能够运行在局限及不稳定的网络之上
+* 能够满足应用对超低延迟的需求
+* 能够实现区域隔离，保护本地数据的隐私
+
+#### 边缘计算的部署/管理挑战
+
+* 需要标准化的和统一的基础环境。每个区域具有类似架构、已知数量
+* 提供自动化管理；在处理部署、更替任何可复原性故障时提供简洁直接的（simple and
+    straightforward）处理方法
+* 当硬件出现故障时，提供简洁高效的（simple, cost-effective）应对计划
+* 本地式容错设计也不容忽视，尤其是面对远程或不可达环境，零接触式的管理模式
+* 维护操作必须简洁。未经过培训的工人能够进行人工修复和替换，而熟练的远程管理员可以进行重装或软件维护
+* 物理设计可能需要整体反思。大多数的边缘计算环境并不理想，有限的能源、灰尘、湿度及震动都应该被考虑在内
+
+![](https://object-storage-ca-ymq-1.vexxhost.net/swift/v1/6e4619c416ff4bd19e1c087f27a43eea/www-assets-prod/5GEdge.svg)
+
+| ![](https://object-storage-ca-ymq-1.vexxhost.net/swift/v1/6e4619c416ff4bd19e1c087f27a43eea/www-assets-prod/edge/whitepaper/centraldatacenter.jpg) |
+|:-:|
+| A detailed view of the edge data center with an automated system used to operate a shrimp farm |
+
+#### 边缘计算模型
+
+##### 中心式控制平面 Centralized Control Plane
+
+TODO:
+
+##### 分布式控制平面 Distributed Control Plane
+
+TODO:
 
 #### 基于边缘存储的点对点网络
 
