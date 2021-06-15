@@ -90,11 +90,43 @@ Defining Edge Storage
 
 ##### 中心式控制平面 Centralized Control Plane
 
-TODO:
+![](https://object-storage-ca-ymq-1.vexxhost.net/swift/v1/6e4619c416ff4bd19e1c087f27a43eea/www-assets-prod/edge/whitepaper/centraldatacenter2.jpg)
+
+Edge infrastructures is built as traditional single data center environment
+which is geographically distributed with WAN connections between the controller
+and compute nodes.
+
+Compute services incoporate running bare metal, containerized and virtualized
+workloads alike.
+
+While the management and orchestration services are centralized, this
+architecture is less resilient to failures from network connection loss. The
+edge data center does not have full automony.
+
+In summary, this architecture model does not fulfill every use case, but it
+provides an evolution path to already existing architectures. Plus, it also suits
+the needs of scenarios where autonomous behavior is not a requirement.
 
 ##### 分布式控制平面 Distributed Control Plane
 
-TODO:
+![](https://object-storage-ca-ymq-1.vexxhost.net/swift/v1/6e4619c416ff4bd19e1c087f27a43eea/www-assets-prod/edge/whitepaper/centraldatacenter3.jpg)
+
+The majority of the control services redie on the large/medium edge data centers.
+This provides an orchestrational overhead to synchronize between these data
+centers and manage them individually and as part of a large, connected environment
+at the same time.
+
+<!--
+There are different options that can be used to overcome the operational
+challenges of this model. One method is to use federation techniques to connect
+the databases to operate the infrastructure as a whole; another option is to
+synchronize the databases across sites to make sure they have the same working
+set of configurations across the deployment.
+-->
+
+| ![](https://docs.starlingx.io/_images/starlingx-deployment-options-distributed-cloud.png) |
+|:-:|
+| [StarlingX Distributed Cloud](https://docs.starlingx.io/deploy_install_guides/r5_release/distributed_cloud/index.html) |
 
 #### 基于边缘存储的点对点网络
 
@@ -148,8 +180,6 @@ __发展方向__
 |:-:|
 | 新华三云边协同处理流程 |
 
-TODO:
-
 -------------------------------------------
 
 Implementation and Deployment
@@ -157,6 +187,70 @@ Implementation and Deployment
 
 Ceph at the Edge
 ----------------
+
+### [Use Mars 400 Ceph Storage in Edge Datacenter](https://www.ambedded.com.tw/en/use-case/Use-Mars-400-Ceph-Storage-in-Edge-Datacenter/use-case-01.html)
+
+After a series of local data processing, the result and original datasets are
+stored in the edge data center. The application only uploads precise result back
+to the central datacenter.
+
+![](https://www.ambedded.com.tw/Templates/pic/Use-Case_Use-Mars-400-Ceph-for-Edge-datacenter-and-IOT.jpg)
+
+Key reason this IoT application leads to use of Ceph:
+1. Scalability with high availability
+2. A storage system with unified storage protocal
+3. A software-defined storage sytem can start from a mini-cluster
+
+* [Ceph Storage Appliance - Mars 400](https://www.ambedded.com.tw/en/product/Ceph-Storage-Appliance/ceph-storage-appliance.html)
+    * [Mars 400 Ceph Appliance Brochure](https://www.ambedded.com.tw/Templates/att/Ceph_Storage_Appliance_Mars_200_400_brochure.pdf?lng=en)
+
+Every ARM server node provides dedicated CPU, memory, storage and network interface
+resources to its supported object storage device (OSD). _As a result, OSD
+performance is far more balanced than traditional single-server node designs
+supporting many OSDs. Also, by limiting the failure domain to a single disk, the
+Mars exhibits faster recovery from microserver failures._
+
+### [OpenStack and Ceph for Distributed Hyperconverged Edge Deployments](https://thenewstack.io/openstack-and-ceph-for-distributed-hyperconverged-edge-deployments/)
+
+> ... The resultant architecture will support NFV (which is backbone technology
+> for 5G), emerging use cases with fewer control planes and distribute VNFs
+> (Virtual Network Functions or network services) within all regional and edge
+> nodes involved in network.
+
+| ![](https://cdn.thenewstack.io/media/2019/02/2c730448-sn1.png) |
+|:-:|
+| Proposed solution referred Akraino Edge Stack (Software stack for Edge, Linux Foundation Open Source Project) |
+
+* Ceph
+
+    | ![](https://cdn.thenewstack.io/media/2019/02/e0647566-sn4.png) |
+    |:-:|
+    | Ceph for the proposed architecture |
+
+    | ![](https://cdn.thenewstack.io/media/2019/02/5ee215ba-sn5.png) |
+    |:-:|
+    | Distributed Compute Nodes with Ceph |
+
+    | ![](https://cdn.thenewstack.io/media/2019/02/6804f747-sn6.png) |
+    |:-:|
+    | Final Architecture showing OpenStack projects + Ceph Cluster in HCI Way |
+
+### [What is MEC? The telco Edge. - Canonical](https://ubuntu.com/blog/what-is-mec-the-telco-edge)
+
+| ![](https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,c_fill,w_1440/https://lh4.googleusercontent.com/2XmTTYnmcITxV2pDUOP6abW4pPjkhgrS1HbV7CdBWX4ZeUY27vxD3wIJTXF4qbDccBnBcMYozzxY3XB47WNjgLVtLOcwv7jAhfrY8tAf9E4OP7CYFw42_he_r-AaxFxXzk6PBrhF) |
+|:-:|
+| Typical edge site design |
+
+* [MAAS](https://maas.io/) to manage bare metal hardware
+* [LXD](https://linuxcontainers.org/) clustering to provide an abstract layer of
+    virtualization
+* Ceph for distributed storage
+* MicroK8s to provide a Kubernetes cluster
+
+### [OpenShift Container Storage: Why Ceph?](https://www.openshift.com/blog/openshift-container-storage-why-ceph)
+
+> What makes Ceph unique - ... - is that it's safe.
+
 
 TODO:
 
