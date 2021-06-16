@@ -13,8 +13,8 @@ from what you'd expect.
 Concepts
 ========
 
-Defining Edge Storage
----------------------
+Defining _"Edge"_
+-----------------
 
 ### What it usually mean?
 
@@ -141,7 +141,8 @@ set of configurations across the deployment.
 
 网络分块（Partition）更加明显的数据中心。
 
-分块内的网络与分块之间的网络有明显的性能异构性，甚至可能在接入方式上也异构。
+分块内的网络与分块之间的网络有明显的性能异构性，甚至可能在接入方式上也异构（但该差异通过 NFV
+技术消除，似乎与电信行业密切相关）。
 
 #### 边缘数据中心
 
@@ -179,6 +180,77 @@ __发展方向__
 | ![](https://www.h3c.com/cn/res/202012/09/20201209_5411526_image002_1362371_473305_0.jpg) |
 |:-:|
 | 新华三云边协同处理流程 |
+
+
+Network Functions Virutalization (NFV)
+-------------------------------------
+
+* [Network Function Virtualization – The Opportunity for OpenStack and Open Source](https://superuser.openstack.org/articles/network-function-virtualization-the-opportunity-for-openstack-and-open-source/)
+* [TelcoWorkingGroup - OpenStack](https://wiki.openstack.org/wiki/TelcoWorkingGroup)
+* [What is Network Functions Virtualization?](https://thenewstack.io/de-ossify-the-network-with-function-virtualization/)
+
+### Background
+
+The networking industry is changing:
+
+* Disaggregation of control plane and data plane
+
+    Taking the current architecture of proprietary, expensive, complex,
+    difficult-to-manage forwarding devices (e.g. routers) and SDN aims to "put
+    an API on it", forwarding devices become devices controlled by open standards.
+
+* A shift in the telco data-center world which embraces lessons from elastic
+    infrastructure cloud
+
+* Disaggregation of hardware and software
+
+    The software part can be open-source implementations of optimized
+    packet-forwarding capabilities which used to be implemented in expensive
+    and proprietary hardware appliances (or "middleboxes").
+
+The main consumers of NFV are Service providers who are looking to accelerate
+the deployment of new network services.
+
+NFV is a complementary initiative to SDN, and SDN makes using NFV much easier and
+better.
+
+<!--
+### NFV in Action
+
+__Use case__
+
+* Virtual customer premise equipment (vCPE)
+* Packet switching mobile network
+* etc
+-->
+
+### NFV Architecture
+
+| ![](https://thenewstack.io/wp-content/uploads/2015/10/NFV-Architecture.jpg) |
+|:-:|
+| The Architectural Framework proposed by ETSI NFV ISG. The grey lines show the main reference points, where green lines and blue lines show the execution and other reference points, respectively. |
+
+Main blocks of NFV framework are:
+* Infrastructure consisting of hardware resources and corresponding virtualization
+* Management and Orchestration (MANO), consisting of orchestrator, virtualized
+    network functions manager (VNFM) and Virtualized Infrastructure Manager (VIM)
+* Virtualized network function and corresponding element management systems (EMS)
+* Operating Support System and Business Support Systems (OSS/BSS)
+
+A Virtualized Network Function (VNF) is a Network Function capable of running
+on an NFV Infrastructure (NFVI) and being orchestrated by a NFV Orchestrator
+(NFVO) and VNF Manager.
+
+The NFVI is the totality of the hardware and software components which build up
+the environment in which VNFs are deployed.
+
+NFV decouples software implementations of Network Functions from the compute,
+storage, and networking resources through a virtualized layer.
+
+The combination of NFVO, VIM and VNFM is typically referred as MANO. NVFO is
+responsible for initialization and setup of new network services, network service
+lifecycle management, global resource management, validation and authorization of
+requests for NFVI, as well as policy management for network service instances.
 
 -------------------------------------------
 
@@ -247,9 +319,11 @@ Mars exhibits faster recovery from microserver failures._
 * Ceph for distributed storage
 * MicroK8s to provide a Kubernetes cluster
 
+<!--
 ### [OpenShift Container Storage: Why Ceph?](https://www.openshift.com/blog/openshift-container-storage-why-ceph)
 
 > What makes Ceph unique - ... - is that it's safe.
+-->
 
 
 TODO:
