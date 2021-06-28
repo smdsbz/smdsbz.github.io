@@ -29,7 +29,9 @@ Defining _"Edge"_
 
 边缘计算是为应用开发者和服务提供商在网络的边缘侧提供云服务和 IT 环境服务，目标是在靠近数据输入或用户的地方提供计算、存储和网络带宽。边缘计算着重解决的问题是传统云计算（或中央计算）模式下存在的高延迟、网络不稳定和低带宽的问题。
 
-![](https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy8xMjExODgxMS0zZmM5NmQxZWUzODk0MDkxP2ltYWdlTW9ncjIvYXV0by1vcmllbnQvc3RyaXB8aW1hZ2VWaWV3Mi8yL3cvNjAwL2Zvcm1hdC93ZWJw?x-oss-process=image/format,png)
+| ![](http://docs.edgegallery.org/zh_CN/latest/_images/EdgeGallery_Architecture.png) |
+|:-:|
+| EdgeGallery v1.1 版本架构图 |
 
 边缘存储（Edge Storage）就是把数据直接存储在数据采集点，而不需要把采集的数据通过网络（即时）传输到存储的数据中心服务器（或云存储）的数据存储方式。例如：
 * 公共监控摄像：在摄像头本地保存数据，即时处理（[Axis](https://www.axis.com/en-us/technologies/edge-storage#:~:text=Edge%20storage%20is%20a%20technology%20used%20in%20Axis,the%20cost%20and%20effort%20for%20remote%20site%20recording.)）
@@ -41,6 +43,8 @@ Defining _"Edge"_
 | 星际云通总体架构 |
 
 边缘计算适用于与物联网设备紧密相关、数据传输延迟敏感、数据交互次数多、数据传输量大的物联网应用；而云存储则适用于延迟敏感度稍低的互联网应用。
+
+> 一般“边缘计算”指“计算”下沉至“端”场景
 
 #### 边缘计算的好处
 
@@ -80,6 +84,16 @@ Defining _"Edge"_
 * 维护操作必须简洁。未经过培训的工人能够进行人工修复和替换，而熟练的远程管理员可以进行重装或软件维护
 * 物理设计可能需要整体反思。大多数的边缘计算环境并不理想，有限的能源、灰尘、湿度及震动都应该被考虑在内
 
+> 基础设施也必须支持容器化部署。容器运行环境有其本带的问题：
+> * 若使用内核驱动，则需要其支持命名空间
+>   * 多数硬件接口，包括 iSCSI，暂无支持方案
+>   * IOMMU / SR-IOV
+> * 天生对系统服务不友好
+>   * `/var` 目录管理困难
+>   * 内核空间相互隔离
+> * 无第一方持久化存储支持
+>   * 映射挂载目录 / 设备文件 / 文件镜像
+
 ![](https://object-storage-ca-ymq-1.vexxhost.net/swift/v1/6e4619c416ff4bd19e1c087f27a43eea/www-assets-prod/5GEdge.svg)
 
 | ![](https://object-storage-ca-ymq-1.vexxhost.net/swift/v1/6e4619c416ff4bd19e1c087f27a43eea/www-assets-prod/edge/whitepaper/centraldatacenter.jpg) |
@@ -87,6 +101,8 @@ Defining _"Edge"_
 | A detailed view of the edge data center with an automated system used to operate a shrimp farm |
 
 #### 边缘计算模型
+
+> 边缘计算模型一般分为 _控制平面_ 与 _数据平面_ 两个解耦的部分讨论
 
 ##### 中心式控制平面 Centralized Control Plane
 
@@ -116,6 +132,8 @@ This provides an orchestrational overhead to synchronize between these data
 centers and manage them individually and as part of a large, connected environment
 at the same time.
 
+> 云-边半对等模型，根据服务质量需要来相互“卸载”计算任务
+
 <!--
 There are different options that can be used to overcome the operational
 challenges of this model. One method is to use federation techniques to connect
@@ -135,6 +153,8 @@ set of configurations across the deployment.
 
 当边缘存储进入实用阶段，去中心化的应用也更容易建立。由于基于边缘存储的点对点网络的建立，使得应用或服务商之间的数据共享变得更加容易和便捷：服务商或应用提供商完全可以不拥有数据，数据本身属于数据的生产者，数据的拥有者可以选择把数据分享给不同的应用或服务。
 
+> 商业模式：用户信息存储不再与某一个服务提供商绑定
+
 ### In our context
 
 #### Intuition
@@ -144,9 +164,9 @@ set of configurations across the deployment.
 分块内的网络与分块之间的网络有明显的性能异构性，甚至可能在接入方式上也异构（但该差异通过 NFV
 技术消除，似乎与电信行业密切相关）。
 
-#### 边缘数据中心
+在项目的上下文中，_边缘存储_ 更多是指 _边缘数据中心_ 上的分布式持久化存储。
 
-在项目的上下文中，_边缘存储_ 更多是指 _边缘数据中心_ 上的分布式存储。
+#### 边缘数据中心
 
 * [边缘数据中心规划发展研究](https://zhuanlan.zhihu.com/p/172160917)
 * [多站融合边缘数据中心方案 - 新华三集团](https://www.h3c.com/cn/d_202012/1362371_473305_0.htm#)
@@ -175,11 +195,11 @@ __发展方向__
         Nawab F, Agrawal D, El Abbadi A. Nomadic datacenter sat the network edge: Data management challenges for the cloud with mobile infrastructure[C]. EDBT, 2018:497-500.
 * 标准化
 
-> 新华三边缘数据中心机房采用微模块标准化建设模式，提供标准接口、部件、子系统、整体架构全方位标准化、模块化定义数据中心，实现客户按需定制，非常适合多站融合边缘计算场景的云基础设施快速部署。
-
-| ![](https://www.h3c.com/cn/res/202012/09/20201209_5411526_image002_1362371_473305_0.jpg) |
-|:-:|
-| 新华三云边协同处理流程 |
+    > 新华三边缘数据中心机房采用微模块标准化建设模式，提供标准接口、部件、子系统、整体架构全方位标准化、模块化定义数据中心，实现客户按需定制，非常适合多站融合边缘计算场景的云基础设施快速部署。
+    >
+    > | ![](https://www.h3c.com/cn/res/202012/09/20201209_5411526_image002_1362371_473305_0.jpg) |
+    > |:-:|
+    > | 新华三云边协同处理流程 |
 
 
 Network Functions Virutalization (NFV)
@@ -188,6 +208,8 @@ Network Functions Virutalization (NFV)
 * [Network Function Virtualization – The Opportunity for OpenStack and Open Source](https://superuser.openstack.org/articles/network-function-virtualization-the-opportunity-for-openstack-and-open-source/)
 * [TelcoWorkingGroup - OpenStack](https://wiki.openstack.org/wiki/TelcoWorkingGroup)
 * [What is Network Functions Virtualization?](https://thenewstack.io/de-ossify-the-network-with-function-virtualization/)
+
+> 主要与电信（Telco）行业相关
 
 ### Background
 
@@ -213,6 +235,10 @@ the deployment of new network services.
 
 NFV is a complementary initiative to SDN, and SDN makes using NFV much easier and
 better.
+
+> 电信提供商希望通过引入云计算中的、基于虚拟化技术的服务管理模式来在基础设施共用的环境下降低运营成本、加速功能迭代
+>
+> 通过 NFV 技术使用虚拟化消除接入方式的不同
 
 <!--
 ### NFV in Action
@@ -252,6 +278,46 @@ responsible for initialization and setup of new network services, network servic
 lifecycle management, global resource management, validation and authorization of
 requests for NFVI, as well as policy management for network service instances.
 
+VNFMs are responsible for lifecycle management of VNF instances and the overall
+coordination between NFVI and EMSs.
+
+VIM, such as OpenStack, is responsible for controlling, managing and monitoring
+NFVI compute, storage and network resources.
+
+| ![](https://wiki.opnfv.org/download/attachments/2925118/opnfv_diagram_fraser_042318.png?version=1&modificationDate=1541999962000&api=v2) |
+|:-:|
+| OPNFV Release Architecture |
+
+> NFV 的具体实现形式尚未知
+
+### 其他材料
+
+* [面向云网融合的细粒度多接入边缘计算架构](https://crad.ict.ac.cn/CN/article/downloadArticleFile.do?attachType=PDF&id=4443)
+* [支持网络切片和绿色通信的软件定义虚拟化接入网](https://crad.ict.ac.cn/CN/article/downloadArticleFile.do?attachType=PDF&id=4444)
+
+### 网络拓扑发现 Network Topology Discovery
+
+* [Current Trends of Topology Discovery in OpenFlow-based Software Defined Network](https://academic.microsoft.com/paper/1915875214/citedby/search?q=Current%20Trends%20of%20Topology%20Discovery%20in%20OpenFlow-based%20Software%20Defined%20Networks&qe=RId%253D1915875214&f=&orderBy=0)
+    * [Discovering the Network Topology: An Efficient Approach for SDN](https://upcommons.upc.edu/bitstream/handle/2117/103436/Efficient_Approach_SDN.pdf?sequence=6&isAllowed=y)  
+        通过 Dijkstra-like 算法找到由网络延迟定义的最短生成路径
+* [Efficient topology discovery in software defined networks](https://academic.microsoft.com/paper/2087899556/reference/search?q=Efficient%20topology%20discovery%20in%20software%20defined%20networks&qe=Or(Id%253D2147118406%252CId%253D2022758041%252CId%253D2798915702%252CId%253D2136451165%252CId%253D2186961980%252CId%253D2028926203%252CId%253D1769222792%252CId%253D2110722699%252CId%253D2089939717%252CId%253D2042876290%252CId%253D2222758232)&f=&orderBy=0)
+
+在 SDN 中（OpenFlow）通常通过二层协议 LLDP（Link Layer Discovery Protocal）实现，SDN
+交换机默认支持 LLDP，但网络拓扑发现的计算仍由 SDN 控制器完成，且该实现并未标准化（但通常认为
+NOX 的实现，OFDP - OpenFlow Discovery Protocal，为标准实现）。
+
+> __NOTE__
+>
+> SDN 中不存在“路由器”概念，路由功能（即报文受控转发）由 SDN 交换机完成。
+
+| ![](https://i.loli.net/2021/06/28/1sGa7OimwHFNQcp.png) |
+|:-:|
+| OFDP 工作流程：控制器通过 Packet-In 报文发现连接 (S1.P1, S2.P3) |
+
+若网络中的传统交换机不支持 LLDP，其二层报文会被直接丢弃。可以利用广播机制来使报文“穿过”传统交换机（如 BDDP，Broadcast Domain Discovery Protocal，非标准协议）。
+
+暂无发现传统交换机的方法，因为传统交换机在逻辑上是透明的。
+
 -------------------------------------------
 
 Implementation and Deployment
@@ -261,6 +327,9 @@ Ceph at the Edge
 ----------------
 
 ### [Use Mars 400 Ceph Storage in Edge Datacenter](https://www.ambedded.com.tw/en/use-case/Use-Mars-400-Ceph-Storage-in-Edge-Datacenter/use-case-01.html)
+
+> * 数据服务器小型化、可热插拔
+> * 主要针对私有云场景
 
 After a series of local data processing, the result and original datasets are
 stored in the edge data center. The application only uploads precise result back
@@ -283,6 +352,10 @@ supporting many OSDs. Also, by limiting the failure domain to a single disk, the
 Mars exhibits faster recovery from microserver failures._
 
 ### [OpenStack and Ceph for Distributed Hyperconverged Edge Deployments](https://thenewstack.io/openstack-and-ceph-for-distributed-hyperconverged-edge-deployments/)
+
+> OpenStack 边缘计算/超融合架构路线书
+>
+> 与 Canonical 合作，基于 LXD 容器；官方 Docker 容器支持情况位置
 
 > ... The resultant architecture will support NFV (which is backbone technology
 > for 5G), emerging use cases with fewer control planes and distribute VNFs
