@@ -302,9 +302,7 @@ NFVI compute, storage and network resources.
         通过 Dijkstra-like 算法找到由网络延迟定义的最短生成路径
 * [Efficient topology discovery in software defined networks](https://academic.microsoft.com/paper/2087899556/reference/search?q=Efficient%20topology%20discovery%20in%20software%20defined%20networks&qe=Or(Id%253D2147118406%252CId%253D2022758041%252CId%253D2798915702%252CId%253D2136451165%252CId%253D2186961980%252CId%253D2028926203%252CId%253D1769222792%252CId%253D2110722699%252CId%253D2089939717%252CId%253D2042876290%252CId%253D2222758232)&f=&orderBy=0)
 
-在 SDN 中（OpenFlow）通常通过二层协议 LLDP（Link Layer Discovery Protocal）实现，SDN
-交换机默认支持 LLDP，但网络拓扑发现的计算仍由 SDN 控制器完成，且该实现并未标准化（但通常认为
-NOX 的实现，OFDP - OpenFlow Discovery Protocal，为标准实现）。
+在 SDN 中（基于 OpenFlow 交换机抽象）通常通过二层协议 LLDP（Link Layer Discovery Protocal）实现，SDN 交换机默认支持 LLDP，但网络拓扑发现的计算仍由 SDN 控制器完成，且该实现并未标准化（但通常认为 NOX 的实现，OFDP - OpenFlow Discovery Protocal，为标准实现）。
 
 > __NOTE__
 >
