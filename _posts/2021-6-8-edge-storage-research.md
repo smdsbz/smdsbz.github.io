@@ -384,7 +384,7 @@ Mars exhibits faster recovery from microserver failures._
 |:-:|
 | Typical edge site design |
 
-* [MAAS](https://maas.io/) to manage bare metal hardware
+* [MaaS](https://maas.io/) to manage bare metal hardware
 * [LXD](https://linuxcontainers.org/) clustering to provide an abstract layer of
     virtualization
 * Ceph for distributed storage
@@ -416,3 +416,15 @@ TODO:
         * 元数据同步开销可能过大，从树变成图
         * 使用 Ceph 的增量 gossip？
     * ...
+
+### Oberservation
+
+* 当 pool 跨多个分区时，分区间延迟对读写性能影响大小依次为 随机读 >> 顺序读 > 随机写。
+
+    * | Inter-partition Lat. | Write IOPS / Lat.  | Seq IOPS / Lat.   | Rand IOPS / Lat. |
+      |----------------------|--------------------|-------------------|------------------|
+      | +0ms                 | 33 / 0.47          | 377 / 0.04        | 7305 / 0.002     |
+      | +50ms                | 24 / 0.65          | 118 / 0.13        | 254 / 0.06       |
+        * 延迟加在网络界面上，即 RT 延迟为所加延迟的两倍
+        * CRUSH 规则选择 host 作为叶子节点，即三个副本分布在三个节点（也即网络分区）上
+        * `rados -p test -b 4K [-O 4M] bench 180 write [-t 16] --no-cleanup`
