@@ -428,3 +428,122 @@ TODO:
         * 延迟加在网络界面上，即 RT 延迟为所加延迟的两倍
         * CRUSH 规则选择 host 作为叶子节点，即三个副本分布在三个节点（也即网络分区）上
         * `rados -p test -b 4K [-O 4M] bench 180 write [-t 16] --no-cleanup`
+
+### Approach
+
+#### Target data placement
+
+对于一个 3-副本的存储池，我们希望其中
+* 前两个副本在离计算较近的边缘节点（可能为发起计算的节点），从而降低读延迟
+* 第三个副本在离计算较远的边缘节点，保障发生关联故障时的数据安全
+
+#### Vanilla CRUSH approach
+
+```text
+ -1         0.04500  root default
+ -3         0.01500      host kart-1
+  0    hdd  0.00499          osd.0             up   1.00000  1.00000
+  1    hdd  0.00499          osd.1             up   1.00000  1.00000
+  2    hdd  0.00499          osd.2             up   1.00000  1.00000
+ -5         0.01500      host kart-2
+  3    hdd  0.00499          osd.3             up   1.00000  1.00000
+  4    hdd  0.00499          osd.4             up   1.00000  1.00000
+  5    hdd  0.00499          osd.5             up   1.00000  1.00000
+ -7         0.01500      host kart-3
+  6    hdd  0.00499          osd.6             up   1.00000  1.00000
+  7    hdd  0.00499          osd.7             up   1.00000  1.00000
+  8    hdd  0.00499          osd.8             up   1.00000  1.00000
+```
+
+对于这样集群结构，我们可以在 CRUSH Map 中人为配置与现实情况相符的分区。
+
+```text
+ -9         0.01500  region only-kart-1
+ -3         0.01500      host kart-1
+  0    hdd  0.00499          osd.0             up   1.00000  1.00000
+  1    hdd  0.00499          osd.1             up   1.00000  1.00000
+  2    hdd  0.00499          osd.2             up   1.00000  1.00000
+-11         0.03000  region except-kart-1
+ -5         0.01500      host kart-2
+  3    hdd  0.00499          osd.3             up   1.00000  1.00000
+  4    hdd  0.00499          osd.4             up   1.00000  1.00000
+  5    hdd  0.00499          osd.5             up   1.00000  1.00000
+ -7         0.01500      host kart-3
+  6    hdd  0.00499          osd.6             up   1.00000  1.00000
+  7    hdd  0.00499          osd.7             up   1.00000  1.00000
+  8    hdd  0.00499          osd.8             up   1.00000  1.00000
+```
+
+然后在人为构造的辅助分区上构建规则。
+
+```text
+rule kart-1_centric {
+        id 1
+        type replicated
+        min_size 3
+        max_size 10
+        step take only-kart-1
+        step chooseleaf firstn 2 type host
+        step emit
+        step take except-kart-1
+        step chooseleaf firstn 0 type host
+        step emit
+}
+```
+
+* [ ] 近计算分区故障时 OSD 分布
+* 对于 n 个分区会产生 O(n) 个辅助分区
+* 首次添加新分区的 Bucket 时需要更新所有现有的辅助分区
+
+可以通过脚本生成 CRUSH Map
+* 获取当前 CRUSH Map
+    * JSON：`ceph osd crush dump`
+
+        ```typescript
+        interface CRUSHMap {
+            devices: {
+                id: number,
+                name: string,
+                class: "hdd" | "ssd" | "nvme"
+            }[],
+            types: {
+                type_id: number,
+                name: string
+            }[],
+            buckets: {
+                id: number,
+                name: string,
+                type_id: number,
+                type_name: string,
+                weight: /*16.16 fixed-point*/number,
+                alg: "uniform" | "list" | "tree" | "straw" | "straw2",
+                hash: "rjenkins1",
+                items: {
+                    id: number,
+                    weight: /*16.16 fixed-point*/number,
+                    pos: number
+                }[]
+            }[],
+            rules: {
+                rule_id: number,
+                rule_name: string,
+                ruleset: number,
+                type: number,
+                min_size: number,
+                max_size: number,
+                steps: (
+                      { op: "take", item: number, item_name: string }
+                    | { op: "choose_firstn" | "choose_indep"
+                            | "chooseleaf_firstn" | "chooseleaf_indep",
+                        num: number, type: string }
+                    | { op: "emit" }
+                )[]
+            }[],
+            tunables: any,
+            choose_args: any
+        }
+        ```
+
+    * 二进制：`ceph osd getcrushmap -o <bin>`
+* 反编译二进制 CRUSH Map：`crushtool -d <bin> -o <txt>`
+* 编译二进制 CRUSH Map：`crushtool -c <txt> -o <bin>`
