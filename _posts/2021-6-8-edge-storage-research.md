@@ -483,15 +483,17 @@ rule kart-1_centric {
         min_size 3
         max_size 10
         step take only-kart-1
-        step chooseleaf firstn 2 type host
+        step chooseleaf firstn 2 type osd
         step emit
         step take except-kart-1
-        step chooseleaf firstn 0 type host
+        step chooseleaf firstn 0 type osd
         step emit
 }
 ```
 
-* [ ] 近计算分区故障时 OSD 分布
+> 这里由于测试硬件条件限制，故障域为 `host`，故叶子节点只能为 `osd`。
+
+* [x] 近计算分区故障时 OSD 分布
 * 对于 n 个分区会产生 O(n) 个辅助分区
 * 首次添加新分区的 Bucket 时需要更新所有现有的辅助分区
 
@@ -547,3 +549,4 @@ rule kart-1_centric {
     * 二进制：`ceph osd getcrushmap -o <bin>`
 * 反编译二进制 CRUSH Map：`crushtool -d <bin> -o <txt>`
 * 编译二进制 CRUSH Map：`crushtool -c <txt> -o <bin>`
+* 更新 CRUSH Map：`ceph osd setcrushmap -i <bin>`
