@@ -491,9 +491,10 @@ rule kart-1_centric {
 }
 ```
 
-> 这里由于测试硬件条件限制，故障域为 `host`，故叶子节点只能为 `osd`。
+> 这里由于测试环境硬件条件限制，故障域为 `host`，故叶子节点只能为 `osd`。
 
-* [x] 近计算分区故障时 OSD 分布
+* 近计算分区故障时 OSD 分布
+    * 目前实现下会导致所有副本重新分布/迁移
 * 对于 n 个分区会产生 O(n) 个辅助分区
 * 首次添加新分区的 Bucket 时需要更新所有现有的辅助分区
 
@@ -550,3 +551,193 @@ rule kart-1_centric {
 * 反编译二进制 CRUSH Map：`crushtool -d <bin> -o <txt>`
 * 编译二进制 CRUSH Map：`crushtool -c <txt> -o <bin>`
 * 更新 CRUSH Map：`ceph osd setcrushmap -i <bin>`
+
+[脚本](https://gitee.com/smdsbz/ceph-edge/blob/248f5785f786de0217b69b02b76a6cdf131d6b5a/scripts/generate_cephedge_crushmap.py)生成的 CRUSH Map
+
+```text
+# begin crush map
+tunable choose_local_tries 0
+tunable choose_local_fallback_tries 0
+tunable choose_total_tries 50
+tunable chooseleaf_descend_once 1
+tunable chooseleaf_vary_r 1
+tunable chooseleaf_stable 1
+tunable straw_calc_version 1
+tunable allowed_bucket_algs 54
+
+# devices
+device 0 osd.0 class hdd
+device 1 osd.1 class hdd
+device 2 osd.2 class hdd
+device 3 osd.3 class hdd
+device 4 osd.4 class hdd
+device 5 osd.5 class hdd
+device 6 osd.6 class hdd
+device 7 osd.7 class hdd
+device 8 osd.8 class hdd
+
+# types
+type 0 osd
+type 1 host
+type 2 chassis
+type 3 rack
+type 4 row
+type 5 pdu
+type 6 pod
+type 7 room
+type 8 datacenter
+type 9 zone
+type 10 region
+type 11 root
+
+# buckets
+host kart-1 {
+        id -3           # do not change unnecessarily
+        id -4 class hdd         # do not change unnecessarily
+        # weight 0.015
+        alg straw2
+        hash 0  # rjenkins1
+        item osd.0 weight 0.005
+        item osd.1 weight 0.005
+        item osd.2 weight 0.005
+}
+host kart-2 {
+        id -5           # do not change unnecessarily
+        id -6 class hdd         # do not change unnecessarily
+        # weight 0.015
+        alg straw2
+        hash 0  # rjenkins1
+        item osd.3 weight 0.005
+        item osd.4 weight 0.005
+        item osd.5 weight 0.005
+}
+host kart-3 {
+        id -7           # do not change unnecessarily
+        id -8 class hdd         # do not change unnecessarily
+        # weight 0.015
+        alg straw2
+        hash 0  # rjenkins1
+        item osd.6 weight 0.005
+        item osd.7 weight 0.005
+        item osd.8 weight 0.005
+}
+root default {
+        id -1           # do not change unnecessarily
+        id -2 class hdd         # do not change unnecessarily
+        # weight 0.045
+        alg straw2
+        hash 0  # rjenkins1
+        item kart-1 weight 0.015
+        item kart-2 weight 0.015
+        item kart-3 weight 0.015
+}
+root CephEdge-except_kart-1 {
+        id -9           # do not change unnecessarily
+        id -10 class hdd                # do not change unnecessarily
+        # weight 0.030
+        alg straw2
+        hash 0  # rjenkins1
+        item kart-2 weight 0.015
+        item kart-3 weight 0.015
+}
+root CephEdge-except_kart-2 {
+        id -11          # do not change unnecessarily
+        id -12 class hdd                # do not change unnecessarily
+        # weight 0.030
+        alg straw2
+        hash 0  # rjenkins1
+        item kart-1 weight 0.015
+        item kart-3 weight 0.015
+}
+root CephEdge-except_kart-3 {
+        id -13          # do not change unnecessarily
+        id -14 class hdd                # do not change unnecessarily
+        # weight 0.030
+        alg straw2
+        hash 0  # rjenkins1
+        item kart-1 weight 0.015
+        item kart-2 weight 0.015
+}
+
+# rules
+rule replicated_rule {
+        id 0
+        type replicated
+        min_size 1
+        max_size 10
+        step take default
+        step chooseleaf firstn 0 type host
+        step emit
+}
+rule CephEdge-kart-1_centric {
+        id 1
+        type replicated
+        min_size 3
+        max_size 10
+        step take kart-1
+        step chooseleaf firstn 2 type osd
+        step emit
+        step take CephEdge-except_kart-1
+        step chooseleaf firstn 0 type host
+        step emit
+}
+rule CephEdge-kart-2_centric {
+        id 2
+        type replicated
+        min_size 3
+        max_size 10
+        step take kart-2
+        step chooseleaf firstn 2 type osd
+        step emit
+        step take CephEdge-except_kart-2
+        step chooseleaf firstn 0 type host
+        step emit
+}
+rule CephEdge-kart-3_centric {
+        id 3
+        type replicated
+        min_size 3
+        max_size 10
+        step take kart-3
+        step chooseleaf firstn 2 type osd
+        step emit
+        step take CephEdge-except_kart-3
+        step chooseleaf firstn 0 type host
+        step emit
+}
+
+# end crush map
+```
+
+```console
+root@kart-1:/# ceph osd pool set test crush_rule CephEdge-kart-1_centric
+set pool 4 crush_rule to CephEdge-kart-1_centric
+root@kart-1:/# for o in {0..9}; do ceph osd map test $o; done
+osdmap e385 pool 'test' (4) object '0' -> pg 4.f18a3536 (4.16) -> up ([0,2,5], p0) acting ([0,2,5], p0)
+osdmap e385 pool 'test' (4) object '1' -> pg 4.437e2a40 (4.0) -> up ([0,1,7], p0) acting ([0,1,7], p0)
+osdmap e385 pool 'test' (4) object '2' -> pg 4.d963a09f (4.1f) -> up ([0,1,6], p0) acting ([0,1,6], p0)
+osdmap e385 pool 'test' (4) object '3' -> pg 4.cd1043f3 (4.13) -> up ([2,1,4], p2) acting ([2,1,4], p2)
+osdmap e385 pool 'test' (4) object '4' -> pg 4.d76e1c1b (4.1b) -> up ([2,1,4], p2) acting ([2,1,4], p2)
+osdmap e385 pool 'test' (4) object '5' -> pg 4.c7c1094d (4.d) -> up ([1,2,3], p1) acting ([1,2,3], p1)
+osdmap e385 pool 'test' (4) object '6' -> pg 4.d7f5bf23 (4.3) -> up ([0,2,6], p0) acting ([0,2,6], p0)
+osdmap e385 pool 'test' (4) object '7' -> pg 4.14d0d63a (4.1a) -> up ([2,0,4], p2) acting ([2,0,4], p2)
+osdmap e385 pool 'test' (4) object '8' -> pg 4.8f0dc6bd (4.1d) -> up ([0,1,7], p0) acting ([0,1,7], p0)
+osdmap e385 pool 'test' (4) object '9' -> pg 4.a81d0697 (4.17) -> up ([0,1,5], p0) acting ([0,1,5], p0)
+root@kart-1:/# ceph osd pool set test crush_rule CephEdge-kart-2_centric
+set pool 4 crush_rule to CephEdge-kart-2_centric
+root@kart-1:/# for o in {0..9}; do ceph osd map test $o; done
+osdmap e412 pool 'test' (4) object '0' -> pg 4.f18a3536 (4.16) -> up ([5,3,0], p5) acting ([5,3,0], p5)
+osdmap e412 pool 'test' (4) object '1' -> pg 4.437e2a40 (4.0) -> up ([4,5,0], p4) acting ([4,5,0], p4)
+osdmap e412 pool 'test' (4) object '2' -> pg 4.d963a09f (4.1f) -> up ([3,5,6], p3) acting ([3,5,6], p3)
+osdmap e412 pool 'test' (4) object '3' -> pg 4.cd1043f3 (4.13) -> up ([4,3,2], p4) acting ([4,3,2], p4)
+osdmap e412 pool 'test' (4) object '4' -> pg 4.d76e1c1b (4.1b) -> up ([4,3,2], p4) acting ([4,3,2], p4)
+osdmap e412 pool 'test' (4) object '5' -> pg 4.c7c1094d (4.d) -> up ([3,4,8], p3) acting ([3,4,8], p3)
+osdmap e412 pool 'test' (4) object '6' -> pg 4.d7f5bf23 (4.3) -> up ([4,5,6], p4) acting ([4,5,6], p4)
+osdmap e412 pool 'test' (4) object '7' -> pg 4.14d0d63a (4.1a) -> up ([4,5,8], p4) acting ([4,5,8], p4)
+osdmap e412 pool 'test' (4) object '8' -> pg 4.8f0dc6bd (4.1d) -> up ([3,5,7], p3) acting ([3,5,7], p3)
+osdmap e412 pool 'test' (4) object '9' -> pg 4.a81d0697 (4.17) -> up ([5,3,0], p5) acting ([5,3,0], p5)
+root@kart-1:/#
+```
+
+* 目前实现在更改性能分区时会导致所有副本重新分布
+    * 希望冗余副本不需要迁移
