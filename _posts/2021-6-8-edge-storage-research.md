@@ -552,7 +552,7 @@ rule kart-1_centric {
 * 编译二进制 CRUSH Map：`crushtool -c <txt> -o <bin>`
 * 更新 CRUSH Map：`ceph osd setcrushmap -i <bin>`
 
-[脚本](https://gitee.com/smdsbz/ceph-edge/blob/248f5785f786de0217b69b02b76a6cdf131d6b5a/scripts/generate_cephedge_crushmap.py)生成的 CRUSH Map
+[脚本](https://gitee.com/smdsbz/ceph-edge/blob/dev/scripts/generate_cephedge_crushmap.py)生成的 CRUSH Map
 
 ```text
 # begin crush map
@@ -560,7 +560,7 @@ tunable choose_local_tries 0
 tunable choose_local_fallback_tries 0
 tunable choose_total_tries 50
 tunable chooseleaf_descend_once 1
-tunable chooseleaf_vary_r 1
+tunable chooseleaf_vary_r 10
 tunable chooseleaf_stable 1
 tunable straw_calc_version 1
 tunable allowed_bucket_algs 54
@@ -575,6 +575,12 @@ device 5 osd.5 class hdd
 device 6 osd.6 class hdd
 device 7 osd.7 class hdd
 device 8 osd.8 class hdd
+device 9 osd.9 class hdd
+device 10 osd.10 class hdd
+device 11 osd.11 class hdd
+device 12 osd.12 class hdd
+device 13 osd.13 class hdd
+device 14 osd.14 class hdd
 
 # types
 type 0 osd
@@ -611,52 +617,102 @@ host kart-2 {
         item osd.4 weight 0.005
         item osd.5 weight 0.005
 }
-host kart-3 {
+host kart-5 {
         id -7           # do not change unnecessarily
         id -8 class hdd         # do not change unnecessarily
         # weight 0.015
         alg straw2
         hash 0  # rjenkins1
+        item osd.12 weight 0.005
+        item osd.9 weight 0.005
         item osd.6 weight 0.005
+}
+host kart-4 {
+        id -9           # do not change unnecessarily
+        id -10 class hdd                # do not change unnecessarily
+        # weight 0.015
+        alg straw2
+        hash 0  # rjenkins1
+        item osd.10 weight 0.005
+        item osd.14 weight 0.005
         item osd.7 weight 0.005
+}
+host kart-3 {
+        id -11          # do not change unnecessarily
+        id -12 class hdd                # do not change unnecessarily
+        # weight 0.015
+        alg straw2
+        hash 0  # rjenkins1
+        item osd.11 weight 0.005
+        item osd.13 weight 0.005
         item osd.8 weight 0.005
 }
 root default {
         id -1           # do not change unnecessarily
         id -2 class hdd         # do not change unnecessarily
-        # weight 0.045
+        # weight 0.073
         alg straw2
         hash 0  # rjenkins1
         item kart-1 weight 0.015
         item kart-2 weight 0.015
+        item kart-5 weight 0.015
+        item kart-4 weight 0.015
         item kart-3 weight 0.015
 }
 root CephEdge-except_kart-1 {
-        id -9           # do not change unnecessarily
-        id -10 class hdd                # do not change unnecessarily
-        # weight 0.030
+        id -13          # do not change unnecessarily
+        id -14 class hdd                # do not change unnecessarily
+        # weight 0.059
         alg straw2
         hash 0  # rjenkins1
         item kart-2 weight 0.015
+        item kart-5 weight 0.015
+        item kart-4 weight 0.015
         item kart-3 weight 0.015
 }
 root CephEdge-except_kart-2 {
-        id -11          # do not change unnecessarily
-        id -12 class hdd                # do not change unnecessarily
-        # weight 0.030
+        id -15          # do not change unnecessarily
+        id -16 class hdd                # do not change unnecessarily
+        # weight 0.059
         alg straw2
         hash 0  # rjenkins1
         item kart-1 weight 0.015
+        item kart-5 weight 0.015
+        item kart-4 weight 0.015
         item kart-3 weight 0.015
 }
-root CephEdge-except_kart-3 {
-        id -13          # do not change unnecessarily
-        id -14 class hdd                # do not change unnecessarily
-        # weight 0.030
+root CephEdge-except_kart-5 {
+        id -17          # do not change unnecessarily
+        id -18 class hdd                # do not change unnecessarily
+        # weight 0.059
         alg straw2
         hash 0  # rjenkins1
         item kart-1 weight 0.015
         item kart-2 weight 0.015
+        item kart-4 weight 0.015
+        item kart-3 weight 0.015
+}
+root CephEdge-except_kart-4 {
+        id -19          # do not change unnecessarily
+        id -20 class hdd                # do not change unnecessarily
+        # weight 0.059
+        alg straw2
+        hash 0  # rjenkins1
+        item kart-1 weight 0.015
+        item kart-2 weight 0.015
+        item kart-5 weight 0.015
+        item kart-3 weight 0.015
+}
+root CephEdge-except_kart-3 {
+        id -21          # do not change unnecessarily
+        id -22 class hdd                # do not change unnecessarily
+        # weight 0.059
+        alg straw2
+        hash 0  # rjenkins1
+        item kart-1 weight 0.015
+        item kart-2 weight 0.015
+        item kart-5 weight 0.015
+        item kart-4 weight 0.015
 }
 
 # rules
@@ -693,8 +749,32 @@ rule CephEdge-kart-2_centric {
         step chooseleaf firstn 0 type host
         step emit
 }
-rule CephEdge-kart-3_centric {
+rule CephEdge-kart-5_centric {
         id 3
+        type replicated
+        min_size 3
+        max_size 10
+        step take kart-5
+        step chooseleaf firstn 2 type osd
+        step emit
+        step take CephEdge-except_kart-5
+        step chooseleaf firstn 0 type host
+        step emit
+}
+rule CephEdge-kart-4_centric {
+        id 4
+        type replicated
+        min_size 3
+        max_size 10
+        step take kart-4
+        step chooseleaf firstn 2 type osd
+        step emit
+        step take CephEdge-except_kart-4
+        step chooseleaf firstn 0 type host
+        step emit
+}
+rule CephEdge-kart-3_centric {
+        id 5
         type replicated
         min_size 3
         max_size 10
@@ -710,34 +790,88 @@ rule CephEdge-kart-3_centric {
 ```
 
 ```console
-root@kart-1:/# ceph osd pool set test crush_rule CephEdge-kart-1_centric
-set pool 4 crush_rule to CephEdge-kart-1_centric
-root@kart-1:/# for o in {0..9}; do ceph osd map test $o; done
-osdmap e385 pool 'test' (4) object '0' -> pg 4.f18a3536 (4.16) -> up ([0,2,5], p0) acting ([0,2,5], p0)
-osdmap e385 pool 'test' (4) object '1' -> pg 4.437e2a40 (4.0) -> up ([0,1,7], p0) acting ([0,1,7], p0)
-osdmap e385 pool 'test' (4) object '2' -> pg 4.d963a09f (4.1f) -> up ([0,1,6], p0) acting ([0,1,6], p0)
-osdmap e385 pool 'test' (4) object '3' -> pg 4.cd1043f3 (4.13) -> up ([2,1,4], p2) acting ([2,1,4], p2)
-osdmap e385 pool 'test' (4) object '4' -> pg 4.d76e1c1b (4.1b) -> up ([2,1,4], p2) acting ([2,1,4], p2)
-osdmap e385 pool 'test' (4) object '5' -> pg 4.c7c1094d (4.d) -> up ([1,2,3], p1) acting ([1,2,3], p1)
-osdmap e385 pool 'test' (4) object '6' -> pg 4.d7f5bf23 (4.3) -> up ([0,2,6], p0) acting ([0,2,6], p0)
-osdmap e385 pool 'test' (4) object '7' -> pg 4.14d0d63a (4.1a) -> up ([2,0,4], p2) acting ([2,0,4], p2)
-osdmap e385 pool 'test' (4) object '8' -> pg 4.8f0dc6bd (4.1d) -> up ([0,1,7], p0) acting ([0,1,7], p0)
-osdmap e385 pool 'test' (4) object '9' -> pg 4.a81d0697 (4.17) -> up ([0,1,5], p0) acting ([0,1,5], p0)
-root@kart-1:/# ceph osd pool set test crush_rule CephEdge-kart-2_centric
-set pool 4 crush_rule to CephEdge-kart-2_centric
-root@kart-1:/# for o in {0..9}; do ceph osd map test $o; done
-osdmap e412 pool 'test' (4) object '0' -> pg 4.f18a3536 (4.16) -> up ([5,3,0], p5) acting ([5,3,0], p5)
-osdmap e412 pool 'test' (4) object '1' -> pg 4.437e2a40 (4.0) -> up ([4,5,0], p4) acting ([4,5,0], p4)
-osdmap e412 pool 'test' (4) object '2' -> pg 4.d963a09f (4.1f) -> up ([3,5,6], p3) acting ([3,5,6], p3)
-osdmap e412 pool 'test' (4) object '3' -> pg 4.cd1043f3 (4.13) -> up ([4,3,2], p4) acting ([4,3,2], p4)
-osdmap e412 pool 'test' (4) object '4' -> pg 4.d76e1c1b (4.1b) -> up ([4,3,2], p4) acting ([4,3,2], p4)
-osdmap e412 pool 'test' (4) object '5' -> pg 4.c7c1094d (4.d) -> up ([3,4,8], p3) acting ([3,4,8], p3)
-osdmap e412 pool 'test' (4) object '6' -> pg 4.d7f5bf23 (4.3) -> up ([4,5,6], p4) acting ([4,5,6], p4)
-osdmap e412 pool 'test' (4) object '7' -> pg 4.14d0d63a (4.1a) -> up ([4,5,8], p4) acting ([4,5,8], p4)
-osdmap e412 pool 'test' (4) object '8' -> pg 4.8f0dc6bd (4.1d) -> up ([3,5,7], p3) acting ([3,5,7], p3)
-osdmap e412 pool 'test' (4) object '9' -> pg 4.a81d0697 (4.17) -> up ([5,3,0], p5) acting ([5,3,0], p5)
+root@kart-1:/# ceph osd tree-from default
+ID   CLASS  WEIGHT   TYPE NAME        STATUS  REWEIGHT  PRI-AFF
+ -1         0.07500  root default
+ -3         0.01500      host kart-1
+  0    hdd  0.00499          osd.0        up   1.00000  1.00000
+  1    hdd  0.00499          osd.1        up   1.00000  1.00000
+  2    hdd  0.00499          osd.2        up   1.00000  1.00000
+ -5         0.01500      host kart-2
+  3    hdd  0.00499          osd.3        up   1.00000  1.00000
+  4    hdd  0.00499          osd.4        up   1.00000  1.00000
+  5    hdd  0.00499          osd.5        up   1.00000  1.00000
+-11         0.01500      host kart-3
+  8    hdd  0.00499          osd.8        up   1.00000  1.00000
+ 11    hdd  0.00499          osd.11       up   1.00000  1.00000
+ 13    hdd  0.00499          osd.13       up   1.00000  1.00000
+ -9         0.01500      host kart-4
+  7    hdd  0.00499          osd.7        up   1.00000  1.00000
+ 10    hdd  0.00499          osd.10       up   1.00000  1.00000
+ 14    hdd  0.00499          osd.14       up   1.00000  1.00000
+ -7         0.01500      host kart-5
+  6    hdd  0.00499          osd.6        up   1.00000  1.00000
+  9    hdd  0.00499          osd.9        up   1.00000  1.00000
+ 12    hdd  0.00499          osd.12       up   1.00000  1.00000
+root@kart-1:/# for r in CephEdge-kart-{1..5}_centric; do ceph osd pool set test crush_rule $r; for o in {0..9}; do ceph osd map test $o; done; done
+set pool 2 crush_rule to CephEdge-kart-1_centric
+osdmap e118 pool 'test' (2) object '0' -> pg 2.f18a3536 (2.16) -> up ([0,1,5,12,7], p0) acting ([0,1,5,12,7], p0)
+osdmap e118 pool 'test' (2) object '1' -> pg 2.437e2a40 (2.0) -> up ([2,1,3,9,7], p2) acting ([2,1,3,9,7], p2)
+osdmap e118 pool 'test' (2) object '2' -> pg 2.d963a09f (2.1f) -> up ([0,1,11,4,9], p0) acting ([0,1,11,4,9], p0)
+osdmap e118 pool 'test' (2) object '3' -> pg 2.cd1043f3 (2.13) -> up ([0,2,7,13,12], p0) acting ([0,2,7,13,12], p0)
+osdmap e118 pool 'test' (2) object '4' -> pg 2.d76e1c1b (2.1b) -> up ([1,0,11,6,5], p1) acting ([1,0,11,6,5], p1)
+osdmap e118 pool 'test' (2) object '5' -> pg 2.c7c1094d (2.d) -> up ([1,2,8,10,5], p1) acting ([1,2,8,10,5], p1)
+osdmap e118 pool 'test' (2) object '6' -> pg 2.d7f5bf23 (2.3) -> up ([1,2,11,14,5], p1) acting ([1,2,11,14,5], p1)
+osdmap e118 pool 'test' (2) object '7' -> pg 2.14d0d63a (2.1a) -> up ([2,0,3,6,10], p2) acting ([2,0,3,6,10], p2)
+osdmap e118 pool 'test' (2) object '8' -> pg 2.8f0dc6bd (2.1d) -> up ([0,1,10,6,3], p0) acting ([0,1,10,6,3], p0)
+osdmap e118 pool 'test' (2) object '9' -> pg 2.a81d0697 (2.17) -> up ([1,2,5,6,11], p1) acting ([1,2,5,6,11], p1)
+set pool 2 crush_rule to CephEdge-kart-2_centric
+osdmap e119 pool 'test' (2) object '0' -> pg 2.f18a3536 (2.16) -> up ([5,3,7,12,0], p5) acting ([5,3,7,12,0], p5)
+osdmap e120 pool 'test' (2) object '1' -> pg 2.437e2a40 (2.0) -> up ([3,5,8,9,2], p3) acting ([3,5,8,9,2], p3)
+osdmap e120 pool 'test' (2) object '2' -> pg 2.d963a09f (2.1f) -> up ([4,3,0,9,11], p4) acting ([4,3,0,9,11], p4)
+osdmap e120 pool 'test' (2) object '3' -> pg 2.cd1043f3 (2.13) -> up ([3,4,7,13,0], p3) acting ([3,4,7,13,0], p3)
+osdmap e120 pool 'test' (2) object '4' -> pg 2.d76e1c1b (2.1b) -> up ([5,3,11,6,14], p5) acting ([5,3,11,6,14], p5)
+osdmap e120 pool 'test' (2) object '5' -> pg 2.c7c1094d (2.d) -> up ([5,3,8,10,1], p5) acting ([5,3,8,10,1], p5)
+osdmap e120 pool 'test' (2) object '6' -> pg 2.d7f5bf23 (2.3) -> up ([5,4,11,14,9], p5) acting ([5,4,11,14,9], p5)
+osdmap e120 pool 'test' (2) object '7' -> pg 2.14d0d63a (2.1a) -> up ([3,4,11,6,2], p3) acting ([3,4,11,6,2], p3)
+osdmap e120 pool 'test' (2) object '8' -> pg 2.8f0dc6bd (2.1d) -> up ([3,5,10,6,8], p3) acting ([3,5,10,6,8], p3)
+osdmap e120 pool 'test' (2) object '9' -> pg 2.a81d0697 (2.17) -> up ([5,3,1,6,11], p5) acting ([5,3,1,6,11], p5)
+set pool 2 crush_rule to CephEdge-kart-3_centric
+osdmap e121 pool 'test' (2) object '0' -> pg 2.f18a3536 (2.16) -> up ([8,11,5,12,7], p8) acting ([8,11,5,12,7], p8)
+osdmap e122 pool 'test' (2) object '1' -> pg 2.437e2a40 (2.0) -> up ([8,11,3,9,2], p8) acting ([8,11,3,9,2], p8)
+osdmap e122 pool 'test' (2) object '2' -> pg 2.d963a09f (2.1f) -> up ([11,13,0,4,9], p11) acting ([11,13,0,4,9], p11)
+osdmap e122 pool 'test' (2) object '3' -> pg 2.cd1043f3 (2.13) -> up ([13,8,7,3,0], p13) acting ([13,8,7,3,0], p13)
+osdmap e122 pool 'test' (2) object '4' -> pg 2.d76e1c1b (2.1b) -> up ([11,13,6,5,14], p11) acting ([11,13,6,5,14], p11)
+osdmap e122 pool 'test' (2) object '5' -> pg 2.c7c1094d (2.d) -> up ([8,13,12,10,1], p8) acting ([8,13,12,10,1], p8)
+osdmap e122 pool 'test' (2) object '6' -> pg 2.d7f5bf23 (2.3) -> up ([11,13,14,5,9], p11) acting ([11,13,14,5,9], p11)
+osdmap e122 pool 'test' (2) object '7' -> pg 2.14d0d63a (2.1a) -> up ([11,8,3,6,2], p11) acting ([11,8,3,6,2], p11)
+osdmap e122 pool 'test' (2) object '8' -> pg 2.8f0dc6bd (2.1d) -> up ([8,11,10,6,3], p8) acting ([8,11,10,6,3], p8)
+osdmap e122 pool 'test' (2) object '9' -> pg 2.a81d0697 (2.17) -> up ([11,8,5,6,1], p11) acting ([11,8,5,6,1], p11)
+set pool 2 crush_rule to CephEdge-kart-4_centric
+osdmap e123 pool 'test' (2) object '0' -> pg 2.f18a3536 (2.16) -> up ([7,10,5,12,8], p7) acting ([7,10,5,12,8], p7)
+osdmap e124 pool 'test' (2) object '1' -> pg 2.437e2a40 (2.0) -> up ([7,10,3,9,2], p7) acting ([7,10,3,9,2], p7)
+osdmap e124 pool 'test' (2) object '2' -> pg 2.d963a09f (2.1f) -> up ([10,14,0,4,9], p10) acting ([10,14,0,4,9], p10)
+osdmap e124 pool 'test' (2) object '3' -> pg 2.cd1043f3 (2.13) -> up ([7,10,12,13,0], p7) acting ([7,10,12,13,0], p7)
+osdmap e124 pool 'test' (2) object '4' -> pg 2.d76e1c1b (2.1b) -> up ([14,7,11,6,5], p14) acting ([14,7,11,6,5], p14)
+osdmap e124 pool 'test' (2) object '5' -> pg 2.c7c1094d (2.d) -> up ([10,14,8,5,1], p10) acting ([10,14,8,5,1], p10)
+osdmap e124 pool 'test' (2) object '6' -> pg 2.d7f5bf23 (2.3) -> up ([14,10,11,5,9], p14) acting ([14,10,11,5,9], p14)
+osdmap e124 pool 'test' (2) object '7' -> pg 2.14d0d63a (2.1a) -> up ([10,14,3,6,2], p10) acting ([10,14,3,6,2], p10)
+osdmap e124 pool 'test' (2) object '8' -> pg 2.8f0dc6bd (2.1d) -> up ([10,7,6,3,8], p10) acting ([10,7,6,3,8], p10)
+osdmap e124 pool 'test' (2) object '9' -> pg 2.a81d0697 (2.17) -> up ([10,14,5,6,11], p10) acting ([10,14,5,6,11], p10)
+set pool 2 crush_rule to CephEdge-kart-5_centric
+osdmap e125 pool 'test' (2) object '0' -> pg 2.f18a3536 (2.16) -> up ([12,6,5,7,0], p12) acting ([12,6,5,7,0], p12)
+osdmap e125 pool 'test' (2) object '1' -> pg 2.437e2a40 (2.0) -> up ([9,6,3,8,7], p9) acting ([9,6,3,8,7], p9)
+osdmap e126 pool 'test' (2) object '2' -> pg 2.d963a09f (2.1f) -> up ([9,6,0,4,11], p9) acting ([9,6,0,4,11], p9)
+osdmap e126 pool 'test' (2) object '3' -> pg 2.cd1043f3 (2.13) -> up ([12,6,7,13,0], p12) acting ([12,6,7,13,0], p12)
+osdmap e126 pool 'test' (2) object '4' -> pg 2.d76e1c1b (2.1b) -> up ([6,9,11,1,5], p6) acting ([6,9,11,1,5], p6)
+osdmap e126 pool 'test' (2) object '5' -> pg 2.c7c1094d (2.d) -> up ([12,9,8,10,1], p12) acting ([12,9,8,10,1], p12)
+osdmap e126 pool 'test' (2) object '6' -> pg 2.d7f5bf23 (2.3) -> up ([9,12,11,14,5], p9) acting ([9,12,11,14,5], p9)
+osdmap e126 pool 'test' (2) object '7' -> pg 2.14d0d63a (2.1a) -> up ([6,9,3,11,2], p6) acting ([6,9,3,11,2], p6)
+osdmap e126 pool 'test' (2) object '8' -> pg 2.8f0dc6bd (2.1d) -> up ([6,9,10,3,8], p6) acting ([6,9,10,3,8], p6)
+osdmap e126 pool 'test' (2) object '9' -> pg 2.a81d0697 (2.17) -> up ([6,12,5,11,1], p6) acting ([6,12,5,11,1], p6)
 root@kart-1:/#
 ```
 
-* 目前实现在更改性能分区时会导致所有副本重新分布
-    * 希望冗余副本不需要迁移
+* `chooseleaf_vary_r = 10`
+
+    设置为较高数值可以让副本选择更稳定，数据池在故障域间切换时数据迁移更少（故障域内主副本会作为冗余故障域的代表副本）
