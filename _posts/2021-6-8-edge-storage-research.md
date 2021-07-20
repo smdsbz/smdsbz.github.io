@@ -875,3 +875,49 @@ root@kart-1:/#
 * `chooseleaf_vary_r = 10`
 
     设置为较高数值可以让副本选择更稳定，数据池在故障域间切换时数据迁移更少（故障域内主副本会作为冗余故障域的代表副本）
+
+### Related Readings
+
+* [ATC'20] Fine-Grained Isolation for Scalable, Dynamic, Multi-tenant Edge Clouds
+    * EdgeOS，为边缘计算设计的操作系统抽象，通过 Feather-Weight Process 降低虚拟化开销
+
+* [ATC'19] FlexGroup Volumes: A Distributed WAFL File System
+    * NetApp ONTAP 存储操作系统专有
+    * 按负载信息将不同目录下的文件 / inode 放在不同机器上，且可通过链接在运行时动态地进行负载均衡
+
+* [FAST'19] DistCache: Provable Load Balancing for Large-Scale Storage Systems
+    with Distributed Cache
+    * （可编程）交换机辅助
+    * 对独立哈希的上下两层同时发起读写（power-of-two-choices）
+
+* [OSDI'18] LegoOS: A Disseminated, Distributed OS for Hardware Resource Disaggregatoin
+    * 基于 RDMA 网络的分布式软总线
+    * 内存/缓存隔离，TLB/MMU 放在远端内存上
+    * Linux ABI 兼容
+    * [ATC'20] Disaggregating Persistent Memory and Controlling Them Remotely:
+        An Exploration of Passive Disaggregated Key-Value Stores
+        * 数据映射表
+        * 无锁元数据链表
+
+* [ATC'18] Fine-grained consistency for geo-replicated systems
+    * 设计上跟 geo 关系不大
+    * Partial-Order Restrictions（PoR）一致性：确定一致性不变量条件，当某次写入改变该不变量时，通知更新所有副本
+
+* [ATC'18] STMS: Improving MPTCP Throughput Under Heterogeneous Networks
+    * 快路与慢路包到达时间差距大，要求有较大重排序缓冲区
+    * 快路利用率/吞吐量波动大
+    * 乱序发射、有序到达
+
+* [OSDI'20] Toward a Generic Fault Tolerance Technique for Partial Network Partitioning
+    * 考察情景：A、B、C 三方中仅 A、B 间通讯受阻，而此时 C 认为集群正常
+    * Nifty：通过 Open vSwitch 绕过问题路径
+
+### Misc Readings
+
+* [OSDI'20] Storage Systems are Distributed Systems (So Verify Them That Way!)
+    * 引入编译器检查程序正确性（Dafny）
+
+* [OSDI'20] HiveD: Sharing a GPU Cluster for Deep Learning with Guarantees
+    * 调度器使用“GPU 数量（quota）”来预留资源，但忽视了所预留 GPU 邻近性（affinity，但 locality 似乎更贴切）的重要性
+    * 通过类伙伴系统分配“GPU - PCIe 交换设备 - CPU 插槽 - QPI - 机架”结构描述的设备
+    * 通过 Virtual Private Cloud 抽象供租户使用
