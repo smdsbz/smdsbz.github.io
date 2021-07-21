@@ -433,11 +433,13 @@ TODO:
 
 #### Target data placement
 
-对于一个 3-副本的存储池，我们希望其中
-* 前两个副本在离计算较近的边缘节点（可能为发起计算的节点），从而降低读延迟
-* 第三个副本在离计算较远的边缘节点，保障发生关联故障时的数据安全
+对于一个 3-副本（及以上）的存储池，我们希望其中
+* 前两个副本在离计算较近的节点，降低主要副本发生故障时的恢复时间
+* 第三个（及以上）副本在离计算较远的节点，保障发生关联故障时的数据安全
 
 #### Vanilla CRUSH approach
+
+__Intuition__
 
 ```text
  -1         0.04500  root default
@@ -493,10 +495,9 @@ rule kart-1_centric {
 
 > 这里由于测试环境硬件条件限制，故障域为 `host`，故叶子节点只能为 `osd`。
 
-* 近计算分区故障时 OSD 分布
-    * 目前实现下会导致所有副本重新分布/迁移
+* [x] 近计算分区故障时 OSD 分布
 * 对于 n 个分区会产生 O(n) 个辅助分区
-* 首次添加新分区的 Bucket 时需要更新所有现有的辅助分区
+* 添加新故障域的 Bucket 时需要更新所有现有的辅助分区，且为了负载均衡会导致必要数据迁移
 
 可以通过脚本生成 CRUSH Map
 * 获取当前 CRUSH Map
@@ -552,7 +553,11 @@ rule kart-1_centric {
 * 编译二进制 CRUSH Map：`crushtool -c <txt> -o <bin>`
 * 更新 CRUSH Map：`ceph osd setcrushmap -i <bin>`
 
+__Implementation__
+
 [脚本](https://gitee.com/smdsbz/ceph-edge/blob/dev/scripts/generate_cephedge_crushmap.py)生成的 CRUSH Map
+
+受 CRUSH Rule 语义限制，这里采用的实现方式为对每一个故障域都定义一个独立的 CRUSH Rule。
 
 ```text
 # begin crush map
@@ -560,6 +565,7 @@ tunable choose_local_tries 0
 tunable choose_local_fallback_tries 0
 tunable choose_total_tries 50
 tunable chooseleaf_descend_once 1
+# 设置为较高数值可以让副本选择更稳定，在更变 pool 的 CRUSH Rule 时数据迁移最少
 tunable chooseleaf_vary_r 10
 tunable chooseleaf_stable 1
 tunable straw_calc_version 1
@@ -778,16 +784,18 @@ rule CephEdge-kart-3_centric {
         type replicated
         min_size 3
         max_size 10
-        step take kart-3
+        step take kart-3                    # 首先从中心故障域选择主要副本
         step chooseleaf firstn 2 type osd
         step emit
-        step take CephEdge-except_kart-3
+        step take CephEdge-except_kart-3    # 之后在其他故障域中选择剩余副本
         step chooseleaf firstn 0 type host
         step emit
 }
 
 # end crush map
 ```
+
+实际生成的数据布局如下：
 
 ```console
 root@kart-1:/# ceph osd tree-from default
@@ -872,9 +880,15 @@ osdmap e126 pool 'test' (2) object '9' -> pg 2.a81d0697 (2.17) -> up ([6,12,5,11
 root@kart-1:/#
 ```
 
-* `chooseleaf_vary_r = 10`
+这样的实现保证了在切换主要工作域时产生的数据迁移是最少的
+* 按照数据放置规则要求，主工作域的两个副本必须被替换，因此最多产生 2 个副本的迁移（对象 0 从 kart-1 到 kart-3）
+* 若迁移后的次要副本恰好选择了之前的主工作域，则可以少迁移 1 个副本，因此最少产生 1 个副本的迁移（对象 0 从 kart-1 到 kart-2）
 
-    设置为较高数值可以让副本选择更稳定，数据池在故障域间切换时数据迁移更少（故障域内主副本会作为冗余故障域的代表副本）
+| Object ID | Main Failure Domain | Up Set        | Up Set (in failure domain) |
+|-----------|---------------------|---------------|----------------------------|
+| 0         | kart-1              | [0,1,5,12,7]  | [1,1,2,5,4]                |
+|           | kart-2              | [5,3,7,12,0]  | [2,2,4,5,1]                |
+|           | kart-3              | [8,11,5,12,7] | [3,3,2,5,4]                |
 
 ### Related Readings
 
