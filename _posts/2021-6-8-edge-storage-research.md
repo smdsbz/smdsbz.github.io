@@ -878,9 +878,6 @@ root@kart-1:/#
 
 ### Related Readings
 
-* [ATC'20] Fine-Grained Isolation for Scalable, Dynamic, Multi-tenant Edge Clouds
-    * EdgeOS，为边缘计算设计的操作系统抽象，通过 Feather-Weight Process 降低虚拟化开销
-
 * [ATC'19] FlexGroup Volumes: A Distributed WAFL File System
     * NetApp ONTAP 存储操作系统专有
     * 按负载信息将不同目录下的文件 / inode 放在不同机器上，且可通过链接在运行时动态地进行负载均衡
@@ -889,6 +886,32 @@ root@kart-1:/#
     with Distributed Cache
     * （可编程）交换机辅助
     * 对独立哈希的上下两层同时发起读写（power-of-two-choices）
+
+* [ATC'18] Fine-grained consistency for geo-replicated systems
+    * 设计上跟 geo 关系不大
+    * Partial-Order Restrictions（PoR）一致性：确定一致性不变量条件，当某次写入改变该不变量时，通知更新所有副本
+        * 与业务逻辑相关
+
+        > 若讨论的上下文为基础设施，则业务逻辑不存在
+
+* [ATC'18] STMS: Improving MPTCP Throughput Under Heterogeneous Networks
+    * 快路与慢路包到达时间差距大，要求有较大重排序缓冲区
+    * 快路利用率/吞吐量波动大
+    * 乱序发射、有序到达
+
+* [OSDI'20] Toward a Generic Fault Tolerance Technique for Partial Network Partitioning
+    * 考察情景：A、B、C 三方中仅 A、B 间通讯受阻，而此时 C 认为集群正常
+
+        > Ceph OSD peering?
+
+    * Nifty：通过 Open vSwitch 绕过问题路径
+    * [OSDI'18] An Analysis of Network-Partitioning Failures in Cloud Systems
+        * NEtwork pArtitioning Testing framework
+
+### Misc Readings
+
+* [ATC'20] Fine-Grained Isolation for Scalable, Dynamic, Multi-tenant Edge Clouds
+    * EdgeOS，为边缘计算设计的操作系统抽象，通过 Feather-Weight Process 降低虚拟化开销
 
 * [OSDI'18] LegoOS: A Disseminated, Distributed OS for Hardware Resource Disaggregatoin
     * 基于 RDMA 网络的分布式软总线
@@ -899,21 +922,6 @@ root@kart-1:/#
         * 数据映射表
         * 无锁元数据链表
 
-* [ATC'18] Fine-grained consistency for geo-replicated systems
-    * 设计上跟 geo 关系不大
-    * Partial-Order Restrictions（PoR）一致性：确定一致性不变量条件，当某次写入改变该不变量时，通知更新所有副本
-
-* [ATC'18] STMS: Improving MPTCP Throughput Under Heterogeneous Networks
-    * 快路与慢路包到达时间差距大，要求有较大重排序缓冲区
-    * 快路利用率/吞吐量波动大
-    * 乱序发射、有序到达
-
-* [OSDI'20] Toward a Generic Fault Tolerance Technique for Partial Network Partitioning
-    * 考察情景：A、B、C 三方中仅 A、B 间通讯受阻，而此时 C 认为集群正常
-    * Nifty：通过 Open vSwitch 绕过问题路径
-
-### Misc Readings
-
 * [OSDI'20] Storage Systems are Distributed Systems (So Verify Them That Way!)
     * 引入编译器检查程序正确性（Dafny）
 
@@ -921,3 +929,26 @@ root@kart-1:/#
     * 调度器使用“GPU 数量（quota）”来预留资源，但忽视了所预留 GPU 邻近性（affinity，但 locality 似乎更贴切）的重要性
     * 通过类伙伴系统分配“GPU - PCIe 交换设备 - CPU 插槽 - QPI - 机架”结构描述的设备
     * 通过 Virtual Private Cloud 抽象供租户使用
+
+* [OSDI'20] Twine: A Unified Cluster Management System for Shared Infrastructure
+    * 主动控制应用生命周期与性能参数、单一控制平面跨数据中心使用的容器协调器
+        * K8s 只能控制 5k 大小集群
+        * 自动系统升级不会重启还在运行其他业务的机器
+        * 适量调度使用小型机器降低能耗
+
+* [OSDI'18] Maelstrom: Mitigating Datacenter-level Disasters by Draining Interdependent
+    Traffic Safely and Efficiently
+    * 业务流量迁移
+    * Runbook 自动化运营
+    * DAG 管理服务依赖
+    * 周常运维演习
+
+* [FAST'20] BCW: Buffer-Controlled Writes to HDDs for SSD-HDD Hybrid Storage Server
+    * 充分利用 HDD 的顺序性（sequential & continuous）以及自带的缓冲区
+    * 降低尾延迟、减少缓存数据交换
+
+* [FAST'20] Transactions and Scalability in Cloud Databases - Can't We Have Both?
+    * 类似两段锁/两段事务，但由开发者选择具体检查哪些关键对象
+    * 基于时序（事务协调器本地时钟）在具体负责关键对象存储的节点上保证 ACID
+    * 可能导致先发起的事务因持有较慢时钟被拒绝，但这对事务 ACID 正确性并无影响
+        * 添加了时钟同步服务减少这种“假阳性”冲突
