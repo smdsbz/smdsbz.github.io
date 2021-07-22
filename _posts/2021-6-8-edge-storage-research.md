@@ -411,6 +411,7 @@ TODO:
     * 模糊指定副本放置位置
         * 确保副本在地理上邻近
         * 确保降级副本离主副本不远
+        * 最快主副本恢复流量调度
     * [ ] 带权图如何与 CRUSH Map 一起在集群中同步？
         * 必要性：CRUSH 为启发式数据放置算法，必须保证算法的输入在所有节点上一致！
         * 元数据同步开销可能过大，从树变成图
@@ -495,7 +496,6 @@ rule kart-1_centric {
 
 > 这里由于测试环境硬件条件限制，故障域为 `host`，故叶子节点只能为 `osd`。
 
-* [x] 近计算分区故障时 OSD 分布
 * 对于 n 个分区会产生 O(n) 个辅助分区
 * 添加新故障域的 Bucket 时需要更新所有现有的辅助分区，且为了负载均衡会导致必要数据迁移
 
@@ -892,21 +892,12 @@ root@kart-1:/#
 
 ### Related Readings
 
-* [ATC'19] FlexGroup Volumes: A Distributed WAFL File System
-    * NetApp ONTAP 存储操作系统专有
-    * 按负载信息将不同目录下的文件 / inode 放在不同机器上，且可通过链接在运行时动态地进行负载均衡
-
 * [FAST'19] DistCache: Provable Load Balancing for Large-Scale Storage Systems
     with Distributed Cache
     * （可编程）交换机辅助
     * 对独立哈希的上下两层同时发起读写（power-of-two-choices）
 
-* [ATC'18] Fine-grained consistency for geo-replicated systems
-    * 设计上跟 geo 关系不大
-    * Partial-Order Restrictions（PoR）一致性：确定一致性不变量条件，当某次写入改变该不变量时，通知更新所有副本
-        * 与业务逻辑相关
-
-        > 若讨论的上下文为基础设施，则业务逻辑不存在
+    > Ceph Cache Tiering 对独立哈希提供原生支持，但暂无同时读写设计
 
 * [ATC'18] STMS: Improving MPTCP Throughput Under Heterogeneous Networks
     * 快路与慢路包到达时间差距大，要求有较大重排序缓冲区
@@ -916,7 +907,7 @@ root@kart-1:/#
 * [OSDI'20] Toward a Generic Fault Tolerance Technique for Partial Network Partitioning
     * 考察情景：A、B、C 三方中仅 A、B 间通讯受阻，而此时 C 认为集群正常
 
-        > Ceph OSD peering?
+        > Ceph OSD peering 问题，进入降级模式。此时的一致性保障、性能指标待考察
 
     * Nifty：通过 Open vSwitch 绕过问题路径
     * [OSDI'18] An Analysis of Network-Partitioning Failures in Cloud Systems
@@ -926,6 +917,17 @@ root@kart-1:/#
 
 * [ATC'20] Fine-Grained Isolation for Scalable, Dynamic, Multi-tenant Edge Clouds
     * EdgeOS，为边缘计算设计的操作系统抽象，通过 Feather-Weight Process 降低虚拟化开销
+
+* [ATC'19] FlexGroup Volumes: A Distributed WAFL File System
+    * NetApp ONTAP 存储操作系统专有
+    * 按负载信息将不同目录下的文件 / inode 放在不同机器上，且可通过链接在运行时动态地进行负载均衡
+
+* [ATC'18] Fine-grained consistency for geo-replicated systems
+    * 设计上跟 geo 关系不大
+    * Partial-Order Restrictions（PoR）一致性：确定一致性不变量条件，当某次写入改变该不变量时，通知更新所有副本
+        * 与业务逻辑相关
+
+        > 若讨论的上下文为基础设施，则业务逻辑不存在
 
 * [OSDI'18] LegoOS: A Disseminated, Distributed OS for Hardware Resource Disaggregatoin
     * 基于 RDMA 网络的分布式软总线
