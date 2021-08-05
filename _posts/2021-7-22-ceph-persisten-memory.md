@@ -22,17 +22,38 @@ tags: Storage DistributedStorage PersistentMemory
 Modern Technologies
 -------------------
 
+### SeaStar
+
+A C++ asynchronous programming framework.
+
+* user space task scheduler
+    * no context switch to minimize system CPU acquisition
+
+> Ceph's crimson-osd use SeaStar to simplify asynchronous development, and to
+> relieve CPU from `if-else`s.
+
 ### Data Plane Development Kit (DPDK)
 
 Provide a simple, complete framework for fast packet processing in data plane
 applications.
+
+* polling-mode
 
 ### Storage Performance Development Kit (SPDK)
 
 The bedrock of SPDK is a user space, polled-mode, asynchronous, lockless NVMe
 driver.
 
-* user space & polled-mode: no context switch
+* user space: no context switch, minimize CPU usage
+    * applications issue NVMe commands to device directly
+* polled-mode: minimize latency & latency jitter
+    * it will fully acquire the assigned CPU
+    * interrupt-mode is enabled by hardware, effectively involve kernel
+
+        > IO_URING
+
+    * NVMe (DDIO) ensures polling only checks host memory (cache)
+* asynchronous
 * lockless: ring buffer with CaS
 
 ### Persistent Memory Development Kit (PMDK)
