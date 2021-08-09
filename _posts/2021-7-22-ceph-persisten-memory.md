@@ -58,4 +58,13 @@ driver.
 
 ### Persistent Memory Development Kit (PMDK)
 
-A collection of libraries for operating NVDIMM.
+A collection of libraries for common use cases of SCM.
+
+* libpmem: low-level
+* libpmemobj: transactional object store
+    * libpmemobj++: STL-like programming model
+* libpmemkv: key in DRAM, value in PMEM
+* libpmemblk: atomically updated block / memory file
+* libpmemlog: persistent log file
+* libpmemcache: use DRAM as LRU cache of PMEM
+* libpmemkind: DRAM as fast tier, PMEM as capatity tier
