@@ -56,11 +56,52 @@ driver.
 * asynchronous
 * lockless: ring buffer with CaS
 
+#### Blobstore
+
+For "blob" (or object) storage.
+
+* `src/spdk/include/blob.h`
+* `src/spdk/lib/blob/`
+
+__Device Abstraction__
+
+| Abstraction (low-high) | Size                        | Function              |
+|------------------------|-----------------------------|-----------------------|
+| Logical block          | 256B / 4KiB                 | Device physical block |
+| Page                   | 4KiB                        | Device atomic op      |
+| Cluster                | Configurable (default 1MiB) | Object size           |
+| Blob                   | Multitude of clusters       | Logical object        |
+| Blobstore              |                             |                       |
+
+| Op                        | Atomicity             |
+|---------------------------|-----------------------|
+| Data writes               | Guaranteed            |
+| Blob metadata update      | Manual\* / On-offload |
+| Blobstore metadata update | On-offload\**         |
+
+> \* `spdk_blob_sync_md()`
+>
+> \** If not shutdown properly, it will take some time for the Blobstore to fully
+> boot up, but consistency is still guaranteed.
+
+__Metadata__
+
+Stored in memory during runtime.
+
+To avoid locking, a separate (SPDK-)thread is used to handle requests on metadata.
+However, it's the caller's responsibility not to mix up metadata requests with
+each other and with regular I/O requests.
+
+__Channel__
+
+SPDK-wide abstraction responsible for actual I/O operations. Best deployed per
+thread.
+
 ### Persistent Memory Development Kit (PMDK)
 
 A collection of libraries for common use cases of SCM.
 
-* libpmem: low-level
+* libpmem(2): low-level
 * libpmemobj: transactional object store
     * libpmemobj++: STL-like programming model
 * libpmemkv: key in DRAM, value in PMEM
