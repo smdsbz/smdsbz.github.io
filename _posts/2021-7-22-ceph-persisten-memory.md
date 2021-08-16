@@ -68,7 +68,7 @@ __Device Abstraction__
 | Abstraction (low-high) | Size                        | Function              |
 |------------------------|-----------------------------|-----------------------|
 | Logical block          | 256B / 4KiB                 | Device physical block |
-| Page                   | 4KiB                        | Device atomic op      |
+| Page (aka Extent)      | 4KiB                        | Device atomic op      |
 | Cluster                | Configurable (default 1MiB) | Object size           |
 | Blob                   | Multitude of clusters       | Logical object        |
 | Blobstore              |                             |                       |
