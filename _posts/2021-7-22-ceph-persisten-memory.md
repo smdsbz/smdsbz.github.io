@@ -32,12 +32,14 @@ A C++ asynchronous programming framework.
 > Ceph's crimson-osd use SeaStar to simplify asynchronous development, and to
 > relieve CPU from `if-else`s.
 
+
 ### Data Plane Development Kit (DPDK)
 
 Provide a simple, complete framework for fast packet processing in data plane
 applications.
 
 * polling-mode
+
 
 ### Storage Performance Development Kit (SPDK)
 
@@ -60,8 +62,8 @@ driver.
 
 For "blob" (or object) storage.
 
-* `src/spdk/include/blob.h`
-* `src/spdk/lib/blob/`
+* `include/spdk/blob.h`
+* `lib/blob/`
 
 __Device Abstraction__
 
@@ -92,10 +94,26 @@ To avoid locking, a separate (SPDK-)thread is used to handle requests on metadat
 However, it's the caller's responsibility not to mix up metadata requests with
 each other and with regular I/O requests.
 
-__Channel__
+#### Block Device Layer
 
-SPDK-wide abstraction responsible for actual I/O operations. Best deployed per
-thread.
+A single generic library `lib/bdev`, plus a number of optional modules that
+implements various types of block devices (equivalent to device driver in a
+traditional operating system).
+
+* Bdev
+    * `include/spdk/bdev.h`
+    * `lib/bdev/`
+* Bdev module
+    * `include/spdk/bdev_module.h`
+    * `module/bdev/`
+
+Bdevs can be layered! Bdevs that route I/O to other bdevs are often referred to
+as virtual bdevs (or vbdevs).
+
+> Fun fact, The `pmem` module internally uses `libpmemblk` from PMDK. Who said
+> anything about user space, lockless and no context switching?
+> ![pmemblk_write](https://i.loli.net/2021/08/18/nr6EJBbAVeLCiQZ.png)
+
 
 ### Persistent Memory Development Kit (PMDK)
 
