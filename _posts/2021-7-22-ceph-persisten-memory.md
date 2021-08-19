@@ -56,6 +56,13 @@ driver.
 
     * NVMe (DDIO) ensures polling only checks host memory (cache)
 * asynchronous
+    * runtimes (_reactors_) are pinned to specific CPU cores
+    * coroutines (_`spdk_thread`s_) are scheduled by SPDK or a user-specified
+        runtime (_environment_), instead of the operating system
+
+        > The default `static` scheduler just round-robin around reactors (on
+        > their designated core), polling for events.
+
 * lockless: ring buffer with CaS
 
 #### Blobstore
