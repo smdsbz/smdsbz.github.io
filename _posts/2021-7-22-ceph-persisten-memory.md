@@ -40,6 +40,10 @@ applications.
 
 * polling-mode
 
+> Used as PCIe driver (_environment_) in SPDK, for MMIO (Memory-Mapped I/O), PCI
+> BAR (Base Address Register), thus enabling NVMe CMB (Controller Memory Buffer)
+> and achieving zero-copy, that kind of stuff.
+
 
 ### Storage Performance Development Kit (SPDK)
 
@@ -57,6 +61,12 @@ driver.
     * NVMe (DDIO) ensures polling only checks host memory (cache)
 * asynchronous
     * runtimes (_reactors_) are pinned to specific CPU cores
+
+        > If a request were not initially polled by the corresponding CPU /
+        > thread of the bounded NVMe queue pair (aka the _owning thread_), it is
+        > preferred that the request is forwarded to the correct thread via
+        >message passing mechenism, as opposed to introduce locking.
+
     * coroutines (_`spdk_thread`s_) are scheduled by SPDK or a user-specified
         runtime (_environment_), instead of the operating system
 
@@ -120,6 +130,22 @@ as virtual bdevs (or vbdevs).
 > Fun fact, The `pmem` module internally uses `libpmemblk` from PMDK. Who said
 > anything about user space, lockless and no context switching?
 > ![pmemblk_write](https://i.loli.net/2021/08/18/nr6EJBbAVeLCiQZ.png)
+
+#### Acceleration Framework
+
+##### Intel I/O Acceleration Technology (I/OAT)
+
+> ... I/OAT allows offloading data movement to dedicated hardware within the
+> platform, recalim CPU cycles that would otherwise be spent on tasks like
+> `memcpy`... Intel I/OAT can take advantage of PCI-Express
+> nontransparent-bridging, which allows movement of memory blocks between two
+> different PCIe connected motherboards, thus effectively allowing the movement
+> of data between two different computers at nearly the same speed as moving
+> data in memory of a single computer...
+>
+> _from [Fast memcpy with SPDK and Intel I/OAT DMA Engine](https://software.intel.com/content/www/us/en/develop/articles/fast-memcpy-using-spdk-and-ioat-dma-engine.html)_
+
+##### Intel Data Streaming Accelerator (DSA)
 
 
 ### Persistent Memory Development Kit (PMDK)
