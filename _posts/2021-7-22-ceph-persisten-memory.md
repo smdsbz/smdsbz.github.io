@@ -160,3 +160,13 @@ A collection of libraries for common use cases of SCM.
 * libpmemlog: persistent log file
 * libpmemcache: use DRAM as LRU cache of PMEM
 * libpmemkind: DRAM as fast tier, PMEM as capatity tier
+
+
+Readings
+--------
+
+* [[SDC'16] Challenges in Using Persistent Memory in Distributed Storage Systems](https://www.snia.org/sites/default/files/SDC/2016/presentations/persistent_memory/Dan_Lambright_Challenges_Persistent_Memory_Distributed_Storage_Systems.pdf)
+    * High performance network (RDMA) and fast storage devices (SCM) only helps
+        with large I/Os, not small
+        * LOOKUP RTT dominates faster data transfer
+    * Considering streamline, coalescing protocal, shrinking stack etc.
