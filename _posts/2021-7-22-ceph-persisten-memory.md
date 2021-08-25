@@ -170,3 +170,11 @@ Readings
         with large I/Os, not small
         * LOOKUP RTT dominates faster data transfer
     * Considering streamline, coalescing protocal, shrinking stack etc.
+
+* [[ATC'17] Octopus: an RDMA-enabled Distributed Persistent Memory File System](https://www.usenix.org/system/files/conference/atc17/atc17-lu.pdf)
+    * Leverage RDMA `write_with_imm` and `cmp_and_swp` one-sided verbs to reduce
+        waiting on network operation acknowledgements
+    * Use shared remote memory pool as view of the overall storage namespace
+    * Transactions are done locally, and then pushed to involved nodes, to avoid
+        complex communications and coordinations
+    * not much about persistent memory...
