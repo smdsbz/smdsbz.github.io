@@ -162,6 +162,17 @@ A collection of libraries for common use cases of SCM.
 * libpmemkind: DRAM as fast tier, PMEM as capatity tier
 
 
+Source
+------
+
+_Based on tag `v16.2.5` (@ `0883bdea7337b95e4b611c768c0279868462204a`)._
+
+* `HAVE_BLUESTORE_PMEM` Compile Flag
+    * pmem used as `mmap()`-ed file
+* `Allocator` type
+    * `BlueStore::shared_alloc` defaults to `"block"` (see `src/os/bluestore/BlueStore.cc/BlueStore::_create_alloc()`)
+
+
 Readings
 --------
 
@@ -171,6 +182,7 @@ Readings
         * LOOKUP RTT dominates faster data transfer
     * Considering streamline, coalescing protocal, shrinking stack etc.
 
+<!--
 * [[ATC'17] Octopus: an RDMA-enabled Distributed Persistent Memory File System](https://www.usenix.org/system/files/conference/atc17/atc17-lu.pdf)
     * Leverage RDMA `write_with_imm` and `cmp_and_swp` one-sided verbs to reduce
         waiting on network operation acknowledgements
@@ -178,3 +190,4 @@ Readings
     * Transactions are done locally, and then pushed to involved nodes, to avoid
         complex communications and coordinations
     * not much about persistent memory...
+-->
