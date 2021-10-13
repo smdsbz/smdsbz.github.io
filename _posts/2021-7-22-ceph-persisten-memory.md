@@ -172,6 +172,8 @@ _Based on tag `v16.2.5` (@ `0883bdea7337b95e4b611c768c0279868462204a`)._
 * `Allocator` type
     * `BlueStore::shared_alloc` defaults to `"block"` (see `src/os/bluestore/BlueStore.cc/BlueStore::_create_alloc()`)
 
+> For all Ceph config options, see `src/common/options.cc/get_global_options()`.
+
 
 Readings
 --------
