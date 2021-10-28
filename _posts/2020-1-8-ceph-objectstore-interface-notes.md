@@ -17,29 +17,33 @@ class ObjectStore
   + static create()         // ObjectStore 对象实例化入口
   + probe_block_device_fsid()
   |
-  | /* 获取该 OSD 性能指标（无锁） */
-  + get_cur_stats() = 0     // 获取性能计数器 objectstore_perf_stat_t
-  + get_perf_conters() = 0
+  | /* 获取该 OSD 性能指标（一般在无锁时调用） */
+  + get_cur_stats() = 0     // 获取 ObjectStore 通用性能计数器 objectstore_perf_stat_t
+  + get_perf_conters() = 0  // 获取该 ObjectStore 实现特定的 PerfCounters
   |
   + class CollectionImpl : public RefCountedObject
   |   |
   |   + flush() = 0         // 阻塞直至所有事务均提交
   |   + flush_commit() = 0  // [异步] 当对象集合所有前置事务完成后执行回调
   |   + get_cid()
+  |   |
+  |   + ...                 // 补充其他对象集合层的 helper（如 finder, reader, writer）
   |
   + class Transaction       // 见 src/os/Transaction.h
   |   |
-  |   + struct Op
-  |   + struct TransactionData
+  |   + struct Op           // 实际数据结构为封装的 ceph::buffer::list op_bl
+  |   + struct TransactionData data
   |   |
-  |   + get_object_index()
+  |   + get_object_index()  // [FileStore] 获取对象名-ID 映射
   |   + register_on_{applied|commit|applied_sync|complete}()
+  |   |                     // 携带回调函数，之后会由 queue_transactions() 传递给 ObjectStore Finisher
   |   |
-  |   + has_contexts()
-  |   + collect_contexts()
-  |   + get_on_{applied|commit|applied_sync}()
+  |   + has_contexts()      // 是否携带了回调函数
+  |   + collect_contexts(), get_on_{applied|commit|applied_sync}()
+  |   |                     // 抽取回调列表
   |   |
   |   + {set|get}_fadvice_flags(), set_fadvice_flag()
+  |   |                     // 当前事务的 I/O 建议 fadvice
   |   |
   |   + _update_op(), _update_op_bl()
   |   |
@@ -149,6 +153,9 @@ class ObjectStore
   + open_collection() = 0
   + create_new_collection() = 0
   |                         // 为即将被创建的集合分配句柄，之后由事务中 OP_MKCOLL 完成实际创建操作
+  |                         //
+  |                         // 此外也可以预先构建一些集合运行时，如 BlueStore 在预创建
+  |                         // 阶段即绑定 OpSeqencer 事务协调器
   |                         //
   |                         // 上层逻辑会创建临时集合以辅助实现事务（如回滚实现，
   |                         // src/osd/ReplicatedBackend.cc/submit_push_data()，
