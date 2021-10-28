@@ -81,11 +81,14 @@ class ObjectStore
   |   + omap_setkeys()
   |   + omap_rmkeys(), omap_rmkeyrange()
   |   + omap_setheader()
-  |   + split_collection()  // 将一个集合中【满足条件的】对象移动到指定的新集合中
-  |   +                     // （仅在单元测试中出现，无实际使用）
-  |   + merge_collection()
+  |   + split_collection()  // 将一个集合中满足条件的对象移动到指定的新集合中
+  |   |                     // 条件为：对象键哈希的低 bits 位与 rem 相同
+  |   |                     // （仅在单元测试中出现，并无实际使用）
+  |   + merge_collection()  // 将前一个集合的对象全部迁移至后一个集合中，并设置合并后集合的
+  |   |                     // 分裂位 split_bits
   |   + collection_set_bits()
-  |   + set_alloc_hint()
+  |   + set_alloc_hint()    // 对某个对象设置分配器偏好
+  |   |                     // 如 BlueStore 中通过 flag 来决定是否压缩对象
   |   |
   |   + encode() / decode()
   |   + dump()
