@@ -61,25 +61,28 @@ class ObjectStore
   |   | /* 向事务内操作列表中添加实际操作项内容的函数簇，构建
   |   |    ObjectStore::Transaction::Op */
   |   + nop()
-  |   + touch()
+  |   + touch()             // i.e. create
   |   + write()
   |   + zero()
   |   + truncate()
   |   + remove()
-  |   + setattr(), setattrs()
-  |   + rmattr(), rmattrs()
-  |   + clone(), clone_range()
+  |   + setattr[s]()
+  |   + rmattr[s]()
+  |   + clone[_range]()
   |   + create_collection()
-  |   + collection_hint()
+  |   + collection_hint()   // 目前只有一种 COLL_HINT_EXPECTED_NUM_OBJECTS
+  |   |                     //            (pg_num, expected_num_objects)
   |   + remove_collection()
-  |   + collection_move()
-  |   + collection_move_rename()
-  |   + try_rename()
+  |   + collection_move()   // [弃用] 与 rename 同义
+  |   + collection_move_rename(), try_rename()  // 对象重命名 / 移动
+  |   |                     // try_rename() 即同一集合内的 collection_move_rename()
+  |   |                     // BlueStore 不支持跨集合 collection_move_rename()
   |   + omap_clear()
   |   + omap_setkeys()
   |   + omap_rmkeys(), omap_rmkeyrange()
   |   + omap_setheader()
-  |   + split_collection()
+  |   + split_collection()  // 将一个集合中【满足条件的】对象移动到指定的新集合中
+  |   +                     // （仅在单元测试中出现，无实际使用）
   |   + merge_collection()
   |   + collection_set_bits()
   |   + set_alloc_hint()
@@ -88,9 +91,8 @@ class ObjectStore
   |   + dump()
   |   + generate_test_instances()
   |
-  | /* 操作执行入口：依次（排队）执行事务，并执行、注册回调 */
-  + queue_transaction()
-  + queue_transactions() = 0
+  | /* （异步）（写）操作（事务）执行入口：依次（排队）执行事务，并执行同步回调、注册回调 */
+  + queue_transaction[s]()  // 将事务加入执行队列（或直接同步完成开销较小操作，如 MemStore）
   |
   | /* OSD 管理 */
   + upgrade()
@@ -142,8 +144,14 @@ class ObjectStore
   | /* 对象集合句柄相关 */
   + get_ideal_list_max()
   + open_collection() = 0
-  + create_new_collection() = 0     // 为即将被创建的集合分配句柄，之后由事务中 OP_MKCOLL
-  |                                 // 完成实际创建操作
+  + create_new_collection() = 0
+  |                         // 为即将被创建的集合分配句柄，之后由事务中 OP_MKCOLL 完成实际创建操作
+  |                         //
+  |                         // 上层逻辑会创建临时集合以辅助实现事务（如回滚实现，
+  |                         // src/osd/ReplicatedBackend.cc/submit_push_data()，
+  |                         // 先在临时集合中异地写，随后将修改的对象覆盖到原集合中，若事务
+  |                         // 执行失败，则直接删去临时集合即可，原集合中数据不会丢失，同时
+  |                         // 避免脏读），因此可以考虑缓存一些临时集合，不必每次都创建
   + set_collection_commit_queue() = 0
   |
   | /* 同步读操作 */
@@ -162,10 +170,10 @@ class ObjectStore
   + collection_exists() = 0     // 对象集合是否存在
   + collection_empty() = 0  // 对象集合是否为空
   + collection_bits() = 0   // 返回 coll_t::pgid 有效位数（低位表示 PG 中对象过多被切分成多个集合）
-  + collection_list[_legacy]() = 0   // 列出对象集合中所有对象
+  + collection_list[_legacy]() = 0  // 列出对象集合中所有对象
   |
   | /* 对象 Omap 相关 */
-  + omap_get() = 0          // 获取对象 KV 数据
+  + omap_get() = 0          // 获取对象 KV 数据库
   + omap_get_header() = 0
   + omap_get_keys() = 0
   + omap_get_values() = 0
