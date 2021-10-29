@@ -265,6 +265,7 @@ class ObjectStore
   + compact()               // 压缩使用空间
   |                         // BlueStore 压缩 RocksDB
   + has_builtin_csum()      // 是否有内建简易数据完整性验证
+                            // 若无，则 PrimaryLogPG 会为该对象计算一个 CRC
 ```
 
 ## Key Concepts
