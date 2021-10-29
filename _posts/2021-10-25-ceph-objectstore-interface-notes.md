@@ -123,7 +123,7 @@ class ObjectStore
   |
   | /* OSD 监控与管理 */
   + upgrade()
-  + get_db_statistics()     // 获取 KV 数据库（BlueStore RockDB）统计数据
+  + get_db_statistics()     // 获取 KV 数据库（BlueStore RocksDB）统计数据
   + generate_db_histogram()
   + flush_cache()           // 清空 ObjectStore 层内部缓存
   + dump_perf_counters()
@@ -204,20 +204,27 @@ class ObjectStore
   |                         // 先在临时集合中异地写，随后将修改的对象覆盖到原集合中，若事务
   |                         // 执行失败，则直接删去临时集合即可，原集合中数据不会丢失，同时
   |                         // 避免脏读），因此可以考虑缓存一些临时集合，不必每次都创建
-  + set_collection_commit_queue() = 0   // 设置完成提交事件的回调队列
-  |                                     // 从而事务完成后能够通知 OSD
+  + set_collection_commit_queue() = 0
+  |                         // 设置某个对象集合完成提交事件的回调队列
+  |                         //
+  |                         // queue_transactions() 需要将事务携带的对应回调添加到 OSD
+  |                         // 负责执行的完成提交回调队列中
+  |                         //
+  |                         // MemStore 直接在 ObjectStore 的 finisher 中执行回调，
+  |                         // 将本函数直接留空。这是因为其数据操作在 queue_transactions()
+  |                         // 中就已完成（applied & committed），不会导致不一致
   |
   |
   | /* 同步读操作 */
   + exists() = 0            // 判断对象是否在集合中
   + set_collection_opts() = 0   // 向下传递（初始化的或更新的）pool 设置（见 pool_opts_t），
   |                             // 返回 -EOPNOTSUPP 代表不支持
-  + stat() = 0              // 获取对象状态（同 Linux 原生文件 stat）
+  + stat() = 0              // 获取对象状态（使用 Linux 原生文件 stat）
   + read() = 0              // 读集合中对象内容
   + fiemap() = 0            // 获取对象数据段布局 file extent mapping (RLE)
   + readv()                 // 批量读，默认实现调用 read()
   + dump_onode()            // [debug] 打印对象信息
-  + getattr() = 0, getattrs() = 0   // 获取对象元数据 xattr
+  + getattr[s]() = 0        // 获取对象元数据 xattr
   |
   |
   | /* 对象集合操作 */
@@ -238,20 +245,26 @@ class ObjectStore
   |
   |
   | /* Misc */
-  + flush_journal()
+  + flush_journal()         // 目前仅 FileStore 实现了独立的日志功能
   + dump_journal()
-  + snapshot()
+  + snapshot()              // 目前仅 FileStore 实现了快照功能（依赖底层文件系统实现）
   |
   + {set|get}_fsid() = 0
   |
   + estimate_objects_overhead() = 0
+  |                         // 估计存放对象的额外空间消耗
+  |                         //
+  |                         // PrimaryLogPG 会将该估计值计入已用空间（num_user_bytes），
+  |                         // 因此 `ceph df` 的空间结果并不准确（Cache Tier 的提升限流
+  |                         // 也是根据平均对象大小进行估计），只有对象数量是准确的
   |
   | /* 调试接口 */
   + inject_data_error()
   + inject_mdata_error()
   |
-  + compact()
-  + has_builtin_csum()
+  + compact()               // 压缩使用空间
+  |                         // BlueStore 压缩 RocksDB
+  + has_builtin_csum()      // 是否有内建简易数据完整性验证
 ```
 
 ## Key Concepts
@@ -265,16 +278,13 @@ class ObjectStore
         1. `src/include/object.h/object_t` - 对 `std::string name` 的简单封装
         2. `src/include/hobject.h/hobject` - hashed pooled snapped object
         3. `src/include/hobject.h/ghobject` - generationed sharded hobject
-* `xattrs` 为对象扩展属性（extended attributes），其本质为键值对集合，不要求实现值内寻址。一个对象的扩展属性通常不超过 64KB，且 Ceph 认为对象内容与其扩展属性通常在物理上临近。
+* `xattrs` 为对象扩展属性（extended attributes），其本质为键值对集合，不要求实现值内寻址。一个对象的扩展属性通常不超过 64KB，且 Ceph 认为对象内容与其扩展属性通常在物理上临近
 * `omap_header` 为一整块数据。
-* `omap` 项与扩展属性 `xattr` 类似，但通常存放在不同的地方。`omap` 项的大小可以达到几个 MB，因此接口规定必须实现其上的随机寻址。
+* `omap` 项与扩展属性 `xattr` 类似，但通常存放在不同的地方。`omap` 项的大小可以达到几个 MB，可单独作为一个 KV 数据库工作（CephFS、RGW），因此接口规定必须实现其上的随机寻址。
 
 ### 对象集合（Collection）
 
 对象集合（`coll_t`）即为一组对象的集合，与 Placement Group（PG）对应，但当一个 PG 内对象过多时，可能会分裂成多个集合（OP_SPLIT_COLLECTION\[2]，但目前未见源码中有地方调用）。
-
-* 集合支持遍历。
-* 集合拥有自己的扩展属性 `xattrs`。
 
 对象集合也负责对事务进行排序——对同一对象集合进行操作的事务按照顺序依次执行，对不同对象集合进行操作的事务可能并行执行。
 
@@ -305,3 +315,4 @@ class ObjectStore
 -------------------------------------------------------------
 
 * [Ceph OSD request 分析](http://www.yangguanjun.com/2015/06/18/ceph-osd-requst-analysis/)
+* [rados objects: omaps and xattrs](https://medium.com/opsops/rados-objects-omaps-and-xattrs-32e66d2b528b)
