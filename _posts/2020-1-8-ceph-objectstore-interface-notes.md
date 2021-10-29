@@ -14,20 +14,28 @@ tags: DistributedSystems Ceph Storage SourceCode
 ```text
 class ObjectStore
   |
-  + static create()         // ObjectStore 对象实例化入口
-  + probe_block_device_fsid()
+  + static create()         // ObjectStore 实例化入口
+  + static probe_block_device_fsid()
+  |                         // 嗅探该 ObjectStore 实例的 fsid 元数据
+  |                         // MemStore 虽有 fsid 元数据，但未在该函数中补充嗅探实现
+  |
   |
   | /* 获取该 OSD 性能指标（一般在无锁时调用） */
   + get_cur_stats() = 0     // 获取 ObjectStore 通用性能计数器 objectstore_perf_stat_t
   + get_perf_conters() = 0  // 获取该 ObjectStore 实现特定的 PerfCounters
   |
-  + class CollectionImpl : public RefCountedObject
+  |
+  + class CollectionImpl : public RefCountedObject  // 对象集合实现虚基类
   |   |
   |   + flush() = 0         // 阻塞直至所有事务均提交
   |   + flush_commit() = 0  // [异步] 当对象集合所有前置事务完成后执行回调
   |   + get_cid()
   |   |
-  |   + ...                 // 补充其他对象集合层的 helper（如 finder, reader, writer）
+  |   + ...                 // 可在实现中自行补充补充其他对象集合层的 helper（如 finder,
+  |                         // reader, writer）
+  + using CollectionHandle = ceph::ref_t<CollectionImpl>
+  |                         // boost::intrusive_ptr<RefCountedObject>
+  |
   |
   + class Transaction       // 见 src/os/Transaction.h
   |   |
@@ -36,7 +44,8 @@ class ObjectStore
   |   |
   |   + get_object_index()  // [FileStore] 获取对象名-ID 映射
   |   + register_on_{applied|commit|applied_sync|complete}()
-  |   |                     // 携带回调函数，之后会由 queue_transactions() 传递给 ObjectStore Finisher
+  |   |                     // 携带回调函数，之后会由 queue_transactions() 传递给
+  |   |                     // ObjectStore Finisher 执行
   |   |
   |   + has_contexts()      // 是否携带了回调函数
   |   + collect_contexts(), get_on_{applied|commit|applied_sync}()
@@ -45,20 +54,24 @@ class ObjectStore
   |   + {set|get}_fadvice_flags(), set_fadvice_flag()
   |   |                     // 当前事务的 I/O 建议 fadvice
   |   |
-  |   + _update_op(), _update_op_bl()
+  |   + append()            // 将另一个事务中的操作拼接到该事务之后
   |   |
-  |   + append()
-  |   |
-  |   + get_encoded_bytes[_test]()
-  |   + get_num_bytes()
+  |   + get_encoded_bytes[_test](), get_num_bytes()
   |   + get_data_{length|offset|alignment}()
-  |   |
+  |   |                     // 打包后的事务数据结构
   |   + empty()
   |   + get_num_ops()
   |   |
-  |   + class iterator
-  |   + _build_actions_from_tbl()
-  |   + _get_next_op()
+  |   + class iterator      // 打包事务读取器
+  |   |   + have_op()
+  |   |   + decode_op()     // 将事务的操作列表表头元素取出
+  |   |   |
+  |   |   + decode_{string|bp|bl|attrset[_bl]|keyset[_bl]}()
+  |   |   + get_{oid|cid|fadvice_flags}()
+  |   |   |                 // 具体每个 Op 携带的参数，以及这些参数对应封装段见源码
+  |   |   + get_objects()
+  |   |
+  |   + _get_next_op()      // [内部] 一些实现填充操作函数簇的助手函数
   |   + _get_coll_id()
   |   + _get_object_id()
   |   |
@@ -101,6 +114,7 @@ class ObjectStore
   | /* （异步）（写）操作（事务）执行入口：依次（排队）执行事务，并执行同步回调、注册回调 */
   + queue_transaction[s]()  // 将事务加入执行队列（或直接同步完成开销较小操作，如 MemStore）
   |
+  |
   | /* OSD 管理 */
   + upgrade()
   + get_db_statistics()
@@ -108,6 +122,7 @@ class ObjectStore
   + flush_cache()
   + dump_perf_counters()
   + dump_cache_stats()
+  |
   |
   | /* OSD 运行时管理 */
   + get_type() = 0          // ObjectStore 类型名称
@@ -130,6 +145,7 @@ class ObjectStore
   + wants_journal() = 0     // 推荐设立日志
   + allows_journal() = 0    // 允许设立日志
   |
+  |
   | /* 设备性能分类 */
   + get_devices()
   + is_sync_onreadable()
@@ -140,6 +156,7 @@ class ObjectStore
   + get_numa_node()
   + can_sort_nibblewise()
   |
+  |
   | /* OSD 元数据管理 */
   + statfs() = 0            // 初始化 OSD 层提供的统计数据结构（见 store_statfs_t）
   |                         // 与自定义错误类型
@@ -147,6 +164,7 @@ class ObjectStore
   + collect_metadata()
   + write_meta()
   + read_meta()
+  |
   |
   | /* 对象集合句柄相关 */
   + get_ideal_list_max()
@@ -164,6 +182,7 @@ class ObjectStore
   |                         // 避免脏读），因此可以考虑缓存一些临时集合，不必每次都创建
   + set_collection_commit_queue() = 0
   |
+  |
   | /* 同步读操作 */
   + exists() = 0            // 判断对象是否在集合中
   + set_collection_opts() = 0   // 向下传递（初始化的或更新的）pool 设置（见 pool_opts_t），
@@ -175,12 +194,14 @@ class ObjectStore
   + dump_onode()            // [debug] 打印对象信息
   + getattr() = 0, getattrs() = 0   // 获取对象元数据 xattr
   |
-  + /* 对象集合 */
+  |
+  | /* 对象集合操作 */
   + list_collections() = 0  // 列出当前 ObjectStore 上所有对象集合
   + collection_exists() = 0     // 对象集合是否存在
   + collection_empty() = 0  // 对象集合是否为空
   + collection_bits() = 0   // 返回 coll_t::pgid 有效位数（低位表示 PG 中对象过多被切分成多个集合）
   + collection_list[_legacy]() = 0  // 列出对象集合中所有对象
+  |
   |
   | /* 对象 Omap 相关 */
   + omap_get() = 0          // 获取对象 KV 数据库
@@ -190,13 +211,13 @@ class ObjectStore
   + omap_check_keys() = 0   // 检查输入的键有哪些是存在于 omap 上的
   + get_omap_iterator() = 0
   |
+  |
   | /* Misc */
   + flush_journal()
   + dump_journal()
   + snapshot()
   |
-  + set_fsid() = 0
-  + get_fsid() = 0
+  + {set|get}_fsid() = 0
   |
   + estimate_objects_overhead() = 0
   |
