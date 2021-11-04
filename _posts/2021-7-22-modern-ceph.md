@@ -1,8 +1,8 @@
 ---
 layout: article
-title: Ceph & Persistent Memory
-key: ceph-persistent-memory
-tags: Storage DistributedStorage PersistentMemory
+title: Modern Ceph
+key: modern-ceph
+tags: Storage DistributedStorage PersistentMemory Asynchronous
 ---
 
 <!-- more -->
