@@ -49,24 +49,53 @@ wanted size.
 
 > `src/os/bluestore/StupidAllocator.cc/StupidAllocator::allocate_int()`
 
-To understand how StupidAllocator works, the data structure
-`vector<interval_set<uint64_t, btree_map_t>> free` must be explained:
-`free` list, as the name suggests, keeps track of available segments. One thing
-special about it is that it's indexed by __segment size__, the B-Tree `free[0]`
-manages segments of 1 block size (`bdev_block_size`) long for example.
-TODO:
+To understand how StupidAllocator works, the private member
+```c++
+std::vector<ceph::interval_set<
+    /*offset/length type*/uint64_t,
+    /*map impl*/btree_map<uint64_t/*offset*/, uint64_t/*length*/>
+    >> free;
+```
+must be explained:
+`free` list, as the name suggests, keeps track of available segments. The vector
+is indexed by __magnitude of segment size__, that is `free[0]` will be available
+segments of \[0, 1) block size (`bdev_block_size`) and `free[3]` will be of
+\[4, 8) bs segments. Since `interval_set` is an
+[AssociativeContainer](https://en.cppreference.com/w/cpp/named_req/AssociativeContainer),
+the segments in a free list entry is naturally sorted by offset.
 
+> The number of entries in `free` is fixed to 10 on initialization, i.e. the
+> maximum contiguous managed allocation block size is `bdev_block_size << 9`.
 
-1. `_choose_bin()` - returns a chosen _bin_ `hint` from available segments
-    `vector<interval_set<uint64_t, btree_map_t>> free`  
+> `btree_map_t` is like `std::map`, but implemented with B-Tree, rather than
+> red-black tree, for smaller footprint.
+
+StupidAllocator then acts as a buddy allocator:
+
+1. `_choose_bin()` - returns a chosen _bin_ `orig_bin` from available segments
+
     Given target allocation size `len`, returns the minimum among effective bits
     of `len` and the last element of `free` list.
-    * `free` list is a set of B-Trees of available segment, classified by
-        magnitude of allocation.
-    > The number of entries in `free` is fixed to 10 on initialization, i.e. the
-    > maximum contiguous managed allocation block size is `bdev_block_size << 10`.
 
-2. Start searching heuristically in available segments `free` from `hint`
+    > PERF: Implemented with `__builtin_clz(ll)` Count Leading Zero instruction.
+
+2. For segments no smaller than `orig_bin`s, i.e. entries after and including
+    `free[orig_bin]`, search heuristically from `hint` address.
+    > The default hint is the immediate address after last allocation.
+3. For segments no smaller than `orig_bin`s, search from lowest address (up to
+    `hint`, because already searched).
+4. For segments smaller than `orig_bin`s, xxxx
+    > Allocate something at least.
+
+| ![](https://pic4.zhimg.com/80/v2-affb31dfc772140d180cdde8bc2f41e7_720w.jpg) |
+|:-:|
+| Heuristic search range and its order (`bin_start` is `orig_bin`) |
+
+5. Manage `free`.
+
+
+### HybridAllocator
+
 
 
 
