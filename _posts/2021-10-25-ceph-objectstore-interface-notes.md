@@ -291,6 +291,8 @@ class ObjectStore
 
 > 对同一 PG 操作顺序性同时也由 OSD 层保证：`OSD::op_sharedwq` 在对处理操作时，`OSD::SharedWQ::_process()`
 > 对操作涉及 PG 上锁，之后再将操作出队、执行。
+>
+> * [滴滴 Ceph 分布式存储系统优化之锁优化](https://zhuanlan.zhihu.com/p/208714152)
 
 ### 事务
 
@@ -320,3 +322,4 @@ class ObjectStore
 
 * [Ceph OSD request 分析](http://www.yangguanjun.com/2015/06/18/ceph-osd-requst-analysis/)
 * [rados objects: omaps and xattrs](https://medium.com/opsops/rados-objects-omaps-and-xattrs-32e66d2b528b)
+* [滴滴 Ceph 分布式存储系统优化之锁优化](https://zhuanlan.zhihu.com/p/208714152)
