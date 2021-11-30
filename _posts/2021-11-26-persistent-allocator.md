@@ -98,7 +98,8 @@ __Source Code__
 
                 > The default alloc class is managed separately as `rt->default_bucket`.
 
-                > TODO: alloc class created with `alloc_class.c/alloc_class_collection_new()`
+                > alloc class created with `alloc_class.c/alloc_class_collection_new()`
+                > during `heap.c/heap_boot()`.
 
             2. `heap_bucket_acquire()` get alloc class (bucket) on thread (arena)
             3. `heap_get_bestfit_block()` extract block from bucket
@@ -108,20 +109,29 @@ __Source Code__
                 2. `heap_split_block()` if extracted whole block is wasteful
             4. `alloc_prep_block()` reserve bucket in transient state
                 1. `write_header()` see `memblock.h`
-                    * MEMORY_BLOCK_HUGE: TODO:
-                    * MEMORY_BLOCK_RUN: TODO:
+                    * MEMORY_BLOCK_HUGE, MEMORY_BLOCK_RUN
+                        * HEADER_LEGACY
+                        * HEADER_COMPACT
+                        * HEADER_NONE
 
         * free: TODO:
 
     2. `palloc_exec_actions()`
         1. `action_funcs[atype]->exec()`
-            * `POBJ_ACTION_TYPE_HEAP` -> `palloc_heap_action_exec()` -> `act->m.mops->prep_hdr()`
-                * `MEMORY_BLOCK_HUGE` TODO:
-                * `MEMORY_BLOCK_RUN`
-                    TODO:
-            * `POBJ_ACTION_TYPE_MEM`
+            * POBJ_ACTION_TYPE_HEAP -> `palloc_heap_action_exec()` -> `act->m.mops->prep_hdr()`
+                * MEMORY_BLOCK_HUGE
+                * MEMORY_BLOCK_RUN: prepare bitmap
+            * POBJ_ACTION_TYPE_MEM
         2. `pmemops_drain()`
         3. `operation_process()`
+            * `ulog_entry_apply()`
+            * `operation_process_persistent_redo()`
+                1. `ulog_store()` persistent `memcpy()` ulog (undo-log) with checksum
+                2. `ulog_process()` for each ulog do a callback
+                3. `ulog_clobber()` zero-out ulog metadata
+            * `operation_process_persistent_undo()`
+                1. `ulog_process()`
+
         4. unlock & `action_funcs[atype]->on_unlock()`
         5. `operation_finish()`
 
@@ -131,8 +141,25 @@ __Source Code__
 
 
 Poseidon [Middleware'20]
---------------------------
+------------------------
 
 * Per-CPU sub-heap for scalability and high-performance
 
-TODO:
+* Undo log for singleton alloc, micro log for transactional alloc, truncated on
+    success
+* Buddy list keeps track of free segments
+* Hash table to manage memory block information (as opposed to AVL)
+    * [F2FS](https://www.usenix.org/conference/fast15/technical-sessions/presentation/lee)
+
+
+ArchTM [[FAST'21](https://www.usenix.org/conference/fast21/presentation/wu-kai)]
+--------------------------------------------------------------------------------
+
+* PMDK Libpmemobj's transaction incurs to many metadata update, causing poor
+    performance
+* Small writes (< 256KiB) causes CoW, waste bandwidth and delays transactions
+
+
+------------------------------------------------------------------------
+
+* [AEP 入门指北](https://csomnia.github.io/posts/aep-tutorial/)
