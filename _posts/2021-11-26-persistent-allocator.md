@@ -39,6 +39,10 @@ __Allocation__
     Block size is chosen to be 8x class size, because it matches bitmap
     representation, which will be the on-media persistent representation.
 
+| ![](https://www.hualigs.cn/image/61a736b3d5c32.jpg) |
+|:-:|
+| On-media Layout |
+
 __Source Code__
 
 1. `pmalloc()`
@@ -48,6 +52,24 @@ __Source Code__
 
     > The introduction of operation and redo-log is needed, for PMEM pool
     > metadata manipulations should be consistent.
+    >
+    > | ![redo-log](https://www.hualigs.cn/image/61a736b4c3474.jpg) |
+    > |:-:|
+    > | Redo Log (used for allocation metadata consistency, external one for user allocation, and internal one for log object allocation) |
+    >
+    > | ![undo-log](https://www.hualigs.cn/image/61a736b3d09a3.jpg) |
+    > |:-:|
+    > | Undo Log (used for user data consistency) |
+    >
+    > PMDK associates generation number to undo log snapshots, so a simple atomic
+    > increment will invalidate (or to say, commit) past transactions, instead
+    > of having to iteratively removing log entries.
+    >
+    > Redo and undo logging are complimentary. Use redo logging for
+    > performance-critical code and where deferred modifications are not a
+    > problem (flush only once, but not immediately visible); use undo logging
+    > where ease of use is important (flush on every update, therefore immediately
+    > visible).
 
 2. `palloc_operation()`
 
@@ -101,7 +123,7 @@ __Source Code__
                 > alloc class created with `alloc_class.c/alloc_class_collection_new()`
                 > during `heap.c/heap_boot()`.
 
-            2. `heap_bucket_acquire()` get alloc class (bucket) on thread (arena)
+            2. `heap_bucket_acquire()` get alloc class (bucket, or free list) on thread (arena)
             3. `heap_get_bestfit_block()` extract block from bucket
                 1. repeatedly `get_rm_bestfit()`
                     * ravl: TODO:
@@ -126,7 +148,7 @@ __Source Code__
         3. `operation_process()`
             * `ulog_entry_apply()`
             * `operation_process_persistent_redo()`
-                1. `ulog_store()` persistent `memcpy()` ulog (undo-log) with checksum
+                1. `ulog_store()` persistent `memcpy()` ulog (Unified Log) with checksum
                 2. `ulog_process()` for each ulog do a callback
                 3. `ulog_clobber()` zero-out ulog metadata
             * `operation_process_persistent_undo()`
@@ -135,9 +157,15 @@ __Source Code__
         4. unlock & `action_funcs[atype]->on_unlock()`
         5. `operation_finish()`
 
+__Limitations__
 
+* Arenas of different threads share a global AVL tree tracking free segments,
+    and then there's the global ulog, limiting scalability [Poseidon]
+* Still too many metadata updates performed on PMem
 
+<br>
 
+* Programming Persistent Memory - A Comprehensive Guide for Developers
 
 
 Poseidon [Middleware'20]
@@ -147,9 +175,13 @@ Poseidon [Middleware'20]
 
 * Undo log for singleton alloc, micro log for transactional alloc, truncated on
     success
-* Buddy list keeps track of free segments
-* Hash table to manage memory block information (as opposed to AVL)
-    * [F2FS](https://www.usenix.org/conference/fast15/technical-sessions/presentation/lee)
+* Buddy list keeps track of free blocks
+* Hash table ([F2FS](https://www.usenix.org/conference/fast15/technical-sessions/presentation/lee))
+    to manage memory block information (as opposed to AVL)
+    * If collision, linear probing; if probe failed, defragmentation; if still
+        not, extend hash table (potential high tail latency)
+
+* Lazy defragmentation (merge adjacent free blocks)
 
 
 ArchTM [[FAST'21](https://www.usenix.org/conference/fast21/presentation/wu-kai)]
