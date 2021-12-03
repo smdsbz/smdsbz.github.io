@@ -187,9 +187,12 @@ Poseidon [Middleware'20]
 ArchTM [[FAST'21](https://www.usenix.org/conference/fast21/presentation/wu-kai)]
 --------------------------------------------------------------------------------
 
-* PMDK Libpmemobj's transaction incurs to many metadata update, causing poor
-    performance
-* Small writes (< 256KiB) causes CoW, waste bandwidth and delays transactions
+* PMDK libpmemobj's transaction incurs too many metadata updates on PMem
+* Small writes (< 256B) causes CoW, wasting bandwidth and delaying transactions
+* CoW design avoid double write and random write as in logging-based
+* PMDK's size-class-based memory allocation is locality unfriendly (contiguous
+    allocation requests may be satisfied with separate blocks in free list),
+    reducing chances of coalescing writes
 
 
 ------------------------------------------------------------------------
