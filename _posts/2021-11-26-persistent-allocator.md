@@ -194,6 +194,17 @@ ArchTM [[FAST'21](https://www.usenix.org/conference/fast21/presentation/wu-kai)]
     allocation requests may be satisfied with separate blocks in free list),
     reducing chances of coalescing writes
 
+2 design principles and 5 techniques:
+* Avoid small writes on PM
+    * Logless
+    * Minimize metadata modification on PM with guaranteed crash consistency
+        * _object lookup table_ on DRAM
+        * TODO: transaction ID
+    * Scalable persistent object referencing
+* Encourage coalescable writes
+    * Consecutive allocation requests get contiguous memory blocks
+    * Avoid memory fragmentation
+
 
 ------------------------------------------------------------------------
 
