@@ -22,7 +22,7 @@ Network interface `ibxxx` disapeared after reboot? Try reinstalling driver!
 
     ```console
     ~# tar -zxvf MLNX_...tgz && cd MLNX_...
-    ~# ./mlxnofedinstall
+    ~# ./mlnxofedinstall
     ```
 
 4. Wait
