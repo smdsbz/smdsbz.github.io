@@ -7,26 +7,29 @@ tags: Storage DistributedStorage Ceph SourceCode MDS
 
 How calling parameters and return data are encoded in Ceph Objecter RPC.
 
+_<small>based on Ceph v16.2.5</small>_
+
 <!-- more -->
 
 Code Teardown Reminder
 ----------------------
 
-* Encoding procedure can be found at `src\osdc\Objecter.h\Objecter::prepare_<op>_op()`.
-* Decoding procedure can be referenced at `src\osdc\Objecter.h\ObjectOperation::struct CB_ObjectOperation_<op>::operator()()` or `src\osdc\Objecter.h\Objecter::C_<Op>::finish()`
+* Encoding procedure of invocation can be found at `src\osdc\Objecter.h\Objecter::prepare_<op>_op()`.
+* Decoding procedure of returned data can be referenced at `src\osdc\Objecter.h\ObjectOperation::struct CB_ObjectOperation_<op>::operator()()` or `src\osdc\Objecter.h\Objecter::C_<Op>::finish()`, which may very likely be in the same order as they were encoded in `src\osd\PrimaryLogPG.cc\PrimaryLogPG::do_osd_ops()`.
 
 Key Data Structures
 -------------------
 
+__Packaged OSD Operations__
+
 ```c++
 namespace Objecter {
-
-/******** Packaged OSD Operations ********/
 
 struct OSDOp;
 using osdc_opvec = boost::container::small_vector<OSDOp, osdc_opvec_len>;
 
 /* src/osdc/Objecter.h */
+
 struct ObjectOperation {
     osdc_opvec ops;     // OSDOp[]
     int flags = 0;
@@ -43,21 +46,50 @@ struct ObjectOperation {
 
     /* ... */
 };  /* struct ObjectOperation */
+
+struct op_target_t {
+    /* ... */
+
+    /** the key/ID of object to operate on */
+    object_t base_oid;              // { std::string name; }
+    /** provides the pool in which the object resides */
+    object_locator_t base_oloc;     // { int64_t pool; ... }
+    /* to be calculated with Objecter::_calc_target() */
+    object_t target_oid;
+    object_locator_t target_oloc;
+
+    /* ... */
+};  /* struct op_target_t */
+
 struct Op {
     /* ... */
 
-    osdc_opvec ops;     // OSDOp[]
+    op_target_t target;
+
+    /* ... */
+
+    /** in short OSDOp[], with optimized allocation code path */
+    osdc_opvec ops;
 
     snapid_t snapid = CEPH_NOSNAP;
     SnapContext snapc;
+    /** modify time */
     ceph::real_time mtime;
 
-    /* final output of the entire sequence of ops, usually organized and filled
-        by callback */
+    /**
+     * final output of the entire sequence of ops, usually organized and filled
+     * by callback
+     */
     ceph::buffer::list *outbl = nullptr;
-    /* individual output of each member op, which are just pointers to underlying
-        fields of individual ops. zeroed by default, same size as `ops` */
+    /**
+     * individual output of each member op, which are just pointers to underlying
+     * fields of individual ops. zeroed by default, same size as `ops`
+     */
     boost::container::small_vector<ceph::buffer::list*, osdc_opvec_len> out_bl;
+    /**
+     * immediate callbacks, executed right after receiving reply
+     * @sa Objecter::handle_osd_op_reply(MOSDOpReply*)
+     */
     boost::container::small_vector<
         fu2::unique_function<void(boost::system::error_code, int,
                                     const ceph::buffer::list& bl) &&>,
@@ -69,17 +101,23 @@ struct Op {
     /* ... */
 };  /* struct Op */
 
+}   /* namespace Objecter */
+```
 
-/******** Individual OSD Operation ********/
+__Individual OSD Operation__
 
+```c++
 struct ceph_osd_op;
 struct sobject_t;
 
 /* src/osd/osd_types.h */
+
 struct OSDOp {
     ceph_osd_op op;     // opcode, flag and extra calling args
     sobject_t soid;
 
+    /* `outdata` (should be) pointed to by `out_bl`s, if need to claim return
+        data, so we may just stuff return data here, should be safe (?) */
     ceph::buffer::list indata, outdata;
     errorcode32_t rval = 0;
 
@@ -88,6 +126,7 @@ struct OSDOp {
 
 
 /* src/include/rados.h */
+
 struct ceph_osd_op {
 	__le16 op;           /* CEPH_OSD_OP_* */
 	__le32 flags;        /* CEPH_OSD_OP_FLAG_* */
@@ -174,15 +213,15 @@ struct ceph_osd_op {
 	__le32 payload_len;
 } __attribute__ ((packed));
 
+
 /* src/include/object.h */
+
 struct sobject_t {
     object_t oid;   // { std::string name; }
     snapid_t snap;  // { uint64_t val; }
 
     /* ... */
 };  /* struct sobject_t */
-
-}   /* namespace Objecter */
 ```
 
 ```c++
@@ -195,9 +234,9 @@ int PrimaryLogPG::do_osd_ops(OpContext *ctx, std::vector<OSDOp>& ops);
 ```
 
 `ObjectOperation` and `Op` are virtually the same in terms of data fields.
-`ObjectOperation` only fills parameters of operations (usually used to generate
-a transactional operation that contains multiple ops), while `Op` finally makes
-the `op_submit()` call. E.g.
+`ObjectOperation` only fills parameters of operations, it is generally a helper
+class used to generate a transactional operation that contains multiple ops,
+while `Op` makes the final `op_submit()` call. E.g.
 
 ```c++
 /* src/mds/CDir.cc/CDir::_omap_fetch_more() */
@@ -211,18 +250,113 @@ the `op_submit()` call. E.g.
 bufferlist-based RPC Format
 ---------------------------
 
+> Snapshot related info may be ambiguous or incorrect.
+
+| Variable | Type            |
+|----------|-----------------|
+| `o`      | `Objecter::Op*` |
+| `osd_op` | `OSDOp&`        |
+
 * `CEPH_OSD_OP_STAT`
     * context
-        * `op->snapid` (I/O context)
+        * `o->snapid` (I/O context)
             > AFAIK the per-object self-managed snap, i.e. `osd_op.soid.snap.val`,
             > is not used by CephFS.
 
-            > `CEPH_NOSNAP` is `((__u64)-2)`.
+            > `CEPH_NOSNAP` is `((__u64)-2)`, i.e. 18446744073709551614.
+        * `o->target.base_oloc.pool` (omitted later)
     * parameters
-        * `osd_op.soid` (TODO: conversion to `hobject_t`, with pool name and such)
-    * return via `osd_op->outdata`
-        * `uint64_t size`
-        * `utime_t mtime`
-    * `osd_op.rval`
+        * `osd_op.soid` (omitted later)
+    * return data via `osd_op.outdata` (omitted later)
+        1. `uint64_t size`
+        2. `utime_t mtime`
+    * return value `osd_op.rval` (omitted later)
         * `0` on success
         * `-ENOENT` on not exist
+
+* `CEPH_OSD_OP_CREATE`
+    * context
+        * `o->mtime`
+        * `o->snapc`
+    * parameters
+        * `osd_op.flags`
+        * `osd_op.soid`
+        * `osd_op.indata`
+            1. `string category` (not implemented and not used)
+    * return data
+        * none
+    * return value
+        * `0` on success
+        * `-EEXIST` on object already present and `CEPH_OSD_OP_FLAG_EXCL`
+            exclusive create flag is set
+        * `-EINVAL` on decoding error, currently unreachable
+
+* `CEPH_OSD_OP_DELETE` (namely `Objecter::ObjectOperation::remove()`)
+    * context
+        * `o->mtime`
+        * `o->snapc`
+    * parameters
+        * `osd_op.soid`
+    * return data
+        * none
+    * return value
+        * `0` on success
+        * `-ENOENT` on object does not exist
+
+* `CEPH_OSD_OP_READ`
+    * context
+        * `o->snapid`
+    * parameters
+        * `osd_op.extent`
+            * `.offset`
+            * `.length` if 0 read the whole object
+            * `.truncate_size`
+            * `.truncate_seq`
+                > Truncate sequence seems to be just a sequence number of
+                > asynchronous truncation jobs, IDK.
+    * return data
+        1. object content
+    * return value
+        * `0` on success
+        * `-EIO` on CRC mismatch and not `CEPH_OSD_OP_FLAG_FAILOK`
+        * or whatever lower level throws, `-EAGAIN` and such
+    * return successful read length via `osd_op.extent.length`
+
+* `CEPH_OSD_OP_WRITE`
+    * context
+        * `o->snapc`
+        * `o->mtime`
+    * parameters
+        * `osd_op.extent`
+            * `.offset`
+            * `.length == osd_op.indata.length()`
+            * `.truncate_size`
+            * `.truncate_seq`
+        * `osd_op.flags`
+            * `CEPH_OSD_OP_FLAG_FADVISE_DONTNEED`
+        * `osd_op.indata`
+            1. new content
+    * return data
+    * return value
+        * `0` on success
+        * `-EINVAL` invalid parameter, e.g. when `osd_op.extent.length != osd_op.indata.length()`
+        * `-EOPNOSUPPORT` on unaligned append when `pool.info.requires_aligned_append()` is true
+
+    > Write may create object silently.
+
+* `CEPH_OSD_OP_WRITEFULL`
+    * context
+        * `o->snapc`
+        * `o->mtime`
+    * parameters
+        * `osd_op.extent`
+            * `.offset`
+            * `.length == osd_op.indata.length()`
+        * `osd_op.flags`
+        * `osd_op.indata`
+            1. new content
+    * return value
+        * `0` on success
+        * `-EINVAL` invalid parameter, e.g. when `osd_op.extent.length != osd_op.indata.length()`
+
+    > Truncate object to `osd_op.length` if already exists.
