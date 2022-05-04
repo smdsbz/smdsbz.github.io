@@ -53,8 +53,8 @@ Handling
         * `_session_op_assign()`  
             assign `OSDSession` to `Op`
         * `_send_op()`
-            * convert `Objecter` request `Op` to `Messenger` request `MOSDOps`
-            * send `MOSDOps` thru `OSDSession`
+            * convert `Objecter` request `Op` to `Messenger` request `MOSDOp`
+            * send `MOSDOp` thru `OSDSession`
         * unlock, release `OSDSession`
 
 `Messenger` on OSD gets the request, and processes it.
@@ -76,7 +76,13 @@ __On successfully return__
         * some context validity checking
         * `op->trace.event("osd op reply)` for zipkin trace
         * re-`_op_submit()` if returnted retry / redirect / `-EAGAIN`
-        * fill return data field `op->out_(bl/rval/ec/handler)`
+        * align return data field `out_(bl/rval/ec)` and call `out_handler`
+            * `out_bl` pointers in `Objecter::Op` will be forced to point to
+                corresponding received `OSDOp::outdata`
+            * `rval` and `ec` will be converted to corresponding host OS error
+                codes from received `OSDOp::rval`
+            * __`out_handler` will be executed__, all calling parameters are
+                provided by the received `OSDOp`
         * `num_in_flight--` if any callback
         * log `l_osdc_op_reply`
         * (get `OSDSession` lock and) `_finish_op()` do callback
