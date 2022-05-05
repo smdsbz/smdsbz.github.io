@@ -14,7 +14,7 @@ _<small>based on Ceph v16.2.5</small>_
 Code Teardown Reminder
 ----------------------
 
-* Encoding procedure of invocation can be found at `src\osdc\Objecter.h\Objecter::prepare_<op>_op()`.
+* Encoding procedure of invocation can be found at `src\osdc\Objecter.h\Objecter::prepare_<op>_op()` and `src\osdc\Objecter.h\ObjectOperation`.
 * Decoding procedure of returned data can be referenced at `src\osdc\Objecter.h\ObjectOperation::struct CB_ObjectOperation_<op>::operator()()` or `src\osdc\Objecter.h\Objecter::C_<Op>::finish()`, which may very likely be in the same order as they were encoded in `src\osd\PrimaryLogPG.cc\PrimaryLogPG::do_osd_ops()`.
 
 Key Data Structures
@@ -23,8 +23,6 @@ Key Data Structures
 __Packaged OSD Operations__
 
 ```c++
-namespace Objecter {
-
 struct OSDOp;
 using osdc_opvec = boost::container::small_vector<OSDOp, osdc_opvec_len>;
 
@@ -46,6 +44,8 @@ struct ObjectOperation {
 
     /* ... */
 };  /* struct ObjectOperation */
+
+namespace Objecter {
 
 struct op_target_t {
     /* ... */
@@ -360,3 +360,61 @@ bufferlist-based RPC Format
         * `-EINVAL` invalid parameter, e.g. when `osd_op.extent.length != osd_op.indata.length()`
 
     > Truncate object to `osd_op.length` if already exists.
+
+* `CEPH_OSD_OP_OMAPSETHEADER`
+    * context (from `Objecter::mutate()`)
+        * `o->snapc`
+        * `o->mtime`
+    * parameters
+        * `osd_op.extent`
+            * `.offset == 0`
+            * `.length == osd_op.indata.length()`
+        * `osd_op.indata`
+            1. header content
+    * return value
+        * `0` on success
+        * `-EOPNOTSUPP` on pool does not support omap
+
+    > May create object silently.
+
+* `CEPH_OSD_OP_OMAPSETVALS`
+    * context
+        * `o->snapc`
+        * `o->mtime`
+    * parameters
+        * `osd_op.extent`
+            * `.offset == 0`
+            * `.length == osd_op.indata.length()`
+        * `osd_op.indata`
+            1. encoded `std::map<string, bufferlist>` or `boost::container::flat_map`
+                key-value pairs
+            > Use `src/os/Transaction.cc/decode_str_str_map_to_bl()` to first extract
+            > effective segment in the overall bl. Then decode the extracted
+            > proportion entirely.
+            >
+            > See `src/osd/PrimaryLogPG.cc/PrimaryLogPG::do_osd_ops()`
+            > `case CEPH_OSD_OP_OMAPSETVALS`.
+    * return value
+        * `0` on success
+        * `-EINVAL` on decode error
+        * `-EOPNOTSUPP` on pool does not support omap
+
+    > May create object silently.
+
+* `CEPH_OSD_OP_RMKEYS`
+    * context
+        * `o->snapc`
+        * `o->mtime`
+    * parameters
+        * `osd_op.extent`
+            * `.offset == 0`
+            * `.length == osd_op.indata.length()`
+        * `osd_op.indata`
+            1. encoded `std::set<string>` or `boost::container::flat_set`
+            > `src/os/Transaction.cc/decode_str_set_to_bl()`
+    * return value
+        * `0` on success
+        * `-ENOENT` on object not exist
+        * `-EINVAL` on decode error
+        * `-EOPNOTSUPP` on pool does not support omap
+
