@@ -259,9 +259,8 @@ bufferlist-based RPC Format
 
 * `CEPH_OSD_OP_STAT`
     * context
-        * `o->snapid` (I/O context)
-            > AFAIK the per-object self-managed snap, i.e. `osd_op.soid.snap.val`,
-            > is not used by CephFS.
+        * `o->snapid` (Self-managed snap)
+            > AFAIK the per-object self-managed snap, is not used by CephFS.
 
             > `CEPH_NOSNAP` is `((__u64)-2)`, i.e. 18446744073709551614.
         * `o->target.base_oloc.pool` (omitted later)
