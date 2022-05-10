@@ -137,10 +137,11 @@ a {
 }
 
 pre, code {
+  font-size: map-get($base, font-size-sm);
   font-family: map-get($base, font-family-code);
 }
 
-code {
+pre > code {
   font-size: map-get($base, font-size-xs);
   line-height: map-get($base, line-height-sm);
 }

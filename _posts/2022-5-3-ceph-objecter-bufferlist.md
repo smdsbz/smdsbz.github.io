@@ -340,6 +340,7 @@ bufferlist-based RPC Format
         * `0` on success
         * `-EINVAL` invalid parameter, e.g. when `osd_op.extent.length != osd_op.indata.length()`
         * `-EOPNOSUPPORT` on unaligned append when `pool.info.requires_aligned_append()` is true
+        * `-EFBIG` exceeding `osd_max_object_size`
 
     > Write may create object silently.
 
@@ -419,7 +420,7 @@ bufferlist-based RPC Format
 
 > Below are operations not so common for MDS services.
 
-* `CEPH_OSD_OP_OMAPGETVALS` (namely `Objecter::ObjectOperation::omap_get_vals()`)
+* `CEPH_OSD_OP_OMAPGETVALS`
     * context (from `Objecter::read()`)
         * `o->snapid`
     * parameters
@@ -440,10 +441,40 @@ bufferlist-based RPC Format
         7. ... more values
         9. `bool truncated` if return data is truncated due to reaching `max_to_get` or `_conf->osd_max_omap_bytes_per_request`
 
-        > 1 ~ 7 can be decoded with Ceph's `decode()` overloaded for `std::map`
+        > 1 ~ 7 can be decoded with Ceph's `decode()` overloaded for `std::map<string, bufferlist>`
         >
         > See also `src/osdc/Objecter.h/ObjectOperation/CB_ObjectOperation_decodevals()`
     * return value
         * `0` on success
         * `-EINVAL` on parameter decode error
         * `-ENOENT` on no omap
+
+* `CEPH_OSD_OP_OMAPGETVALSBYKEY`
+    * context (from `Objecter::read()`)
+        * `o->snapid`
+    * parameters
+        * `osd_op.extent`
+            * `.offset == 0`
+            * `.length == osd_op.indata.length()`
+        * `osd_op.indata`
+            1. `std::set<std::string>` or `boost::container::flat_set<std::string>` of keys
+    * return data
+        1. `std::map<std::string, bufferlist>` of kv pairs
+    * return value
+        * `0` on success
+        * `-EINVAL` on parameter decode error
+
+* `CEPH_OSD_OP_ZERO`
+    * context
+        * `o->snapc`
+        * `o->mtime`
+    * parameters
+        * `osd_op.extent`
+            * `.offset`
+            * `.length`
+    * return value
+        * `0` on success
+        * `-EOPNOSUPPORT` on misalign
+        * `-EFBIG` exceeding `osd_max_object_size`
+
+    > No-op if object does not exist.
