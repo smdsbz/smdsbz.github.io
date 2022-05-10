@@ -414,6 +414,36 @@ bufferlist-based RPC Format
     * return value
         * `0` on success
         * `-ENOENT` on object not exist
-        * `-EINVAL` on decode error
+        * `-EINVAL` on parameter decode error
         * `-EOPNOTSUPP` on pool does not support omap
 
+> Below are operations not so common for MDS services.
+
+* `CEPH_OSD_OP_OMAPGETVALS` (namely `Objecter::ObjectOperation::omap_get_vals()`)
+    * context (from `Objecter::read()`)
+        * `o->snapid`
+    * parameters
+        * `osd_op.extent`
+            * `.offset == 0`
+            * `.length == osd_op.indata.length()`
+        * `osd_op.indata`
+            1. `std::string start_after`
+            2. `uint64_t max_to_get`
+            3. `sdt::string filter_prefix`
+    * return data
+        1. `uint32_t num` total number of retrieved KV pairs
+        2. `std::string key1`
+        3. `ceph::buffer::list value1`
+        4. `std::string key2`
+        5. `ceph::buffer::list value2`
+        6. ... more keys
+        7. ... more values
+        9. `bool truncated` if return data is truncated due to reaching `max_to_get` or `_conf->osd_max_omap_bytes_per_request`
+
+        > 1 ~ 7 can be decoded with Ceph's `decode()` overloaded for `std::map`
+        >
+        > See also `src/osdc/Objecter.h/ObjectOperation/CB_ObjectOperation_decodevals()`
+    * return value
+        * `0` on success
+        * `-EINVAL` on parameter decode error
+        * `-ENOENT` on no omap
