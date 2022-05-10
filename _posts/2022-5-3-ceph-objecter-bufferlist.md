@@ -114,7 +114,9 @@ struct sobject_t;
 
 struct OSDOp {
     ceph_osd_op op;     // opcode, flag and extra calling args
-    sobject_t soid;
+    sobject_t soid;     // stripped object name, not used by CephFS, for it has
+                        // its own stripping logic
+                        // (src/osdc/Striper.cc/Striper::file_to_extents())
 
     /* `outdata` (should be) pointed to by `out_bl`s, if need to claim return
         data, so we may just stuff return data here, should be safe (?) */
@@ -264,8 +266,7 @@ bufferlist-based RPC Format
 
             > `CEPH_NOSNAP` is `((__u64)-2)`, i.e. 18446744073709551614.
         * `o->target.base_oloc.pool` (omitted later)
-    * parameters
-        * `osd_op.soid` (omitted later)
+        * `o->target.base_oid` (omitted later)
     * return data via `osd_op.outdata` (omitted later)
         1. `uint64_t size`
         2. `utime_t mtime`
