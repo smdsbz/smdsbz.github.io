@@ -311,8 +311,6 @@ bufferlist-based RPC Format
             * `.length` if 0 read the whole object
             * `.truncate_size`
             * `.truncate_seq`
-                > Truncate sequence seems to be just a sequence number of
-                > asynchronous truncation jobs, IDK.
     * return data
         1. object content
     * return value
@@ -339,7 +337,7 @@ bufferlist-based RPC Format
     * return value
         * `0` on success
         * `-EINVAL` invalid parameter, e.g. when `osd_op.extent.length != osd_op.indata.length()`
-        * `-EOPNOSUPPORT` on unaligned append when `pool.info.requires_aligned_append()` is true
+        * `-EOPNOSUPP` on unaligned append when `pool.info.requires_aligned_append()` is true
         * `-EFBIG` exceeding `osd_max_object_size`
 
     > Write may create object silently.
@@ -441,7 +439,7 @@ bufferlist-based RPC Format
         7. ... more values
         9. `bool truncated` if return data is truncated due to reaching `max_to_get` or `_conf->osd_max_omap_bytes_per_request`
 
-        > 1 ~ 7 can be decoded with Ceph's `decode()` overloaded for `std::map<string, bufferlist>`
+        > 1 ~ 7 can be decoded with `ceph::decode()` overloaded for `std::map<string, bufferlist>`
         >
         > See also `src/osdc/Objecter.h/ObjectOperation/CB_ObjectOperation_decodevals()`
     * return value
@@ -474,7 +472,112 @@ bufferlist-based RPC Format
             * `.length`
     * return value
         * `0` on success
-        * `-EOPNOSUPPORT` on misalign
+        * `-EOPNOSUPP` if pool `requires_aligned_append()`
         * `-EFBIG` exceeding `osd_max_object_size`
 
     > No-op if object does not exist.
+
+* `CEPH_OSD_OP_OMAPRMKEYS`
+    * context (from `Objecter::mutate()`)
+        * `o->snapc`
+        * `o->mtime`
+    * parameters
+        * `osd_op.indata`
+            1. `std::set<std::string>` or `boost::container::flat_set<std::string>` of keys
+    * return value
+        * `0` on success
+        * `-ENOSUPPORT` on pool does not support omap
+        * `-ENOENT` on object not exist
+        * `-EINVAL` on parameter decode error
+
+* `CEPH_OSD_OP_OMAPCLAER`
+    * context (from `Objecter::mutate()`)
+        * `o->snapc`
+        * `o->mtime`
+    * return value
+        * `0` on success
+        * `-EOPNOSUPP` if pool does not support omap
+        * `-ENOENT` if object does not exist
+
+* `CEPH_OSD_OP_SETXATTR`
+    * context
+        * `o->snapc`
+        * `o->mtime`
+    * parameters
+        * `osd_op.xattr`
+            * `.name_len == strlen(name) or 0 if not provided`
+            * `.value_len == bl.length()`
+        * `osd_op.indata`
+            1. `char *name` if provided (trailing `'\0'` not included)
+            2. `ceph::buffer::list bl` value
+    * return value
+        * `0` on success
+        * `-EFBIG` if value larger than `_conf->osd_max_attr_size` (if set)
+        * `-ENAMETOOLONG` if name longer than either `osd->store->get_max_attr_name_length()` or `_conf->osd_max_attr_name_len`
+
+    > May silently create object if not exist.
+
+    > In original Ceph, the on-disk name for an xattr is `"_<name>"` therefore it is okay to not provide xattr name (the corresponding key in DB would be `"_"`).
+
+* `CEPH_OSD_OP_RMXATTR` (namely `Objecter::removexattr()`)
+    * context
+        * `o->snapc`
+        * `o->mtime`
+    * parameters
+        * `osd_op.xattr`
+            * `.name_len == strlen(name) or 0 if not provided`
+            * `.value_len == bl.length()`
+        * `osd_op.indata`
+            1. `char *name` if provided
+    * return value
+        * `0` on success
+        * `-ENOENT` if object does not exist
+
+* `CEPH_OSD_OP_GETXATTR`
+    * context
+        * `o->snapid`
+        * `o->mtime`
+    * parameters
+        * `osd_op.xattr`
+            * `.name_len == strlen(name) or 0 if not provided`
+            * `.value_len == 0`
+        * `osd_op.indata`
+            1. `char *name` if provided
+    * return data
+        1. xattr value
+    * return value
+        * `0` on success
+    * return value length via `osd_op.xattr.value_len`
+
+* `CEPH_OSD_OP_TRUNCATE` (namely `ObjectOperation::truncate()`)
+    * context (from `Objecter::mutate()`)
+        * `o->snapc`
+        * `o->mtime`
+    * parameters
+        * `osd_op.extent`
+            * `.offset`
+            * `.length == 0`
+        * `osd_op.indata`
+            1. empty `ceph::buffer::list`
+    * return value
+        * `0` on success
+        * `-EOPNOSUPP` if pool `requires_aligned_append()`
+        * `-EFBIG` if exceeding `osd_max_object_size`
+
+    > No-op if object does not exist.
+
+* `CEPH_OSD_OP_TRIMTRUNC` (via `src/osdc/Filer.cc/Filer::truncate()`)
+    * context (from `Objecter::_modify()`)
+        * `o->spanc`
+        * `o->mtime`
+    * parameters
+        * `osd_op.extent`
+            * `.truncate_seq`
+                > Truncate sequence seems to be just a sequence number of
+                > asynchronous truncation jobs.
+                >
+                > See also `src/mds/mdstypes.h/struct inode_t`. For every call to
+                > `inode_t::truncate()`, the sequence number increases.
+                > `PrimaryLogPG` treats incoming truncation with no larger seq as
+                > no-op.
+            * `.truncate_size` same as `.offset` with `CEPH_OSD_OP_TRUNCATE`
