@@ -115,8 +115,10 @@ struct sobject_t;
 struct OSDOp {
     ceph_osd_op op;     // opcode, flag and extra calling args
     sobject_t soid;     // stripped object name, not used by CephFS, for it has
-                        // its own stripping logic
-                        // (src/osdc/Striper.cc/Striper::file_to_extents())
+                        // its own stripping (or they call layout) logic
+                        // (see src/osdc/Striper.cc/Striper::file_to_extents()).
+                        // and a metadata object always has object size equal to
+                        // strip size, which is 4MiB
 
     /* `outdata` (should be) pointed to by `out_bl`s, if need to claim return
         data, so we may just stuff return data here, should be safe (?) */
@@ -218,6 +220,7 @@ struct ceph_osd_op {
 
 /* src/include/object.h */
 
+/** short for stripped object */
 struct sobject_t {
     object_t oid;   // { std::string name; }
     snapid_t snap;  // { uint64_t val; }
