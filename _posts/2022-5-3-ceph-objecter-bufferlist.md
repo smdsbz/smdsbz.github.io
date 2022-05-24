@@ -319,6 +319,7 @@ bufferlist-based RPC Format
         1. object content
     * return value
         * `0` on success
+        * `-ENOENT` on object not exist
         * `-EIO` on CRC mismatch and not `CEPH_OSD_OP_FLAG_FAILOK`
         * or whatever lower level throws, `-EAGAIN` and such
     * return successful read length via `osd_op.extent.length`
@@ -421,6 +422,17 @@ bufferlist-based RPC Format
         * `-EOPNOTSUPP` on pool does not support omap
 
 > Below are operations not so common for MDS services.
+
+* `CEPH_OSD_OP_OMAPGETHEADER`
+    * context (from `Objecter::read()`)
+        * `o->snapid`
+    * parameters
+        * none
+    * return data
+        1. header content
+    * return value
+        * `0` always return success, for object that does not have OMAP header
+            just return empty header
 
 * `CEPH_OSD_OP_OMAPGETVALS`
     * context (from `Objecter::read()`)
