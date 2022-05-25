@@ -404,7 +404,7 @@ bufferlist-based RPC Format
 
     > May create object silently.
 
-* `CEPH_OSD_OP_RMKEYS`
+* `CEPH_OSD_OP_OMAPRMKEYS`
     * context
         * `o->snapc`
         * `o->mtime`
