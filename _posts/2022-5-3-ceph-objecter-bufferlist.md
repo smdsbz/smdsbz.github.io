@@ -600,3 +600,20 @@ bufferlist-based RPC Format
                 > `PrimaryLogPG` treats incoming truncation with no larger seq as
                 > no-op.
             * `.truncate_size` same as `.offset` with `CEPH_OSD_OP_TRUNCATE`
+
+
+About Transaction
+-----------------
+
+After the `Op` is constructed on `osdc` (OSD Client) side, the `Op` is sent to
+the remote OSD server for the `OSDOp`s in `Op` to be actually executed.
+
+For read ops, they are eager executed in `PrimaryLogPG::do_osd_ops()` (this
+function sits in `PrimaryLogPG::prepare_transaction()` procedure, which makes its
+naming __really really confusing__, for it only does / performs part of the
+received ops, not all of them). For writes and modifications, on object's blob
+or xattrs or OMAP, they are pushed into `PGTransaction` to be later submitted to
+`PGBackend`.
+
+TODO what about aborted transactions? how's their ops interpreted at `Objecter`
+side? how are their callbacks executed, if at all?
