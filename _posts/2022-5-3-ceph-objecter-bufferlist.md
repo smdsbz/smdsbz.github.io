@@ -431,8 +431,8 @@ bufferlist-based RPC Format
     * return data
         1. header content
     * return value
-        * `0` always return success, for object that does not have OMAP header
-            just return empty header
+        * `0` on success
+        * `-ENOENT` on object not exist
 
 * `CEPH_OSD_OP_OMAPGETVALS`
     * context (from `Objecter::read()`)
@@ -461,7 +461,7 @@ bufferlist-based RPC Format
     * return value
         * `0` on success
         * `-EINVAL` on parameter decode error
-        * `-ENOENT` on no omap
+        * `-ENOENT` on object does not exist
 
 * `CEPH_OSD_OP_OMAPGETVALSBYKEY`
     * context (from `Objecter::read()`)
@@ -477,6 +477,7 @@ bufferlist-based RPC Format
     * return value
         * `0` on success
         * `-EINVAL` on parameter decode error
+        * `-ENOENT` on object does not exist
 
 * `CEPH_OSD_OP_ZERO`
     * context
@@ -563,6 +564,8 @@ bufferlist-based RPC Format
         1. xattr value
     * return value
         * `0` on success
+        * `-ENOENT` on object not exist
+        * `-ENODATA` on xattr not exist
     * return value length via `osd_op.xattr.value_len`
 
 * `CEPH_OSD_OP_TRUNCATE` (namely `ObjectOperation::truncate()`)
