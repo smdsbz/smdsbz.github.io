@@ -615,5 +615,18 @@ received ops, not all of them). For writes and modifications, on object's blob
 or xattrs or OMAP, they are pushed into `PGTransaction` to be later submitted to
 `PGBackend`.
 
-TODO what about aborted transactions? how's their ops interpreted at `Objecter`
-side? how are their callbacks executed, if at all?
+`OSDOp`s of aborted transactions are returned as is, that is, OSD may return
+vector of `OSDOp`s that has the first few ops done, the one somewhere in the
+middle failed and the trailing untouched (default-initialized). The successful
+ops will have `rval` of 0, the failed one will have negative `rval`, and their
+handlers are expected to skip decoding for these ops. The untouched ones will have
+untouched `rval`s, which will probably (behavior defined by handler implementation)
+be zero, their decoding handler will get executed, but will no doubt throw
+`ceph::buffer::error` and then modify its `rval = -EIO`.
+
+The supplied callback (i.e. `onfinish` in `Objecter::handle_osd_op_reply()`),
+however, takes the overall return code (i.e. `rc` in `Objecter::handle_osd_op_reply()`,
+which is the `result` return of `PrimaryLogPG::do_osd_ops()`, the return code of
+the failed and not ignored sub-op in the transactional `Op`). Typically (behavior
+defined by implementation) does nothing or specific error handling if it is not
+zero or positive.
