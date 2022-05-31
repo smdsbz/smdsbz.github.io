@@ -76,7 +76,8 @@ __On successfully return__
         * some context validity checking
         * `op->trace.event("osd op reply)` for zipkin trace
         * re-`_op_submit()` if returnted retry / redirect / `-EAGAIN`
-        * align return data field `out_(bl/rval/ec)` and call `out_handler`
+        * copy return data field `out_(bl/rval/ec)` and call `out_handler` in
+            received `MOSDOpReply` to local `Objecter::Op`
             * `out_bl` pointers in `Objecter::Op` will be forced to point to
                 corresponding received `OSDOp::outdata`
             * `rval` and `ec` will be converted to corresponding host OS error
