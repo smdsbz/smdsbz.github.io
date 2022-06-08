@@ -77,8 +77,13 @@ struct Op {
     ceph::real_time mtime;
 
     /**
-     * final output of the entire sequence of ops, usually organized and filled
-     * by callback
+     * legacy culmulative output
+     *
+     * Used only by certain read ops (getxattr, read, stat), and only when the
+     * overall `Op` has **only one** OSDOp. The content of the only effective
+     * `outdata` is then copied to the upper-layer-supplied bufferlist pointed
+     * to by this pointer (transfered over the network by the dedicated
+     * `Message::data` frame segment).
      */
     ceph::buffer::list *outbl = nullptr;
     /**
