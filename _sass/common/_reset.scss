@@ -139,6 +139,7 @@ a {
 pre, code {
   font-size: map-get($base, font-size-root);
   font-family: map-get($base, font-family-code);
+  font-variant-ligatures: none;
 }
 
 pre > code {
