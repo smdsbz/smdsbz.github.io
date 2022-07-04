@@ -86,38 +86,38 @@ for t in param_ops:
 
 ```python
 for opname, ops in param_ops_by_opname.items():
-    print(opname)
+    print(opname, '\t', 'occurance:', len(ops))
     for op in ops[:3]:
         print(op['params'])
 ```
 
-    write
+    write 	 occurance: 12296
     {'oid': '200.00000001', 'snap': 18446744073709551614, 'osize': 2225, 'oseq': 0, 'offset': 2225, 'length': 2889, 'truncate_size': 0, 'truncate_seq': 0}
     {'oid': '200.00000001', 'snap': 18446744073709551614, 'osize': 5114, 'oseq': 0, 'offset': 5114, 'length': 3158740, 'truncate_size': 0, 'truncate_seq': 0}
     {'oid': '200.00000001', 'snap': 18446744073709551614, 'osize': 3163854, 'oseq': 0, 'offset': 3163854, 'length': 1030450, 'truncate_size': 0, 'truncate_seq': 0}
-    delete
+    delete 	 occurance: 19
     {'oid': '200.00000007', 'snap': 18446744073709551614}
     {'oid': '200.00000008', 'snap': 18446744073709551614}
     {'oid': '200.00000009', 'snap': 18446744073709551614}
-    omapsetheader
+    omapsetheader 	 occurance: 30
     {'oid': 'mds0_openfiles.0', 'snap': 18446744073709551614}
     {'oid': 'mds0_openfiles.0', 'snap': 18446744073709551614}
     {'oid': 'mds0_openfiles.0', 'snap': 18446744073709551614}
-    omapsetvals
+    omapsetvals 	 occurance: 27
     {'oid': 'mds0_openfiles.0', 'snap': 18446744073709551614}
     {'oid': 'mds0_openfiles.0', 'snap': 18446744073709551614}
     {'oid': 'mds0_openfiles.0', 'snap': 18446744073709551614}
-    writefull
+    writefull 	 occurance: 10
     {'oid': '200.00000000', 'snap': 18446744073709551614, 'osize': 90, 'offset': 0, 'length': 90}
     {'oid': '200.00000000', 'snap': 18446744073709551614, 'osize': 90, 'offset': 0, 'length': 90}
     {'oid': '200.00000000', 'snap': 18446744073709551614, 'osize': 90, 'offset': 0, 'length': 90}
-    create
+    create 	 occurance: 1
     {'oid': '10000001976.00000000', 'snap': 18446744073709551614}
-    omaprmkeys
+    omaprmkeys 	 occurance: 25
     {'oid': 'mds0_openfiles.0', 'snap': 18446744073709551614}
     {'oid': 'mds0_openfiles.0', 'snap': 18446744073709551614}
     {'oid': 'mds0_openfiles.0', 'snap': 18446744073709551614}
-    read
+    read 	 occurance: 751
     {'oid': '100000027ee.00000000', 'snap': 18446744073709551614, 'osize': 131, 'oseq': 0, 'offset': 0, 'length': 131, 'truncate_size': 0, 'truncate_seq': 0}
     {'oid': '10000002feb.00000000', 'snap': 18446744073709551614, 'osize': 578, 'oseq': 0, 'offset': 0, 'length': 578, 'truncate_size': 0, 'truncate_seq': 0}
     {'oid': '10000001c2e.00000000', 'snap': 18446744073709551614, 'osize': 982, 'oseq': 0, 'offset': 0, 'length': 982, 'truncate_size': 0, 'truncate_seq': 0}
@@ -169,7 +169,7 @@ for t in param_ops_by_opname['create']:
 print('create parameters:', create_params)
 ```
 
-    create parameters: {'snap', 'oid'}
+    create parameters: {'oid', 'snap'}
     
 
 
@@ -198,7 +198,7 @@ for t in param_ops_by_opname['delete']:
 print('delete parameters:', delete_params)
 ```
 
-    delete parameters: {'snap', 'oid'}
+    delete parameters: {'oid', 'snap'}
     
 
 
@@ -227,7 +227,7 @@ for t in param_ops_by_opname['read']:
 print('read parameters:', read_params)
 ```
 
-    read parameters: {'oseq', 'offset', 'snap', 'oid', 'truncate_size', 'truncate_seq', 'osize', 'length'}
+    read parameters: {'oid', 'offset', 'length', 'truncate_size', 'osize', 'truncate_seq', 'oseq', 'snap'}
     
 
 
@@ -261,7 +261,7 @@ for t in param_ops_by_opname['write']:
 print('write parameters:', write_params)
 ```
 
-    write parameters: {'oseq', 'offset', 'snap', 'oid', 'truncate_size', 'truncate_seq', 'osize', 'length'}
+    write parameters: {'oid', 'offset', 'length', 'truncate_size', 'osize', 'truncate_seq', 'oseq', 'snap'}
     
 
 
@@ -281,7 +281,7 @@ print('all write op flags:', {hex(t['params']['flags']) for t in post_ops if t['
 print('all write op result:', {hex(t['params']['result']) for t in post_ops if t['params']['opname'] == 'write'})
 ```
 
-    all write op flags: {'0x0', '0x20'}
+    all write op flags: {'0x20', '0x0'}
     all write op result: {'0x0'}
     
 
@@ -311,7 +311,7 @@ for t in param_ops_by_opname['writefull']:
 print('writefull parameters:', writefull_params)
 ```
 
-    writefull parameters: {'offset', 'snap', 'oid', 'osize', 'length'}
+    writefull parameters: {'oid', 'offset', 'length', 'osize', 'snap'}
     
 
 
@@ -365,7 +365,7 @@ for t in param_ops_by_opname['omapsetheader']:
 print('omapsetheader parameters:', omapsetheader_params)
 ```
 
-    omapsetheader parameters: {'snap', 'oid'}
+    omapsetheader parameters: {'oid', 'snap'}
     
 
 
@@ -384,7 +384,7 @@ for t in param_ops_by_opname['omapsetvals']:
 print('omapsetvals parameters:', omapsetvals_params)
 ```
 
-    omapsetvals parameters: {'snap', 'oid'}
+    omapsetvals parameters: {'oid', 'snap'}
     
 
 
@@ -403,7 +403,7 @@ for t in param_ops_by_opname['omaprmkeys']:
 print('omaprmkeys parameters:', omaprmkeys_params)
 ```
 
-    omaprmkeys parameters: {'snap', 'oid'}
+    omaprmkeys parameters: {'oid', 'snap'}
     
 
 
