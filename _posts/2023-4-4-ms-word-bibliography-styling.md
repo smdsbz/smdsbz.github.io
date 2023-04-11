@@ -305,14 +305,20 @@ Appendix: Bibliography styling code
 							<b:ImportantField>
 								<xsl:text>b:PeriodicalTitle</xsl:text>
 							</b:ImportantField>
-							<b:ImportantField>
+							<!-- <b:ImportantField>
 								<xsl:text>b:Month</xsl:text>
 							</b:ImportantField>
 							<b:ImportantField>
 								<xsl:text>b:Day</xsl:text>
-							</b:ImportantField>
+							</b:ImportantField> -->
 							<b:ImportantField>
 								<xsl:text>b:Pages</xsl:text>
+							</b:ImportantField>
+							<b:ImportantField>
+								<xsl:text>b:Volume</xsl:text>
+							</b:ImportantField>
+							<b:ImportantField>
+								<xsl:text>b:Issue</xsl:text>
 							</b:ImportantField>
 						</xsl:when>
 
@@ -331,6 +337,9 @@ Appendix: Bibliography styling code
 							</b:ImportantField>
 							<b:ImportantField>
 								<xsl:text>b:ConferenceName</xsl:text>
+							</b:ImportantField>
+							<b:ImportantField>
+								<xsl:text>b:Pages</xsl:text>
 							</b:ImportantField>
 						</xsl:when>
 
@@ -7882,7 +7891,13 @@ Appendix: Bibliography styling code
 							<xsl:call-template name ="BibDisplayTitle"/>
 							<xsl:call-template name="BibDisplayConferenceName" />
 							<xsl:call-template name ="BibDisplayConfCityConfProc"/>
-							<xsl:call-template name ="BibDisplayYear"/>
+							<!-- <xsl:call-template name ="BibDisplayYear"/> -->
+							<xsl:value-of select="b:Year"/>
+							<xsl:if test="count(b:Pages)!=0">
+								<xsl:text>: </xsl:text>
+								<xsl:value-of select="b:Pages"/>
+							</xsl:if>
+							<xsl:call-template name="templ_prop_Dot"/>
 						</xsl:element>
 					</xsl:element>
 				</xsl:element>
@@ -8441,4 +8456,3 @@ Appendix: Bibliography styling code
 	</xsl:template>
 </xsl:stylesheet>
 ```
-
