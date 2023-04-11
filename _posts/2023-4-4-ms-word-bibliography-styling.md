@@ -6508,7 +6508,7 @@ Appendix: Bibliography styling code
 			</xsl:if>
 			<xsl:text>: </xsl:text>
 			<xsl:value-of select="b:Pages"/>
-			<xsl:call-template name ="templ_prop_Dot"/>
+			<!-- <xsl:call-template name ="templ_prop_Dot"/> -->
 			<!-- <xsl:choose>
 				<xsl:when test="$cVolume!=0 or $cIssue!=0 or $cPages!=0 or $cYear!=0">
 					<xsl:call-template name ="templ_prop_ListSeparator"/>
@@ -7496,14 +7496,14 @@ Appendix: Bibliography styling code
 								<xsl:value-of select="b:Month"/>
 								<xsl:call-template name ="templ_prop_Space"/>
 								<xsl:value-of select="b:Year"/>
-								<xsl:call-template name ="templ_prop_Dot"/>
+								<!-- <xsl:call-template name ="templ_prop_Dot"/> -->
 							</xsl:when>
 						</xsl:choose>
 					</xsl:when>
 					<xsl:otherwise>
 						<xsl:if test ="$cYear!=0">
 							<xsl:value-of select="b:Year"/>
-							<xsl:call-template name ="templ_prop_Dot"/>
+							<!-- <xsl:call-template name ="templ_prop_Dot"/> -->
 						</xsl:if>
 					</xsl:otherwise>
 
@@ -7516,7 +7516,7 @@ Appendix: Bibliography styling code
 						<xsl:value-of select="b:Month"/>
 						<xsl:call-template name ="templ_prop_Space"/>
 						<xsl:value-of select="b:Year"/>
-						<xsl:call-template name ="templ_prop_Dot"/>
+						<!-- <xsl:call-template name ="templ_prop_Dot"/> -->
 					</xsl:when>
 				</xsl:choose>
 			</xsl:when>
@@ -7525,14 +7525,14 @@ Appendix: Bibliography styling code
 				<xsl:choose>
 					<xsl:when test="$cYear!=0">
 						<xsl:value-of select="b:Year"/>
-						<xsl:call-template name ="templ_prop_Dot"/>
+						<!-- <xsl:call-template name ="templ_prop_Dot"/> -->
 					</xsl:when>
 				</xsl:choose>
 			</xsl:when>
 
 			<xsl:when test="$cYear!=0">
 				<xsl:value-of select="b:Year"/>
-				<xsl:call-template name ="templ_prop_Dot"/>
+				<!-- <xsl:call-template name ="templ_prop_Dot"/> -->
 			</xsl:when>
 		</xsl:choose>
 	</xsl:template>
@@ -7897,7 +7897,7 @@ Appendix: Bibliography styling code
 								<xsl:text>: </xsl:text>
 								<xsl:value-of select="b:Pages"/>
 							</xsl:if>
-							<xsl:call-template name="templ_prop_Dot"/>
+							<!-- <xsl:call-template name="templ_prop_Dot"/> -->
 						</xsl:element>
 					</xsl:element>
 				</xsl:element>
