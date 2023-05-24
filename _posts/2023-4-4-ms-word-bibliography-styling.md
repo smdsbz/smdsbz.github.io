@@ -52,8 +52,43 @@ Limitations
 -----------
 
 * There is always an empty space before and after the citation text. This
-    behavior is hard-coded into the MS Word templating engine, and there is
-    nothing I can do about it.
+    behavior is hard-coded into the MS Word templating engine, you will have to
+    enable "Design Mode" (开发工具-控件-设计模式), and perform a global
+    pattern-matching replacement to trim the citation.
+
+    ```vb
+    Sub 删除文献引用前后空格()
+    '
+    ' 删除文献引用前后空格 宏
+    '
+    '
+        ' 需要手动开关设计模式
+        'ActiveDocument.ToggleFormsDesign
+        'Selection.Find.ClearFormatting
+        Selection.Find.Replacement.ClearFormatting
+        With Selection.Find.Replacement.Font
+            .Superscript = True
+            .Subscript = False
+        End With
+        With Selection.Find
+            .Text = " \[(*)\] "
+            .Replacement.Text = "[\1]"
+            .Forward = True
+            .Wrap = wdFindContinue
+            .Format = True
+            .MatchCase = False
+            .MatchWholeWord = False
+            .MatchByte = False
+            .MatchAllWordForms = False
+            .MatchSoundsLike = False
+            .MatchFuzzy = False
+            .MatchWildcards = True
+        End With
+        Selection.Find.Execute Replace:=wdReplaceAll
+        'ActiveDocument.ToggleFormsDesign
+    End Sub
+    ```
+
 * You may have to manually widen the column width of the indices in the
     generated bibliography table if you have more than 60~70 source entries.
 
@@ -305,20 +340,14 @@ Appendix: Bibliography styling code
 							<b:ImportantField>
 								<xsl:text>b:PeriodicalTitle</xsl:text>
 							</b:ImportantField>
-							<!-- <b:ImportantField>
+							<b:ImportantField>
 								<xsl:text>b:Month</xsl:text>
 							</b:ImportantField>
 							<b:ImportantField>
 								<xsl:text>b:Day</xsl:text>
-							</b:ImportantField> -->
+							</b:ImportantField>
 							<b:ImportantField>
 								<xsl:text>b:Pages</xsl:text>
-							</b:ImportantField>
-							<b:ImportantField>
-								<xsl:text>b:Volume</xsl:text>
-							</b:ImportantField>
-							<b:ImportantField>
-								<xsl:text>b:Issue</xsl:text>
 							</b:ImportantField>
 						</xsl:when>
 
@@ -337,9 +366,6 @@ Appendix: Bibliography styling code
 							</b:ImportantField>
 							<b:ImportantField>
 								<xsl:text>b:ConferenceName</xsl:text>
-							</b:ImportantField>
-							<b:ImportantField>
-								<xsl:text>b:Pages</xsl:text>
 							</b:ImportantField>
 						</xsl:when>
 
@@ -6508,7 +6534,7 @@ Appendix: Bibliography styling code
 			</xsl:if>
 			<xsl:text>: </xsl:text>
 			<xsl:value-of select="b:Pages"/>
-			<!-- <xsl:call-template name ="templ_prop_Dot"/> -->
+			<xsl:call-template name ="templ_prop_Dot"/>
 			<!-- <xsl:choose>
 				<xsl:when test="$cVolume!=0 or $cIssue!=0 or $cPages!=0 or $cYear!=0">
 					<xsl:call-template name ="templ_prop_ListSeparator"/>
@@ -7496,14 +7522,14 @@ Appendix: Bibliography styling code
 								<xsl:value-of select="b:Month"/>
 								<xsl:call-template name ="templ_prop_Space"/>
 								<xsl:value-of select="b:Year"/>
-								<!-- <xsl:call-template name ="templ_prop_Dot"/> -->
+								<xsl:call-template name ="templ_prop_Dot"/>
 							</xsl:when>
 						</xsl:choose>
 					</xsl:when>
 					<xsl:otherwise>
 						<xsl:if test ="$cYear!=0">
 							<xsl:value-of select="b:Year"/>
-							<!-- <xsl:call-template name ="templ_prop_Dot"/> -->
+							<xsl:call-template name ="templ_prop_Dot"/>
 						</xsl:if>
 					</xsl:otherwise>
 
@@ -7516,7 +7542,7 @@ Appendix: Bibliography styling code
 						<xsl:value-of select="b:Month"/>
 						<xsl:call-template name ="templ_prop_Space"/>
 						<xsl:value-of select="b:Year"/>
-						<!-- <xsl:call-template name ="templ_prop_Dot"/> -->
+						<xsl:call-template name ="templ_prop_Dot"/>
 					</xsl:when>
 				</xsl:choose>
 			</xsl:when>
@@ -7525,14 +7551,14 @@ Appendix: Bibliography styling code
 				<xsl:choose>
 					<xsl:when test="$cYear!=0">
 						<xsl:value-of select="b:Year"/>
-						<!-- <xsl:call-template name ="templ_prop_Dot"/> -->
+						<xsl:call-template name ="templ_prop_Dot"/>
 					</xsl:when>
 				</xsl:choose>
 			</xsl:when>
 
 			<xsl:when test="$cYear!=0">
 				<xsl:value-of select="b:Year"/>
-				<!-- <xsl:call-template name ="templ_prop_Dot"/> -->
+				<xsl:call-template name ="templ_prop_Dot"/>
 			</xsl:when>
 		</xsl:choose>
 	</xsl:template>
@@ -7891,13 +7917,7 @@ Appendix: Bibliography styling code
 							<xsl:call-template name ="BibDisplayTitle"/>
 							<xsl:call-template name="BibDisplayConferenceName" />
 							<xsl:call-template name ="BibDisplayConfCityConfProc"/>
-							<!-- <xsl:call-template name ="BibDisplayYear"/> -->
-							<xsl:value-of select="b:Year"/>
-							<xsl:if test="count(b:Pages)!=0">
-								<xsl:text>: </xsl:text>
-								<xsl:value-of select="b:Pages"/>
-							</xsl:if>
-							<!-- <xsl:call-template name="templ_prop_Dot"/> -->
+							<xsl:call-template name ="BibDisplayYear"/>
 						</xsl:element>
 					</xsl:element>
 				</xsl:element>
