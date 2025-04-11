@@ -1,6 +1,7 @@
 .article__content {
   word-wrap: break-word;
   line-height: map-get($base, line-height);
+  text-align: justify;
   @include block-elements() {
     margin: map-get($base, vertical-space-lg) 0;
   }
