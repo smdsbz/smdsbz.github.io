@@ -20,7 +20,7 @@ url: https://smdsbz.github.io
 baseurl: /
 title: "Xiaoguang Zhu's Blog"
 description: >
-    CS Undergrad @ HUST
+    @ Aliyun Shanghai
 
 
 ## => Language and Timezone
@@ -106,7 +106,7 @@ analytics:
     anonymize_op: true
 
 toc:
-  selectors: "h1,h2"
+  selectors: "h1,h2,h3"
 
 ## => Build
 ##############################
